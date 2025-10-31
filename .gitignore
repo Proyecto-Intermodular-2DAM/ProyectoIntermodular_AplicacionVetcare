@@ -1,0 +1,26 @@
+# --- Node / React / Ionic ---
+node_modules/
+dist/
+build/
+.pnpm-store/
+.vscode/
+.DS_Store
+*.log
+*.tmp
+
+# --- Spring Boot ---
+backend/target/
+backend/build/
+backend/.gradle/
+backend/out/
+backend/.idea/
+
+# --- Environment / config ---
+.env
+.env.local
+.env.production
+.env.development
+
+# --- OS / Editor ---
+Thumbs.db
+*.iml

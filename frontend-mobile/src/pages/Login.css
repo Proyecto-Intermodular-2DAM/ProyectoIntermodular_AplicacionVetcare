@@ -1,0 +1,115 @@
+/*
+ * Centra el contenido en el medio de la pantalla y añade el gradiente.
+ */
+ion-content.login-background {
+  --background: linear-gradient(to bottom, #80cbc4, #00695c);
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  width: 100%;
+}
+
+/*
+ * Tarjeta de Login: Se aplica la apariencia de caja.
+ */
+.login-card {
+  max-width: 400px;
+  width: 100%;
+  background: #f8f7fa;
+  border-radius: 20px;
+  box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease-in-out;
+}
+
+/*
+ * Contenido interno de la tarjeta: Flexbox para organizar los elementos verticalmente.
+ */
+.login-card-content {
+  padding: 40px 32px;
+  text-align: center;
+}
+
+/* Animación sutil al pasar el ratón (solo en escritorio) */
+@media (hover: hover) {
+  .login-card:hover {
+    transform: translateY(-4px);
+  }
+}
+
+/* Icono */
+.login-icon {
+  font-size: 64px;
+  color: #00695c;
+  margin-bottom: 12px;
+}
+
+/* Título */
+.login-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #00695c;
+  margin-bottom: 24px;
+}
+
+/*
+ * Estilo de los campos de entrada (IonItem).
+ * Esto es lo que necesitas para que se vean blancos y con borde.
+ */
+/* Inputs */
+.login-input {
+  margin-bottom: 20px;
+  --padding-start: 12px;
+  --border-radius: 8px;
+  --highlight-color-focused: #00695c;
+  
+  --background: #ffffff; /* Fondo blanco para el campo */
+  
+  /* Aquí están las propiedades clave para los bordes */
+  --border-color: #939191; /* Un color de borde gris más oscuro */
+  --border-style: solid; 
+  --border-width: 2px; /* Un grosor de borde un poco más grande */
+  
+  --color: #333; /* El color del texto que se escribe */
+  width: 100%;
+}
+
+/* Para los iconos y etiquetas */
+.login-input ion-icon {
+  color: #00695c;
+}
+
+.login-input ion-label {
+    --color: #00695c; /* Color de la etiqueta flotante */
+}
+
+/* Botón */
+.login-button {
+  --background: #00695c;
+  --background-hover: #004d40;
+  --color: white;
+  --border-radius: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  margin-top: 12px;
+  height: 44px;
+  width: 100%;
+}
+
+/* 📱 Ajustes para pantallas pequeñas */
+@media (max-width: 480px) {
+  .login-card-content {
+    padding: 24px 16px;
+  }
+
+  .login-title {
+    font-size: 20px;
+  }
+
+  .login-icon {
+    font-size: 52px;
+  }
+}
