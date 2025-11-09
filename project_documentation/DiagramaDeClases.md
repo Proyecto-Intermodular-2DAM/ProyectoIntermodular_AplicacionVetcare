@@ -1,5 +1,7 @@
 ## 10. Diagrama de Clases
 
+![img_91.png](img_91.png)
+
 Este diagrama muestra un **modelo entidad-relación orientado a clases (UML)** de un sistema de **gestión veterinaria**. A continuación, un resumen de sus partes:
 
 - **Empleado:** contiene los datos del personal (DNI, nombre, teléfono, cuenta, sueldo).  
