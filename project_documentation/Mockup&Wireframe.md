@@ -8,12 +8,6 @@ Pantalla recuperar contraseña.
 
 ![img_17.png](img_17.png)
 
-
-
-
-
-
-
 Pantalla de error.
 
 ![img_18.png](img_18.png)
@@ -22,22 +16,14 @@ Pantalla gestión de citas
 
 ![img_19.png](img_19.png)
 
-
-
-
-
 Pantalla de historial de citas.
 
 ![img_20.png](img_20.png)
-
-
 
 Pantalla de gestión de empleados.
 
 
 ![img_22.png](img_22.png)
-
-
 
 
 Pantalla de historial de empleados.
@@ -47,10 +33,6 @@ Pantalla de historial de empleados.
 Pantalla de gestión de centros.
 
 ![img_24.png](img_24.png)
-
-
-
-
 
 Pantalla historial de centro.
 
@@ -66,7 +48,6 @@ Pantalla Listado de animales.
 
 Pantalla de gestión de salas.
 
-
 ![img_29.png](img_29.png)
 
 
@@ -78,10 +59,6 @@ Pantalla de gestión de tratamiento.
 
 ![img_30.png](img_30.png)
 
-
-
-
-
 Pantalla listada de tratamientos.
 
 ![img_31.png](img_31.png)
@@ -90,26 +67,15 @@ Pantalla gestión de adopción.
 
 ![img_32.png](img_32.png)
 
-
-
-
-
 Pantalla de historial de adopción.
 
 ![img_33.png](img_33.png)
 
 Pantalla de gestión de clientes.
 
-
-
 ![img_34.png](img_34.png)
 
-
-
 Pantalla de listado de cliente
-
-
-
 
 ![img_35.png](img_35.png)
 
@@ -127,98 +93,64 @@ Pantalla de listado de cliente
 ## Wireframe aplicación Movil
 
 Inicio de sesión
+
 ![img_36.png](img_36.png)
 
 Recuperar Contraseña
-![img_38.png](img_38.png)
 
+![img_38.png](img_38.png)
 
 Registrarse
 
 ![img_39.png](img_39.png)
 
-
-
-
 Confirmación registro
-
 
 ![img_40.png](img_40.png)
 
-
 Registro fallido
-
 
 ![img_41.png](img_41.png)
 
-
 Menú
-
-
 
 ![img_42.png](img_42.png)
 
-
-
 Adopción.
-
 
 ![img_43.png](img_43.png)
 
-
 Adopciones
-
 
 ![img_44.png](img_44.png)
 
-
 Condiciones legales
-
 
 ![img_45.png](img_45.png)
 
-
 Contáctanos
-
 
 ![img_46.png](img_46.png)
 
-
 Citas
-
 
 ![img_47.png](img_47.png)
 
-
 Historial
-
-
 
 ![img_48.png](img_48.png)
 
-
-
 Lista Animales
-
 
 ![img_49.png](img_49.png)
 
-
 Tratamientos
-
-
-
 
 ![img_50.png](img_50.png)
 
-
-
-
 Perfil Usuario
 
-
 ![img_51.png](img_51.png)
-
 
 Editar perfil
 
