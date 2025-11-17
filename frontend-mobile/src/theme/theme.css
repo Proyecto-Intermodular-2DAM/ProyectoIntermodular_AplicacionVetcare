@@ -1,0 +1,154 @@
+/*  
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap'); 
+    pnpm install @fontsource/roboto -- evito problemas de CORS y errores de carga de fuentes
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap'); 
+    pnpm install @fontsource/poppins -- evito problemas de CORS y errores de carga de fuentes
+*/
+
+:root {
+    /* 
+    -------------
+    Colorometría
+    ------------- 
+    */
+    /* Colores primario y secundario */
+    --color-primary: rgba(0, 77, 64, 1);
+    --color-secondary: rgba(128, 203, 196, 1);
+
+    /* Black colors */
+    --color-black-1: rgba(0, 0, 0, 1);
+    --color-black-2: rgba(33, 33, 33, 1);
+    --color-black-3: rgba(66, 66, 66, 1);
+    --color-white: rgba(255, 255, 255, 1);
+
+    /* Grey colors */
+    --color-grey-1: rgba(97, 97, 97, 1);
+    --color-grey-2: rgba(158, 158, 158, 1);
+    --color-grey-3: rgba(189, 189, 189, 1);
+    --color-grey-4: rgba(238, 238, 238, 1);
+    --color-grey-5: rgba(245, 245, 245, 1);
+
+    /* State Colors */
+    --color-info: rgba(33, 150, 243, 1);
+    --color-error: rgba(229, 57, 53, 1);
+    --color-succes: rgba(76, 175, 80, 1);
+    --color-warning: rgba(255, 152, 0, 1);
+
+    --dropshadow: 0px 4px 24px 0px rgba(9, 44, 76, 0.4);
+
+    /* 
+    -------------
+    Tipografías
+    ------------- 
+    */
+
+    /* Global Font Family */
+    font-family: 'Poppins', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+
+    /* Heading 1 */
+    /* --heading-h1-font-family: "Poppins", Helvetica; */
+    --heading-h1-font-size: 56px;
+    --heading-h1-font-style: normal;
+    --heading-h1-font-weight: 700;
+    --heading-h1-letter-spacing: 0px;
+    --heading-h1-line-height: 61.599998474121094px;
+
+    /* Heading 2 */
+    /* --heading-h2-font-family: "Inter", Helvetica; */
+    --heading-h2-font-size: 48px;
+    --heading-h2-font-style: normal;
+    --heading-h2-font-weight: 700;
+    --heading-h2-letter-spacing: 0px;
+    --heading-h2-line-height: 52.79999923706055px;
+    /* Heading 3 */
+    /* --heading-h3-font-family: "Inter", Helvetica; */
+    --heading-h3-font-size: 40px;
+    --heading-h3-font-style: normal;
+    --heading-h3-font-weight: 700;
+    --heading-h3-letter-spacing: 0px;
+    --heading-h3-line-height: 44px;
+
+    /* Heading 4 */
+    /* --heading-h4-font-family: "Inter", Helvetica; */
+    --heading-h4-font-size: 32px;
+    --heading-h4-font-style: normal;
+    --heading-h4-font-weight: 700;
+    --heading-h4-letter-spacing: 0px;
+    --heading-h4-line-height: 35.20000076293945px;
+
+    /* Heading 5 */
+    /* --heading-h5-font-family: "Inter", Helvetica; */
+    --heading-h5-font-size: 24px;
+    --heading-h5-font-style: normal;
+    --heading-h5-font-weight: 700;
+    --heading-h5-letter-spacing: 0px;
+    --heading-h5-line-height: 26.399999618530273px;
+
+    /* Heading 6 */
+    /* --heading-h6-font-family: "Inter", Helvetica; */
+    --heading-h6-font-size: 20px;
+    --heading-h6-font-style: normal;
+    --heading-h6-font-weight: 600;
+    --heading-h6-letter-spacing: 0px;
+    --heading-h6-line-height: 22px;
+
+    /* Text Style Large */
+    /* --text-large-bold-font-family: "Poppins", Helvetica; */
+    --text-large-bold-font-size: 20px;
+    --text-large-bold-font-style: normal;
+    --text-large-bold-font-weight: 700;
+    --text-large-bold-letter-spacing: 0px;
+    --text-large-bold-line-height: 28px;
+
+    /* --text-large-font-family: "Poppins", Helvetica; */
+    --text-large-font-size: 20px;
+    --text-large-font-style: normal;
+    --text-large-font-weight: 400;
+    --text-large-letter-spacing: 0px;
+    --text-large-line-height: 28px;
+
+    /* Text Style Medium */
+    /* --text-medium-bold-font-family: "Poppins", Helvetica; */
+    --text-medium-bold-font-size: 18px;
+    --text-medium-bold-font-style: normal;
+    --text-medium-bold-font-weight: 700;
+    --text-medium-bold-letter-spacing: 0px;
+    --text-medium-bold-line-height: 25.200000762939453px;
+
+    /* --text-medium-font-family: "Poppins", Helvetica; */
+    --text-medium-font-size: 18px;
+    --text-medium-font-style: normal;
+    --text-medium-font-weight: 400;
+    --text-medium-letter-spacing: 0px;
+    --text-medium-line-height: 25.200000762939453px;
+    
+    /* Text Style Normal */
+    /* --text-normal-bold-font-family: "Roboto", Helvetica; */
+    --text-normal-bold-font-size: 16px;
+    --text-normal-bold-font-style: normal;
+    --text-normal-bold-font-weight: 700;
+    --text-normal-bold-letter-spacing: 0px;
+    --text-normal-bold-line-height: 22.399999618530273px;
+
+    --text-normal-font-family: "Poppins", Helvetica;
+    --text-normal-font-size: 16px;
+    --text-normal-font-style: normal;
+    --text-normal-font-weight: 400;
+    --text-normal-letter-spacing: 0px;
+    --text-normal-line-height: 22.399999618530273px;
+
+    /* Text Style Small */
+    /* --text-small-bold-font-family: "Poppins", Helvetica; */
+    --text-small-bold-font-size: 14px;
+    --text-small-bold-font-style: normal;
+    --text-small-bold-font-weight: 700;
+    --text-small-bold-letter-spacing: 0px;
+    --text-small-bold-line-height: 19.600000381469727px;
+
+    --text-small-font-family: "Poppins", Helvetica;
+    --text-small-font-size: 14px;
+    --text-small-font-style: normal;
+    --text-small-font-weight: 400;
+    --text-small-letter-spacing: 0px;
+    --text-small-line-height: 19.600000381469727px;
+}
