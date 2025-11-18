@@ -1,0 +1,148 @@
+/* --- Variables de Color basadas en el diseño original --- */
+:root {
+    /* Color principal (usado para botones, enlaces, bordes de input, texto secundario) */
+    --color-primary-design: #006458; 
+    /* Color de fondo de la página (bg-color-secondary) */
+    --color-secondary-bg-design: #e0f2f1; 
+    /* Color de fondo de la tarjeta */
+    --color-card-bg: #ffffff; 
+    /* Color de texto general (lo mantendremos negro o lo ajustaremos según el diseño final) */
+    --color-text-design: #000000; 
+}
+
+/* 1. Fondo de la Página (Simula bg-color-secondary) */
+.login-page-background {
+    --ion-background-color: var(--color-secondary-bg-design);
+}
+
+/* 2. Contenedor Central (Simula la posición de la main card) */
+.login-center-container {
+    display: flex;
+    justify-content: center;
+    /* Usamos margin-top para simular el top: 23.45% del diseño original */
+    padding-top: 23.45%;
+    min-height: 100vh;
+}
+
+/* 3. Estilo de la Tarjeta de Login */
+.login-card {
+    width: 83.25%; /* Ancho basado en el diseño original */
+    max-width: 412px; /* Límite de ancho para que no se estire demasiado */
+    height: fit-content;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --background: var(--color-card-bg);
+    margin-bottom: 50px; /* Espacio inferior para evitar que se pegue al pie */
+}
+
+.login-card-content {
+    padding: 24px 16px; /* px-4 py-6 del diseño original */
+    /* Nota: Se recomienda gestionar el espaciado entre elementos con margin-bottom */
+}
+
+/* 4. Cabecera, Logo y Título */
+.login-header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px; /* gap-6 del diseño original */
+    margin-bottom: 24px; /* Separación de la cabecera con los inputs */
+}
+
+.login-icon {
+    font-size: 46px; /* Tamaño del icono */
+    color: var(--color-primary-design);
+}
+
+.login-title {
+    font-size: 24px; /* heading-h4 del diseño original */
+    font-weight: 600;
+    color: var(--color-primary-design);
+    margin: 0;
+}
+
+.login-signup-text {
+    color: var(--color-primary-design);
+    font-size: 16px;
+    margin: 0;
+}
+
+.login-signup-button {
+    color: var(--color-primary-design);
+    font-weight: bold;
+    background: none;
+    border: none;
+    padding: 0 4px;
+    cursor: pointer;
+}
+
+/* 5. CAMPOS DE ENTRADA (IonItem y IonInput) - CORRECCIÓN CLAVE */
+.login-input {
+    /* Hacemos el fondo del IonItem TRANSPARENTE */
+    --background: transparent; 
+    
+    /* Remueve los estilos por defecto del item para aplicar el borde */
+    --inner-border-width: 0;
+    --border-color: transparent;
+    --highlight-color-valid: transparent;
+    --highlight-color-focused: transparent;
+    
+    /* El borde visible se aplica al IonItem */
+    border: 1px solid var(--color-primary-design);
+    border-radius: 6px;
+    height: 46px;
+    margin-bottom: 24px; /* gap-6 entre los campos del diseño original */
+    padding: 0 16px; /* px-4 del diseño original */
+}
+
+/* Ajuste del color del icono y el color del texto dentro del IonInput */
+.login-input ion-icon {
+    color: var(--color-primary-design); /* Color del icono de la patita */
+    margin-right: 8px;
+}
+
+.login-input ion-input {
+    /* Hacemos el fondo del input (que está dentro del item) TRANSPARENTE */
+    --background: transparent; 
+    /* El texto debe ser del color principal para coincidir con tu diseño, o blanco/negro si cambia */
+    --color: var(--color-primary-design);
+}
+
+/* 6. OPCIONES (Recordarme y Recuperar Contraseña) - CORRECCIÓN CLAVE */
+.login-options-grid {
+    margin-bottom: 24px; /* gap-6 entre las opciones y el botón de Sign in */
+    /* Asegura que el color de texto en toda la grid sea visible */
+    color: var(--color-primary-design);
+}
+
+.login-remember-me {
+    /* Hacemos el fondo del IonItem que contiene el checkbox TRANSPARENTE */
+    --background: transparent;
+    --padding-start: 0;
+    --inner-padding-end: 0;
+    --inner-border-width: 0;
+    /* Ajustamos el color del texto del label */
+    --color: var(--color-primary-design); 
+}
+
+.login-label {
+    color: var(--color-primary-design);
+    font-size: 14px;
+}
+
+.login-recover-password-button {
+    --color: var(--color-primary-design);
+    font-weight: bold;
+    font-size: 14px;
+    text-transform: none;
+}
+
+/* 7. Botón de Iniciar Sesión */
+.login-button {
+    --background: var(--color-primary-design);
+    --color: white;
+    font-weight: bold;
+    height: 48px;
+    --border-radius: 6px;
+    text-transform: none;
+}
