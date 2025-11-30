@@ -39,7 +39,7 @@ public class Animal {
 
     @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<HistorialAdopcion> adoptions;
+    private List<AdoptionHistory> adoptions;
 
     @OneToMany(mappedBy = "animal", cascade = CascadeType.ALL)
     @JsonIgnore

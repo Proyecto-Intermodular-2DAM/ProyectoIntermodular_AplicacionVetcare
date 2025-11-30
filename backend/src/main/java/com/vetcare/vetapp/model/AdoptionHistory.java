@@ -10,7 +10,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "adoption_history")
 @Data
-public class HistorialAdopcion {
+public class AdoptionHistory {
 
     @Id
     @UuidGenerator

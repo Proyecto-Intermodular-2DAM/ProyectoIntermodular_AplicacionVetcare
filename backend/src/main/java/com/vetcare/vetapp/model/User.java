@@ -62,7 +62,7 @@ public class User {
 
     @OneToMany(mappedBy = "adopter", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<HistorialAdopcion> adoptions;
+    private List<AdoptionHistory> adoptions;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     @JsonIgnore
