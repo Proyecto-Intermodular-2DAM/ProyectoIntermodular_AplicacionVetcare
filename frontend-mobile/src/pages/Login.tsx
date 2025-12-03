@@ -44,6 +44,7 @@ const Login: React.FC = () => {
 
     const handleRecoverPassword = () => {
         console.log("Navegar a recuperación de contraseña");
+        history.push("/passwordRecovery");
         // history.push("/recover-password"); // Ejemplo de navegación
     };
 

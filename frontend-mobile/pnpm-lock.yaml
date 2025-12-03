@@ -10,25 +10,25 @@ importers:
     dependencies:
       '@capacitor/android':
         specifier: 7.4.3
-        version: 7.4.3(@capacitor/core@7.4.3)
+        version: 7.4.3(@capacitor/core@7.4.4)
       '@capacitor/app':
         specifier: 7.1.0
-        version: 7.1.0(@capacitor/core@7.4.3)
+        version: 7.1.0(@capacitor/core@7.4.4)
       '@capacitor/core':
-        specifier: 7.4.3
-        version: 7.4.3
+        specifier: 7.4.4
+        version: 7.4.4
       '@capacitor/haptics':
         specifier: 7.0.2
-        version: 7.0.2(@capacitor/core@7.4.3)
+        version: 7.0.2(@capacitor/core@7.4.4)
       '@capacitor/ios':
         specifier: 7.4.3
-        version: 7.4.3(@capacitor/core@7.4.3)
+        version: 7.4.3(@capacitor/core@7.4.4)
       '@capacitor/keyboard':
         specifier: 7.0.3
-        version: 7.0.3(@capacitor/core@7.4.3)
+        version: 7.0.3(@capacitor/core@7.4.4)
       '@capacitor/status-bar':
         specifier: 7.0.3
-        version: 7.0.3(@capacitor/core@7.4.3)
+        version: 7.0.3(@capacitor/core@7.4.4)
       '@ionic/react':
         specifier: ^8.7.4
         version: 8.7.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -61,8 +61,8 @@ importers:
         version: 5.3.4(react@19.1.1)
     devDependencies:
       '@capacitor/cli':
-        specifier: 7.4.3
-        version: 7.4.3
+        specifier: 7.4.4
+        version: 7.4.4
       '@testing-library/dom':
         specifier: '>=7.21.4'
         version: 10.4.1
@@ -75,6 +75,9 @@ importers:
       '@testing-library/user-event':
         specifier: ^14.4.3
         version: 14.6.1(@testing-library/dom@10.4.1)
+      '@types/jest':
+        specifier: ^30.0.0
+        version: 30.0.0
       '@types/react':
         specifier: 19.0.10
         version: 19.0.10
@@ -646,13 +649,13 @@ packages:
     peerDependencies:
       '@capacitor/core': '>=7.0.0'
 
-  '@capacitor/cli@7.4.3':
-    resolution: {integrity: sha512-SWozpdDgrbQ/ry1nIapugDFvE9z+l22BmU/+fpgL2Zv5487hGdXvCX5+1SluuFBP3IPpx6b4LjsKnBigyJoUWg==}
+  '@capacitor/cli@7.4.4':
+    resolution: {integrity: sha512-J7ciBE7GlJ70sr2s8oz1+H4ZdNk4MGG41fsakUlDHWva5UWgFIZYMiEdDvGbYazAYTaxN3lVZpH9zil9FfZj+Q==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
-  '@capacitor/core@7.4.3':
-    resolution: {integrity: sha512-wCWr8fQ9Wxn0466vPg7nMn0tivbNVjNy1yL4GvDSIZuZx7UpU2HeVGNe9QjN/quEd+YLRFeKEBLBw619VqUiNg==}
+  '@capacitor/core@7.4.4':
+    resolution: {integrity: sha512-xzjxpr+d2zwTpCaN0k+C6wKSZzWFAb9OVEUtmO72ihjr/NEDoLvsGl4WLfjWPcCO2zOy0b2X52tfRWjECFUjtw==}
 
   '@capacitor/haptics@7.0.2':
     resolution: {integrity: sha512-vqfeEM6s2zMgLjpITCTUIy7P/hadq/Gr5E/RClFgMJPB41Y5FsqOKD+j85/uwh8N2cf/aWaPeXUmjnTzJbEB2g==}
@@ -4492,15 +4495,15 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@capacitor/android@7.4.3(@capacitor/core@7.4.3)':
+  '@capacitor/android@7.4.3(@capacitor/core@7.4.4)':
     dependencies:
-      '@capacitor/core': 7.4.3
+      '@capacitor/core': 7.4.4
 
-  '@capacitor/app@7.1.0(@capacitor/core@7.4.3)':
+  '@capacitor/app@7.1.0(@capacitor/core@7.4.4)':
     dependencies:
-      '@capacitor/core': 7.4.3
+      '@capacitor/core': 7.4.4
 
-  '@capacitor/cli@7.4.3':
+  '@capacitor/cli@7.4.4':
     dependencies:
       '@ionic/cli-framework-output': 2.2.8
       '@ionic/utils-subprocess': 3.0.1
@@ -4522,25 +4525,25 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@capacitor/core@7.4.3':
+  '@capacitor/core@7.4.4':
     dependencies:
       tslib: 2.8.1
 
-  '@capacitor/haptics@7.0.2(@capacitor/core@7.4.3)':
+  '@capacitor/haptics@7.0.2(@capacitor/core@7.4.4)':
     dependencies:
-      '@capacitor/core': 7.4.3
+      '@capacitor/core': 7.4.4
 
-  '@capacitor/ios@7.4.3(@capacitor/core@7.4.3)':
+  '@capacitor/ios@7.4.3(@capacitor/core@7.4.4)':
     dependencies:
-      '@capacitor/core': 7.4.3
+      '@capacitor/core': 7.4.4
 
-  '@capacitor/keyboard@7.0.3(@capacitor/core@7.4.3)':
+  '@capacitor/keyboard@7.0.3(@capacitor/core@7.4.4)':
     dependencies:
-      '@capacitor/core': 7.4.3
+      '@capacitor/core': 7.4.4
 
-  '@capacitor/status-bar@7.0.3(@capacitor/core@7.4.3)':
+  '@capacitor/status-bar@7.0.3(@capacitor/core@7.4.4)':
     dependencies:
-      '@capacitor/core': 7.4.3
+      '@capacitor/core': 7.4.4
 
   '@colors/colors@1.5.0':
     optional: true
