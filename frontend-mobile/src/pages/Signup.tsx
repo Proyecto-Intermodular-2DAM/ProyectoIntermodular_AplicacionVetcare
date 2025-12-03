@@ -33,7 +33,7 @@ const Signup: React.FC = () => {
 
         // TODO: conectar con backend (AuthService) para registro
         if (name && surname && email && dni && pass) {
-            history.push("/home");
+            history.push("/signUpSuccessful");
         }
     };
 

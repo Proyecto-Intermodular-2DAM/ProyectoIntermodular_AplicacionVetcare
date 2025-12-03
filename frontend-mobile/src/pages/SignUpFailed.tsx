@@ -6,11 +6,11 @@ import {
     IonIcon,
     IonButton
 } from "@ionic/react";
-import { paw } from "ionicons/icons";
-import "../theme/Login.css";
+import { paw, closeCircle } from "ionicons/icons";
+import "../theme/SignUp.css";
 import { useHistory } from "react-router-dom";
 
-const PasswordRecovery: React.FC = () => {
+const SignUpFailed: React.FC = () => {
 
     const history = useHistory();
 
@@ -27,17 +27,14 @@ const PasswordRecovery: React.FC = () => {
                             
                             <header className="login-header-container">
                                 <IonIcon icon={paw} className="login-icon" />
-                                <h1 className="login-title">Recuperar contraseña</h1>
+                                <h1 className="login-title">Error al Registrarse</h1>
 
                                 <p className="login-signup-text">
-                                    ¡Listo! Te enviamos un Gmail con el enlace
-                                    para restablecer tu contraseña.
+                                    Ha habido un error al registrar el usuario,
+                                    vuelve a intentarlo más tarde.
                                 </p>
 
-                                <p className="login-signup-text">
-                                    Revisa tu bandeja de entrada o la carpeta
-                                    de spam si no lo ves enseguida.
-                                </p>
+                                <IonIcon icon={closeCircle} className="signup-failed" />
                             </header>
 
                             <IonButton expand="block" className="login-button" onClick={goToLogin}>
@@ -52,4 +49,4 @@ const PasswordRecovery: React.FC = () => {
     );
 };
 
-export default PasswordRecovery;
+export default SignUpFailed;
