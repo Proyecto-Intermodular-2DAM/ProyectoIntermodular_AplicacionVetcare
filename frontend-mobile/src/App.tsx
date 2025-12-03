@@ -4,6 +4,8 @@ import { IonReactRouter } from '@ionic/react-router';
 
 /* Theme variables */
 import Login from './pages/Login';
+import ErrorPage from './pages/ErrorPage';
+import LegalTerms from './pages/LegalTerms';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 
@@ -35,6 +37,8 @@ import '@ionic/react/css/display.css';
 /* import '@ionic/react/css/palettes/dark.class.css'; */
 import '@ionic/react/css/palettes/dark.system.css';
 import PasswordRecovery from './pages/PasswordRecovery';
+import SignUpSuccessful from './pages/SignUpSuccessful';
+import SignUpFailed from './pages/SignUpFailed';
 
 
 
@@ -45,9 +49,13 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonRouterOutlet>
         <Route path="/login" component={Login} exact />
+        <Route path="/error-page" component={ErrorPage} exact />
+        <Route path="/legal-terms" component={LegalTerms} exact />
         <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
+        <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
+        <Route path="/signUpFailed" component={SignUpFailed} exact />
         <Redirect exact from="/" to="/login" />
       </IonRouterOutlet>
     </IonReactRouter>

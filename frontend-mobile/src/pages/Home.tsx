@@ -25,7 +25,7 @@ import {
 } from 'ionicons/icons';
 
 // Asegúrate de que esta ruta sea correcta para tus estilos
-import '../theme/Home.css';
+import '../theme/css/Home.css';
 
 interface MenuOption {
     title: string;
