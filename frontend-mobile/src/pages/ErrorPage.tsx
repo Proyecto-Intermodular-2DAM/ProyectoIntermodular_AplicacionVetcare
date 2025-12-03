@@ -1,7 +1,7 @@
 import React from 'react';
 import { IonContent, IonPage, IonButton, IonIcon } from '@ionic/react';
 import { close } from 'ionicons/icons';
-import '../theme/ErrorPage.css';
+import '../theme/css/ErrorPage.css';
 import { useHistory } from 'react-router-dom';
 
 const ErrorPage: React.FC = () => {
