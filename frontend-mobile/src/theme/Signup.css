@@ -115,3 +115,12 @@
     margin-top: 30px;
     font-size: 16px;
 }
+.signup-success {
+    font-size: 100px;
+    color: green;
+}
+
+.signup-failed {
+    font-size: 100px;
+    color: red;
+}

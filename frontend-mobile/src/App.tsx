@@ -35,6 +35,8 @@ import '@ionic/react/css/display.css';
 /* import '@ionic/react/css/palettes/dark.class.css'; */
 import '@ionic/react/css/palettes/dark.system.css';
 import PasswordRecovery from './pages/PasswordRecovery';
+import SignUpSuccessful from './pages/SignUpSuccessful';
+import SignUpFailed from './pages/SignUpFailed';
 
 
 
@@ -48,6 +50,8 @@ const App: React.FC = () => (
         <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
+        <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
+        <Route path="/signUpFailed" component={SignUpFailed} exact />
         <Redirect exact from="/" to="/login" />
       </IonRouterOutlet>
     </IonReactRouter>
