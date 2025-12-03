@@ -38,12 +38,12 @@ const Login: React.FC = () => {
     };
 
     const handleSignUp = () => {
-        console.log("Navegar a Sign up");
-        // history.push("/signup"); // Ejemplo de navegación
+        history.push("/signup");
     };
 
     const handleRecoverPassword = () => {
         console.log("Navegar a recuperación de contraseña");
+        history.push("/passwordRecovery");
         // history.push("/recover-password"); // Ejemplo de navegación
     };
 
