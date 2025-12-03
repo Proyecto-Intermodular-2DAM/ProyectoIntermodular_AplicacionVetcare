@@ -24,17 +24,23 @@
 /* --- CABECERA Y TOOLBAR (IonHeader / IonToolbar) --- */
 /* ---------------------------------------------------------------------- */
 
-.vetcare-header {
-    ion-toolbar {
-        /* Fondo blanco para la barra de herramientas */
-        --background: white !important;
-        box-shadow: none;
-        padding: 0 5px;
-        /* Add a subtle bottom border to match the design */
-        border-bottom: 1px solid #e0e0e0;
-        --border-width: 0;
-        padding-top: 30px;
-    }
+.vetcare-header ion-toolbar {
+    /* Fondo blanco para la barra de herramientas */
+    --background: white !important;
+    box-shadow: none;
+    padding: 0 5px;
+    /* Add a subtle bottom border to match the design */
+    border-bottom: 1px solid #e0e0e0;
+    --border-width: 0;
+    /* Reset padding since we are using a spacer */
+    padding-top: 10px;
+}
+
+.status-bar-spacer {
+    width: 100%;
+    height: 20px;
+    /* Adjust this value as needed */
+    background: white;
 }
 
 /* Color de fondo de la barra de estado superior (para imitar el diseño iOS) */
@@ -62,75 +68,73 @@ ion-header {
 .profile-button {
     --padding-end: 0;
     --padding-start: 0;
+}
 
-    ion-icon {
-        /* CLAVE: Color azul/cian para el icono del círculo exterior */
-        color: #00897b !important;
-        /* CLAVE: Fondo verde claro para el círculo interior */
-        background-color: #e0f2f1 !important;
-        font-size: 38px;
-        border-radius: 50%;
-        padding: 2px;
-    }
+.profile-button ion-icon {
+    /* CLAVE: Color azul/cian para el icono del círculo exterior */
+    color: #00897b !important;
+    /* CLAVE: Fondo verde claro para el círculo interior */
+    background-color: #e0f2f1 !important;
+    font-size: 48px;
+    border-radius: 50%;
+    padding: 2px;
 }
 
 /* Botón Hamburguesa */
 .menu-button {
     --color: #334355 !important;
+}
 
-    /* Gris oscuro para el menú */
-    ion-icon {
-        font-size: 30px;
-    }
+/* Gris oscuro para el menú */
+.menu-button ion-icon {
+    font-size: 40px;
 }
 
 /* ---------------------------------------------------------------------- */
 /* --- ITEMS DE MENÚ (Tarjetas) --- */
 /* ---------------------------------------------------------------------- */
 
-.menu-content {
-    .menu-list {
-        background: transparent;
-        padding-top: 40px;
-        padding-bottom: 40px;
-    }
+.menu-content .menu-list {
+    background: transparent;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
 
-    .menu-item-box {
-        /* Estilo de caja redondeada con sombra */
-        --background: white !important;
-        /* Fuerza fondo blanco */
-        --min-height: 87px;
-        margin-bottom: 25px;
-        border-radius: 18px;
-        /* Borde más sutil para la imagen */
-        border: 1px solid #e0e0e0;
-        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.05);
+.menu-content .menu-item-box {
+    /* Estilo de caja redondeada con sombra */
+    --background: white !important;
+    /* Fuerza fondo blanco */
+    --min-height: 87px;
+    margin-bottom: 25px;
+    border-radius: 18px;
+    /* Borde más sutil para la imagen */
+    border: 1px solid #e0e0e0;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.05);
+}
 
-        .item-icon {
-            font-size: 34px;
-            color: #334355 !important;
-            /* Color gris oscuro de los iconos */
-        }
+.menu-content .menu-item-box .item-icon {
+    font-size: 34px;
+    color: #334355 !important;
+    /* Color gris oscuro de los iconos */
+}
 
-        ion-label {
-            padding-left: 20px;
+.menu-content .menu-item-box ion-label {
+    padding-left: 20px;
+}
 
-            h2 {
-                font-family: var(--text-normal-font-family, 'Roboto', Helvetica);
-                font-size: 24px;
-                font-weight: normal;
-                color: black !important;
-                /* Texto negro */
-                margin: 0;
-            }
-        }
+.menu-content .menu-item-box ion-label h2 {
+    font-family: var(--text-normal-font-family, 'Roboto', Helvetica);
+    font-size: 24px;
+    font-weight: normal;
+    color: black !important;
+    /* Texto negro */
+    margin: 0;
+}
 
-        .arrow-icon {
-            font-size: 24px;
-            color: #334355 !important;
-            /* Flecha gris oscuro */
-        }
-    }
+.menu-content .menu-item-box .arrow-icon {
+    font-size: 24px;
+    color: #334355 !important;
+    /* Flecha gris oscuro */
 }
 
 /* ---------------------------------------------------------------------- */
@@ -140,15 +144,15 @@ ion-header {
 .home-indicator-footer {
     --background: transparent;
     padding-bottom: 10px;
+}
 
-    .home-indicator {
-        width: 136px;
-        height: 7px;
-        background-color: black;
-        border-radius: 100px;
-        margin: 0 auto;
-        opacity: 0.1;
-    }
+.home-indicator-footer .home-indicator {
+    width: 136px;
+    height: 7px;
+    background-color: black;
+    border-radius: 100px;
+    margin: 0 auto;
+    opacity: 0.1;
 }
 
 /* --- Cabecera y Toolbar --- */
@@ -159,10 +163,10 @@ ion-header {
 .header-icon-button {
     /* Aseguramos que el color base sea el gris oscuro */
     --color: #334355 !important;
+}
 
-    ion-icon {
-        font-size: 24px;
-    }
+.header-icon-button ion-icon {
+    font-size: 24px;
 }
 
 /* ... (otros estilos) ... */
@@ -181,8 +185,8 @@ ion-header {
     /* Usamos el padding por defecto para que tenga un margen correcto */
     --padding-end: var(--ion-padding-end, 12px);
     --padding-start: var(--ion-padding-start, 12px);
+}
 
-    ion-icon {
-        font-size: 30px;
-    }
+.menu-button ion-icon {
+    font-size: 40px;
 }
