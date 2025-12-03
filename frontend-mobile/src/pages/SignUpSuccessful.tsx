@@ -7,7 +7,7 @@ import {
     IonButton
 } from "@ionic/react";
 import { paw, checkmarkCircle } from "ionicons/icons";
-import "../theme/SignUp.css";
+import "../theme/css/SignUp.css";
 import { useHistory } from "react-router-dom";
 
 const SignUpSuccessful: React.FC = () => {

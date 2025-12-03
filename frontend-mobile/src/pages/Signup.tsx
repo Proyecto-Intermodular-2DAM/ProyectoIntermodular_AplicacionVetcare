@@ -11,7 +11,7 @@ import {
 import { paw } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
-import "../theme/Signup.css";
+import "../theme/css/Signup.css";
 
 const Signup: React.FC = () => {
     const history = useHistory();

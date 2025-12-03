@@ -7,7 +7,7 @@ import {
     IonButton
 } from "@ionic/react";
 import { paw } from "ionicons/icons";
-import "../theme/Login.css";
+import "../theme/css/Login.css";
 import { useHistory } from "react-router-dom";
 
 const PasswordRecovery: React.FC = () => {
