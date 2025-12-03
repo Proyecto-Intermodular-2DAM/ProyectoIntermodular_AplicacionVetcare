@@ -54,6 +54,7 @@ const MenuPage: React.FC = () => {
 
             {/* -------------------- Cabecera de la Aplicación -------------------- */}
             <IonHeader className="ion-no-border vetcare-header">
+                <div className="status-bar-spacer" />
                 <IonToolbar>
 
                     {/* TÍTULO: Vetcare */}
