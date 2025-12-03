@@ -16,7 +16,7 @@ import {
 import { person, lockClosed, paw } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
-import "../theme/Login.css";
+import "../theme/css/Login.css";
 
 // Importa el logo si lo necesitas. Usaremos 'paw' por ahora como icono.
 // import vector from "./vector.svg"; 

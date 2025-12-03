@@ -6,11 +6,11 @@ import {
     IonIcon,
     IonButton
 } from "@ionic/react";
-import { paw } from "ionicons/icons";
-import "../theme/css/Login.css";
+import { paw, checkmarkCircle } from "ionicons/icons";
+import "../theme/css/SignUp.css";
 import { useHistory } from "react-router-dom";
 
-const PasswordRecovery: React.FC = () => {
+const SignUpSuccessful: React.FC = () => {
 
     const history = useHistory();
 
@@ -27,17 +27,9 @@ const PasswordRecovery: React.FC = () => {
                             
                             <header className="login-header-container">
                                 <IonIcon icon={paw} className="login-icon" />
-                                <h1 className="login-title">Recuperar contraseña</h1>
+                                <h1 className="login-title">Registro Exitoso</h1>
 
-                                <p className="login-signup-text">
-                                    ¡Listo! Te enviamos un Gmail con el enlace
-                                    para restablecer tu contraseña.
-                                </p>
-
-                                <p className="login-signup-text">
-                                    Revisa tu bandeja de entrada o la carpeta
-                                    de spam si no lo ves enseguida.
-                                </p>
+                                <IonIcon icon={checkmarkCircle} className="signup-success" />
                             </header>
 
                             <IonButton expand="block" className="login-button" onClick={goToLogin}>
@@ -52,4 +44,4 @@ const PasswordRecovery: React.FC = () => {
     );
 };
 
-export default PasswordRecovery;
+export default SignUpSuccessful;

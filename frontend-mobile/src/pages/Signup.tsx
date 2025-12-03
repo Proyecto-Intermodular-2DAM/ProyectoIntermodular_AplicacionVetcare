@@ -11,7 +11,7 @@ import {
 import { paw } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
-import "../theme/Signup.css";
+import "../theme/css/Signup.css";
 
 const Signup: React.FC = () => {
     const history = useHistory();
@@ -33,7 +33,7 @@ const Signup: React.FC = () => {
 
         // TODO: conectar con backend (AuthService) para registro
         if (name && surname && email && dni && pass) {
-            history.push("/home");
+            history.push("/signUpSuccessful");
         }
     };
 
