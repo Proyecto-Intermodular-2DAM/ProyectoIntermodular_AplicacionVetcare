@@ -16,7 +16,7 @@ import {
 import { person, lockClosed, paw } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
-import "../theme/Login.css";
+import "../theme/css/Login.css";
 
 // Importa el logo si lo necesitas. Usaremos 'paw' por ahora como icono.
 // import vector from "./vector.svg"; 
@@ -38,12 +38,12 @@ const Login: React.FC = () => {
     };
 
     const handleSignUp = () => {
-        console.log("Navegar a Sign up");
-        // history.push("/signup"); // Ejemplo de navegación
+        history.push("/signup");
     };
 
     const handleRecoverPassword = () => {
         console.log("Navegar a recuperación de contraseña");
+        history.push("/passwordRecovery");
         // history.push("/recover-password"); // Ejemplo de navegación
     };
 
