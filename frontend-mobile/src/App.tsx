@@ -4,6 +4,7 @@ import { IonReactRouter } from '@ionic/react-router';
 
 /* Theme variables */
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import Home from './pages/Home';
 
 
@@ -44,6 +45,7 @@ const App: React.FC = () => (
     <IonReactRouter>
       <IonRouterOutlet>
         <Route path="/login" component={Login} exact />
+        <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
         <Redirect exact from="/" to="/login" />
