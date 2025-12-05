@@ -1,0 +1,137 @@
+/* TopBar Styles */
+.top-bar-toolbar {
+    --background: var(--color-white) !important;
+}
+
+.top-bar-title {
+    cursor: pointer;
+    font-weight: 900;
+    font-size: 1.8rem;
+    color: var(--color-black-1);
+    display: flex;
+    align-items: center;
+}
+
+.top-bar-title-margin {
+    margin-left: 10px;
+}
+
+.top-bar-icon-primary {
+    color: var(--color-black-1);
+}
+
+.top-bar-icon-profile {
+    font-size: 2.2rem;
+    color: var(--color-secondary);
+}
+
+.top-bar-icon-menu {
+    color: var(--color-black-2);
+    font-size: 2.2rem;
+}
+
+/* SideMenu Styles */
+.side-menu {
+    top: 56px;
+    height: calc(100% - 56px);
+    --background: var(--color-white) !important;
+}
+
+.side-menu-content {
+    --background: var(--color-white) !important;
+    background: var(--color-white) !important;
+}
+
+.side-menu-close-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px;
+    background: var(--color-white);
+}
+
+.side-menu-close-icon {
+    font-size: 24px;
+    color: var(--color-black-1);
+}
+
+.side-menu-list {
+    background: var(--color-white) !important;
+    --background: var(--color-white) !important;
+}
+
+.side-menu-item {
+    --background: var(--color-white) !important;
+    --background-activated: var(--color-grey-4) !important;
+    --background-focused: var(--color-grey-4) !important;
+    --background-hover: var(--color-grey-4) !important;
+    --color: var(--color-black-1) !important;
+    --color-activated: var(--color-black-1) !important;
+    --color-focused: var(--color-black-1) !important;
+    --color-hover: var(--color-black-1) !important;
+}
+
+.side-menu-item-icon {
+    color: var(--color-black-2) !important;
+}
+
+.side-menu-item-label {
+    color: var(--color-black-2) !important;
+    font-weight: 500;
+}
+
+/* Logout Modal Styles */
+.logout-modal-container {
+    padding: 24px;
+    text-align: center;
+    background: var(--color-white);
+    border-radius: 16px;
+}
+
+.logout-modal-icon-container {
+    background: var(--color-secondary);
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px auto;
+}
+
+.logout-modal-icon {
+    color: var(--color-black-2);
+    font-size: 24px;
+}
+
+.logout-modal-title {
+    margin: 0 0 8px 0;
+    font-weight: bold;
+    font-size: 20px;
+    color: var(--color-primary);
+}
+
+.logout-modal-text {
+    margin: 0 0 24px 0;
+    color: var(--color-primary);
+    font-size: 16px;
+}
+
+.logout-modal-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.logout-modal-button-confirm {
+    flex: 1;
+    --border-color: var(--color-primary);
+    --color: var(--color-primary);
+    --border-radius: 8px;
+    font-weight: bold;
+}
+
+.logout-modal-button-cancel {
+    flex: 1;
+    --background: var(--color-primary);
+    --border-radius: 8px;
+    font-weight: bold;
+}

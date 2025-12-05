@@ -1,6 +1,7 @@
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact, IonMenu, IonContent, IonList, IonItem, IonLabel, IonMenuToggle, IonIcon } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { home, call, documentText, logOut, close } from 'ionicons/icons';
 
 /* Theme variables */
 import Login from './pages/Login';
@@ -8,6 +9,7 @@ import ErrorPage from './pages/ErrorPage';
 import LegalTerms from './pages/LegalTerms';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import SideMenu from './components/SideMenu';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -17,6 +19,8 @@ import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
 import '@ionic/react/css/typography.css';
+import './theme/theme.css';
+import './theme/index.css';
 
 /* Optional CSS utils that can be commented out */
 import '@ionic/react/css/padding.css';
@@ -47,7 +51,8 @@ setupIonicReact();
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
-      <IonRouterOutlet>
+      <SideMenu />
+      <IonRouterOutlet id="main-content">
         <Route path="/login" component={Login} exact />
         <Route path="/error-page" component={ErrorPage} exact />
         <Route path="/legal-terms" component={LegalTerms} exact />
