@@ -30,6 +30,7 @@ const TopBar: React.FC = () => {
 
     return (
         <IonHeader className="ion-no-border">
+            <div className="status-bar-spacer" />
             <IonToolbar className="top-bar-toolbar">
                 <IonButtons slot="start">
                     {!isHome && (
