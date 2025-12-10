@@ -1,0 +1,81 @@
+.error-page-content {
+    --background: #ffffff;
+}
+
+.error-page-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px;
+    text-align: center;
+}
+
+.dead-face-icon {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.eyes-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.eye-cross {
+    font-size: 40px;
+    color: #004d40;
+    /* Dark green */
+    font-weight: bold;
+    line-height: 1;
+}
+
+.mouth-line {
+    width: 60px;
+    height: 6px;
+    background-color: #004d40;
+    border-radius: 3px;
+    transform: rotate(-10deg);
+}
+
+.error-page-title {
+    color: #004d40;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.error-page-message {
+    color: #00695c;
+    font-size: 14px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+    max-width: 300px;
+}
+
+.primary-button {
+    --background: #004d40;
+    --color: white;
+    --border-radius: 4px;
+    width: 100%;
+    max-width: 250px;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-transform: none;
+}
+
+.secondary-button {
+    --background: transparent;
+    --color: #004d40;
+    --border-color: #004d40;
+    --border-style: solid;
+    --border-width: 1px;
+    --border-radius: 4px;
+    width: 100%;
+    max-width: 250px;
+    font-weight: bold;
+    text-transform: none;
+}

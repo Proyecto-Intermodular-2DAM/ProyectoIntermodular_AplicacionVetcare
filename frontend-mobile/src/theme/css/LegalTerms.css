@@ -1,0 +1,62 @@
+.legal-terms-page {
+    --background: #ffffff;
+}
+
+.legal-header-toolbar {
+    --background: #ffffff;
+    --border-width: 0;
+}
+
+.legal-title-container {
+    text-align: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.legal-main-title {
+    font-size: 32px;
+    font-weight: bold;
+    color: black;
+    margin: 0;
+    line-height: 1.2;
+}
+
+.legal-paw-icon {
+    font-size: 40px;
+    color: #00695c;
+    margin-top: 10px;
+}
+
+.legal-content-container {
+    padding: 20px;
+    color: #333;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.legal-section-title {
+    font-weight: bold;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.legal-text {
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+.legal-list {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+.legal-list li {
+    margin-bottom: 5px;
+}
+
+.header-logo-text {
+    font-weight: bold;
+    font-size: 20px;
+    color: black;
+}

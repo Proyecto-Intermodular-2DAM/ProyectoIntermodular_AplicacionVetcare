@@ -1,11 +1,17 @@
 import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
+import { IonApp, IonRouterOutlet, setupIonicReact, IonMenu, IonContent, IonList, IonItem, IonLabel, IonMenuToggle, IonIcon } from '@ionic/react';
 import { IonReactRouter } from '@ionic/react-router';
+import { home, call, documentText, logOut, close } from 'ionicons/icons';
 
 /* Theme variables */
 import Login from './pages/Login';
+import ErrorPage from './pages/ErrorPage';
+import LegalTerms from './pages/LegalTerms';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import SideMenu from './components/SideMenu';
+import EditProfile from './pages/EditProfile';
+import UserProfile from './pages/UserProfile';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -15,6 +21,8 @@ import '@ionic/react/css/core.css';
 import '@ionic/react/css/normalize.css';
 import '@ionic/react/css/structure.css';
 import '@ionic/react/css/typography.css';
+import './theme/theme.css';
+import './theme/index.css';
 
 /* Optional CSS utils that can be commented out */
 import '@ionic/react/css/padding.css';
@@ -46,14 +54,19 @@ setupIonicReact();
 const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
-      <IonRouterOutlet>
+      <SideMenu />
+      <IonRouterOutlet id="main-content">
         <Route path="/login" component={Login} exact />
+        <Route path="/error-page" component={ErrorPage} exact />
+        <Route path="/legal-terms" component={LegalTerms} exact />
         <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
         <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
         <Route path="/signUpFailed" component={SignUpFailed} exact />
-        <Route path="/contactUs" component={ContactUs} exact />  
+        <Route path="/edit-profile" component={EditProfile} exact />
+        <Route path="/user-profile" component={UserProfile} exact />
+        <Route path="/contactUs" component={ContactUs} exact />
         <Redirect exact from="/" to="/login" />
       </IonRouterOutlet>
     </IonReactRouter>

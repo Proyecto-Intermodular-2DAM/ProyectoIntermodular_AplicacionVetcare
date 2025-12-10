@@ -1,7 +1,11 @@
 
+.contactus-page-background {
+    --ion-background-color: white;
+}
+
 .cards {
-    --background: var(--color-primary);
-    --color: black;
+    --background: var(--color-secondary);
+    --color: var(--color-black-1);
     width: 90%;
     height: 75px;
     border-radius: 15px;
@@ -21,5 +25,13 @@
 .card-icon {
     font-size: 32px;
     color: var(--color-primary-design);
+}
 
+/*
+TODO: revisar variables de titulo porque no se aplican
+*/
+.card-title{
+    font-size: var(--heading-h1-font-size);
+    font-weight: var(--heading-h2-font-weight);
+    color: var(--color-black-1);
 }

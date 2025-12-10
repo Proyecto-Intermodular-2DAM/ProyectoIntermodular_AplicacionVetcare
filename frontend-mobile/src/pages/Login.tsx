@@ -38,7 +38,7 @@ const Login: React.FC = () => {
     };
 
     const handleSignUp = () => {
-        history.push("/contactUs");
+        history.push("/signup");
     };
 
     const handleRecoverPassword = () => {

@@ -7,6 +7,7 @@ import {
 } from "@ionic/react";
 import { paw, mailOutline, callOutline } from "ionicons/icons";
 import "../theme/css/ContactUs.css";
+import TopBar from "../components/TopBar";
 import { useHistory } from "react-router-dom";
 
 const ContactUs: React.FC = () => {
@@ -14,14 +15,16 @@ const ContactUs: React.FC = () => {
     const history = useHistory();
 
     return (
-        <IonPage className="login-page-background">
+        <IonPage className="contactus-page-background">
+
+            <TopBar />
+
             <IonContent fullscreen>
                 <div className="login-center-container">
-                    <IonCard className="login-card">
                         <IonCardContent className="login-card-content">
                             
                             <header className="login-header-container">
-                                <h1 className="login-title">Contactanos</h1>
+                                <h1 className="card-title">Contactanos</h1>
                                 <IonIcon icon={paw} className="login-icon" />
 
 
@@ -36,7 +39,6 @@ const ContactUs: React.FC = () => {
                             </IonCard>
                             </header>
                         </IonCardContent>
-                    </IonCard>
                 </div>
             </IonContent>
         </IonPage>
