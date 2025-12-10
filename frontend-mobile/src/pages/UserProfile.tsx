@@ -49,7 +49,7 @@ const UserProfile: React.FC = () => {
     ];
 
     const handleGoBack = () => {
-        history.goBack();
+        history.push("/login");
     };
 
     const handleEditProfile = () => {
