@@ -1,27 +1,13 @@
 import React from 'react';
-import { IonContent, IonPage, IonHeader, IonToolbar, IonTitle, IonButtons, IonBackButton, IonIcon, IonButton } from '@ionic/react';
-import { paw, personCircleOutline, menuOutline } from 'ionicons/icons';
+import { IonContent, IonPage, IonIcon } from '@ionic/react';
+import { paw } from 'ionicons/icons';
 import '../theme/css/LegalTerms.css';
+import TopBar from '../components/TopBar';
 
 const LegalTerms: React.FC = () => {
     return (
         <IonPage>
-            <IonHeader className="ion-no-border">
-                <IonToolbar className="legal-header-toolbar">
-                    <IonButtons slot="start">
-                        <IonBackButton defaultHref="/home" color="dark" />
-                    </IonButtons>
-                    <IonTitle className="header-logo-text ion-text-center">Vetcare</IonTitle>
-                    <IonButtons slot="end">
-                        <IonButton color="medium">
-                            <IonIcon icon={personCircleOutline} size="large" />
-                        </IonButton>
-                        <IonButton color="dark">
-                            <IonIcon icon={menuOutline} size="large" />
-                        </IonButton>
-                    </IonButtons>
-                </IonToolbar>
-            </IonHeader>
+            <TopBar />
 
             <IonContent className="legal-terms-page" fullscreen>
                 <div className="legal-title-container">
