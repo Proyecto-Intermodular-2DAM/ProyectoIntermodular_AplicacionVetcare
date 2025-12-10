@@ -1,0 +1,99 @@
+.adoptions-container {
+    padding: 16px;
+    background-color: #fff;
+    /* O el color de fondo de tu app */
+}
+
+.adoptions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #666;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.filter-text {
+    color: #008080;
+    /* Teal color similar to screenshot */
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sort-by-title {
+    font-size: 1.2rem;
+    color: #006666;
+    /* Darker teal */
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.adoption-card {
+    margin-inline: 0;
+    margin-bottom: 30px;
+    box-shadow: none;
+    /* Screenshot looks flat or very subtle shadow */
+    border: none;
+    background: transparent;
+}
+
+.card-image-container {
+    background-color: #e6f2ff;
+    /* Light blue placeholder bg */
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 12px;
+}
+
+.card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* If using a placeholder icon instead of full image: */
+    /* width: 50px; height: 50px; opacity: 0.5; */
+}
+
+.adoption-date {
+    color: #666;
+    font-size: 0.85rem;
+    text-transform: none;
+    /* Remove default uppercase if needed */
+    padding-bottom: 4px;
+    font-weight: normal;
+}
+
+.adoption-title {
+    color: #006666;
+    /* Dark teal */
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding-bottom: 8px;
+}
+
+.adoption-content {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+}
+
+ion-card-header {
+    padding-left: 0;
+    padding-right: 0;
+    padding-top: 0;
+}
+
+.read-more-link {
+    display: inline-block;
+    margin-top: 8px;
+    color: #006666;
+    font-weight: 600;
+    text-decoration: underline;
+}

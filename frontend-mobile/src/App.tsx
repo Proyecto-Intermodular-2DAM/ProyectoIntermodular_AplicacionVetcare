@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import ErrorPage from './pages/ErrorPage';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import Adoptions from './pages/Adoptions';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -51,6 +52,7 @@ const App: React.FC = () => (
         <Route path="/error-page" component={ErrorPage} exact />
         <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
+        <Route path="/adopcion" component={Adoptions} exact />
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
         <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
         <Route path="/signUpFailed" component={SignUpFailed} exact />
