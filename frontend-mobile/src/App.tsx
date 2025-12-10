@@ -10,6 +10,8 @@ import LegalTerms from './pages/LegalTerms';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import SideMenu from './components/SideMenu';
+import EditProfile from './pages/EditProfile';
+import UserProfile from './pages/UserProfile';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -61,6 +63,8 @@ const App: React.FC = () => (
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
         <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
         <Route path="/signUpFailed" component={SignUpFailed} exact />
+        <Route path="/edit-profile" component={EditProfile} exact />
+        <Route path="/user-profile" component={UserProfile} exact />
         <Redirect exact from="/" to="/login" />
       </IonRouterOutlet>
     </IonReactRouter>
