@@ -17,7 +17,7 @@ const TopBar: React.FC = () => {
     const isHome = location.pathname === '/home';
 
     const handleLogoClick = () => {
-        router.push('/home', 'root', 'replace');
+        router.push('/home', 'root', 'push');
     };
 
     const handleBackClick = () => {
