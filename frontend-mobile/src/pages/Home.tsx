@@ -1,28 +1,20 @@
 import React from 'react';
 import {
     IonPage,
-    IonHeader,
-    IonToolbar,
-    IonTitle,
     IonContent,
-    IonButtons,
-    IonButton,
-    IonIcon,
     IonList,
     IonItem,
     IonLabel,
-    IonFooter,
-    IonMenuButton
+    IonIcon,
 } from '@ionic/react';
 import {
-    personCircleOutline, // Icono de usuario/perfil
     calendarOutline, // Icono para Citas
     pawOutline, // Icono para Adopción
     documentTextOutline, // Icono para Historial
     pulseOutline, // Icono para Tratamientos
     chevronForwardOutline, // Icono de flecha para detalle
-    menuOutline // <-- ¡CLAVE! Asegúrate de que esté aquí.
 } from 'ionicons/icons';
+import TopBar from '../components/TopBar';
 
 // Asegúrate de que esta ruta sea correcta para tus estilos
 import '../theme/css/Home.css';
@@ -53,28 +45,7 @@ const MenuPage: React.FC = () => {
         <IonPage className="vetcare-page">
 
             {/* -------------------- Cabecera de la Aplicación -------------------- */}
-            <IonHeader className="ion-no-border vetcare-header">
-                <div className="status-bar-spacer" />
-                <IonToolbar>
-
-                    {/* TÍTULO: Vetcare */}
-                    <IonTitle className="vetcare-title" slot="start">Vetcare</IonTitle>
-
-                    {/* BOTONES DE LA DERECHA (Perfil y Menú Hamburguesa) */}
-                    <IonButtons slot="end">
-
-                        {/* 1. Icono de Perfil estilizado */}
-                        <IonButton className="header-icon-button profile-button" onClick={() => handleNavigation('/profile')}>
-                            <IonIcon slot="icon-only" icon={personCircleOutline} />
-                        </IonButton>
-
-                        {/* 2. Botón Hamburguesa (Menu Button) */}
-                        <IonButton className="header-icon-button menu-button" onClick={() => handleNavigation('/menu')}>
-                            <IonIcon slot="icon-only" icon={menuOutline} />
-                        </IonButton>
-                    </IonButtons>
-                </IonToolbar>
-            </IonHeader>
+            <TopBar />
 
             {/* -------------------- Contenido Principal (Opciones de Menú) -------------------- */}
             <IonContent className="ion-padding menu-content">
