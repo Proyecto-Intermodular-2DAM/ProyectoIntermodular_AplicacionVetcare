@@ -7,6 +7,7 @@ import {
     IonLabel,
     IonIcon,
 } from '@ionic/react';
+import { useHistory } from 'react-router-dom';
 import {
     calendarOutline, // Icono para Citas
     pawOutline, // Icono para Adopción
@@ -26,11 +27,16 @@ interface MenuOption {
 }
 
 const MenuPage: React.FC = () => {
+    const history = useHistory();
 
-    // Función de navegación (simulada)
+    // Función de navegación
     const handleNavigation = (path: string) => {
-        console.log(`Navegando a: ${path}`);
-        // En una aplicación real, usarías history.push(path) o useNavigate()
+        if (path === '/tratamientos') {
+            history.push('/treatment');
+        } else {
+            console.log(`Navegando a: ${path}`);
+            // En una aplicación real, usarías history.push(path) para otras rutas
+        }
     };
 
     // Definición de las opciones del menú

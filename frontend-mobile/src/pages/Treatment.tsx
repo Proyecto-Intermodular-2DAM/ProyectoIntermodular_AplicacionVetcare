@@ -10,9 +10,10 @@ import {
     IonIcon,
 } from '@ionic/react';
 import { arrowForward, medkit } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import SideMenu from '../components/SideMenu';
-import '../theme/css/ListAnimals.css';
+import '../theme/css/Treatment.css';
 
 interface Animal {
     id: number;
@@ -22,7 +23,8 @@ interface Animal {
     activeTreatments: number;
 }
 
-const ListAnimals: React.FC = () => {
+const Treatment: React.FC = () => {
+    const history = useHistory();
     // Mock data for animals
     const animals: Animal[] = [
         {
@@ -45,8 +47,7 @@ const ListAnimals: React.FC = () => {
     const animalsInTreatment = animals.filter(animal => animal.activeTreatments > 0).length;
 
     const handleAnimalClick = (animalId: number) => {
-        console.log('Navegando a detalles de animal:', animalId);
-        // TODO: Navigate to animal details page
+        history.push(`/animal-treatment/${animalId}`);
     };
 
     return (
@@ -54,64 +55,64 @@ const ListAnimals: React.FC = () => {
             <SideMenu />
             <IonPage id="main-content">
                 <TopBar />
-                <IonContent fullscreen className="list-animals-content">
-                    <div className="list-animals-container">
+                <IonContent fullscreen className="treatment-content">
+                    <div className="treatment-container">
                         {/* Header Section */}
-                        <div className="list-animals-header">
-                            <h1 className="list-animals-title">Mis Mascotas</h1>
-                            <p className="list-animals-subtitle">
+                        <div className="treatment-header">
+                            <h1 className="treatment-title">Mis Mascotas</h1>
+                            <p className="treatment-subtitle">
                                 Selecciona una mascota para ver su tratamiento
                             </p>
 
                             {/* Stats Card */}
-                            <IonCard className="list-animals-stats-card">
-                                <IonCardContent className="list-animals-stats-content">
-                                    <div className="list-animals-stat">
-                                        <div className="list-animals-stat-label">Total mascotas</div>
-                                        <div className="list-animals-stat-value">{totalAnimals}</div>
+                            <IonCard className="treatment-stats-card">
+                                <IonCardContent className="treatment-stats-content">
+                                    <div className="treatment-stat">
+                                        <div className="treatment-stat-label">Total mascotas</div>
+                                        <div className="treatment-stat-value">{totalAnimals}</div>
                                     </div>
-                                    <div className="list-animals-stat-divider"></div>
-                                    <div className="list-animals-stat">
-                                        <div className="list-animals-stat-label">En tratamiento</div>
-                                        <div className="list-animals-stat-value">{animalsInTreatment}</div>
+                                    <div className="treatment-stat-divider"></div>
+                                    <div className="treatment-stat">
+                                        <div className="treatment-stat-label">En tratamiento</div>
+                                        <div className="treatment-stat-value">{animalsInTreatment}</div>
                                     </div>
                                 </IonCardContent>
                             </IonCard>
                         </div>
 
                         {/* Animals List */}
-                        <div className="list-animals-list">
+                        <div className="treatment-list">
                             {animals.map((animal) => (
                                 <IonCard
                                     key={animal.id}
-                                    className="list-animals-card"
+                                    className="treatment-card"
                                     button
                                     onClick={() => handleAnimalClick(animal.id)}
                                 >
-                                    <IonCardContent className="list-animals-card-content">
-                                        <div className="list-animals-card-left">
-                                            <IonAvatar className="list-animals-avatar">
+                                    <IonCardContent className="treatment-card-content">
+                                        <div className="treatment-card-left">
+                                            <IonAvatar className="treatment-avatar">
                                                 <img src={animal.image} alt={animal.name} />
                                             </IonAvatar>
-                                            <div className="list-animals-info">
-                                                <h2 className="list-animals-name">{animal.name}</h2>
-                                                <p className="list-animals-breed">{animal.breed}</p>
+                                            <div className="treatment-info">
+                                                <h2 className="treatment-name">{animal.name}</h2>
+                                                <p className="treatment-breed">{animal.breed}</p>
                                             </div>
                                         </div>
-                                        <div className="list-animals-card-right">
+                                        <div className="treatment-card-right">
                                             {animal.activeTreatments > 0 ? (
-                                                <div className="list-animals-treatments">
-                                                    <IonIcon icon={medkit} className="list-animals-treatment-icon" />
-                                                    <span className="list-animals-treatment-text">
+                                                <div className="treatment-treatments">
+                                                    <IonIcon icon={medkit} className="treatment-treatment-icon" />
+                                                    <span className="treatment-treatment-text">
                                                         {animal.activeTreatments} Tratamientos activos
                                                     </span>
                                                 </div>
                                             ) : (
-                                                <div className="list-animals-no-treatments">
+                                                <div className="treatment-no-treatments">
                                                     Sin tratamientos activos
                                                 </div>
                                             )}
-                                            <IonIcon icon={arrowForward} className="list-animals-arrow-icon" />
+                                            <IonIcon icon={arrowForward} className="treatment-arrow-icon" />
                                         </div>
                                     </IonCardContent>
                                 </IonCard>
@@ -124,4 +125,4 @@ const ListAnimals: React.FC = () => {
     );
 };
 
-export default ListAnimals;
+export default Treatment;
