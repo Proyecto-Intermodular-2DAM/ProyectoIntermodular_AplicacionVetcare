@@ -1,0 +1,195 @@
+/* ListAnimals Page Styles */
+
+.list-animals-content {
+    --background: var(--color-grey-5);
+}
+
+.list-animals-container {
+    padding: 0;
+    min-height: 100%;
+}
+
+/* Header Section */
+.list-animals-header {
+    background: var(--color-secondary);
+    padding: 24px 20px 32px 20px;
+    border-radius: 0 0 0 0;
+}
+
+.list-animals-title {
+    font-size: var(--heading-h5-font-size);
+    font-weight: var(--heading-h5-font-weight);
+    line-height: var(--heading-h5-line-height);
+    color: var(--color-white);
+    margin: 0 0 8px 0;
+}
+
+.list-animals-subtitle {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+    line-height: var(--text-small-line-height);
+    color: var(--color-white);
+    margin: 0 0 20px 0;
+    opacity: 0.9;
+}
+
+/* Stats Card */
+.list-animals-stats-card {
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.list-animals-stats-content {
+    padding: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.list-animals-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.list-animals-stat-label {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+    color: var(--color-grey-1);
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.list-animals-stat-value {
+    font-size: var(--heading-h4-font-size);
+    font-weight: var(--heading-h4-font-weight);
+    color: var(--color-black-2);
+}
+
+.list-animals-stat-divider {
+    width: 1px;
+    height: 40px;
+    background-color: var(--color-grey-3);
+    margin: 0 16px;
+}
+
+/* Animals List */
+.list-animals-list {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Animal Card */
+.list-animals-card {
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.list-animals-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.list-animals-card-content {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.list-animals-card-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.list-animals-avatar {
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--color-secondary);
+}
+
+.list-animals-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.list-animals-name {
+    font-size: var(--text-medium-bold-font-size);
+    font-weight: var(--text-medium-bold-font-weight);
+    color: var(--color-black-2);
+    margin: 0;
+}
+
+.list-animals-breed {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+    color: var(--color-grey-1);
+    margin: 0;
+}
+
+.list-animals-card-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.list-animals-treatments {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(128, 203, 196, 0.15);
+    padding: 6px 12px;
+    border-radius: 16px;
+}
+
+.list-animals-treatment-icon {
+    font-size: 16px;
+    color: var(--color-primary);
+}
+
+.list-animals-treatment-text {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-bold-font-weight);
+    color: var(--color-primary);
+    white-space: nowrap;
+}
+
+.list-animals-no-treatments {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+    color: var(--color-grey-2);
+    white-space: nowrap;
+}
+
+.list-animals-arrow-icon {
+    font-size: 20px;
+    color: var(--color-grey-2);
+    flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .list-animals-card-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .list-animals-card-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .list-animals-treatment-text {
+        font-size: 12px;
+    }
+}
