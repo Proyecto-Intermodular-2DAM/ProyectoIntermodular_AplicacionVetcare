@@ -12,6 +12,8 @@ import Home from './pages/Home';
 import SideMenu from './components/SideMenu';
 import EditProfile from './pages/EditProfile';
 import UserProfile from './pages/UserProfile';
+import Citas from './pages/Citas';
+
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -56,7 +58,7 @@ const App: React.FC = () => (
       <SideMenu />
       <IonRouterOutlet id="main-content">
         <Route path="/login" component={Login} exact />
-        <Route path="/error-page" component={ErrorPage} exact />
+        <Route path="*" component={ErrorPage} exact />
         <Route path="/legal-terms" component={LegalTerms} exact />
         <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
@@ -65,6 +67,7 @@ const App: React.FC = () => (
         <Route path="/signUpFailed" component={SignUpFailed} exact />
         <Route path="/edit-profile" component={EditProfile} exact />
         <Route path="/user-profile" component={UserProfile} exact />
+        <Route path="/citas" component={Citas} exact />
         <Redirect exact from="/" to="/login" />
       </IonRouterOutlet>
     </IonReactRouter>
