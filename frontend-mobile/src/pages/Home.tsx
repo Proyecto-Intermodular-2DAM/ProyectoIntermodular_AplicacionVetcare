@@ -27,12 +27,16 @@ interface MenuOption {
 }
 
 const MenuPage: React.FC = () => {
-
     const history = useHistory();
 
+    // Función de navegación
     const handleNavigation = (path: string) => {
-        console.log(`Navegando a: ${path}`);
-        history.push(path);
+        if (path === '/tratamientos') {
+            history.push('/treatment');
+        } else {
+            console.log(`Navegando a: ${path}`);
+            // En una aplicación real, usarías history.push(path) para otras rutas
+        }
     };
 
     // Definición de las opciones del menú
