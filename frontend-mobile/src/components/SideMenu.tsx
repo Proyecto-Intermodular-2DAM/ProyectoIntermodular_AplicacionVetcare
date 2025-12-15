@@ -13,9 +13,10 @@ import {
     IonText
 } from '@ionic/react';
 import { home, call, documentText, logOut, close } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 
 const SideMenu: React.FC = () => {
-    const router = useIonRouter();
+    const history = useHistory(); // Using useHistory for consistency
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const handleLogoutClick = () => {
@@ -23,8 +24,9 @@ const SideMenu: React.FC = () => {
     };
 
     const confirmLogout = () => {
+        console.log("Logging out...");
         setShowLogoutModal(false);
-        router.push('/login', 'root', 'replace');
+        history.replace('/login'); // Use replace to prevent going back
     };
 
     return (

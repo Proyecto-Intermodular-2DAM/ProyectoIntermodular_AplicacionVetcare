@@ -12,6 +12,9 @@ import Home from './pages/Home';
 import SideMenu from './components/SideMenu';
 import EditProfile from './pages/EditProfile';
 import UserProfile from './pages/UserProfile';
+import Citas from './pages/Citas';
+import Historial from './pages/Historial';
+
 import Treatment from './pages/Treatment';
 import AnimalTreatment from './pages/AnimalTreatment';
 
@@ -53,26 +56,28 @@ import SignUpFailed from './pages/SignUpFailed';
 setupIonicReact();
 
 const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <SideMenu />
-      <IonRouterOutlet id="main-content">
-        <Route path="/login" component={Login} exact />
-        <Route path="/error-page" component={ErrorPage} exact />
-        <Route path="/legal-terms" component={LegalTerms} exact />
-        <Route path="/signup" component={Signup} exact />
-        <Route path="/home" component={Home} exact />
-        <Route path="/passwordRecovery" component={PasswordRecovery} exact />
-        <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
-        <Route path="/signUpFailed" component={SignUpFailed} exact />
-        <Route path="/edit-profile" component={EditProfile} exact />
-        <Route path="/user-profile" component={UserProfile} exact />
-        <Route path="/treatment" component={Treatment} exact />
-        <Route path="/animal-treatment/:animalId" component={AnimalTreatment} exact />
-        <Redirect exact from="/" to="/login" />
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
+    <IonApp>
+        <IonReactRouter>
+            <SideMenu />
+            <IonRouterOutlet id="main-content">
+                <Route path="/login" component={Login} exact />
+                <Route path="/legal-terms" component={LegalTerms} exact />
+                <Route path="/signup" component={Signup} exact />
+                <Route path="/home" component={Home} exact />
+                <Route path="/passwordRecovery" component={PasswordRecovery} exact />
+                <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
+                <Route path="/signUpFailed" component={SignUpFailed} exact />
+                <Route path="/edit-profile" component={EditProfile} exact />
+                <Route path="/user-profile" component={UserProfile} exact />
+                <Route path="/citas" component={Citas} exact />
+                <Route path="/historial" component={Historial} exact />
+                <Route path="/treatment" component={Treatment} exact />
+                <Route path="/animal-treatment/:animalId" component={AnimalTreatment} exact />
+                <Redirect exact from="/" to="/login" />
+                <Route path="error" component={ErrorPage} />
+            </IonRouterOutlet>
+        </IonReactRouter>
+    </IonApp>
 );
 
 export default App;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import {
     IonPage,
     IonContent,
@@ -7,7 +8,6 @@ import {
     IonLabel,
     IonIcon,
 } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
 import {
     calendarOutline, // Icono para Citas
     pawOutline, // Icono para Adopción
@@ -31,12 +31,7 @@ const MenuPage: React.FC = () => {
 
     // Función de navegación
     const handleNavigation = (path: string) => {
-        if (path === '/tratamientos') {
-            history.push('/treatment');
-        } else {
-            console.log(`Navegando a: ${path}`);
-            // En una aplicación real, usarías history.push(path) para otras rutas
-        }
+        history.push(path);
     };
 
     // Definición de las opciones del menú
@@ -44,7 +39,7 @@ const MenuPage: React.FC = () => {
         { title: "Citas", icon: calendarOutline, path: "/citas" },
         { title: "Adopción", icon: pawOutline, path: "/adopcion" },
         { title: "Historial", icon: documentTextOutline, path: "/historial" },
-        { title: "Tratamientos", icon: pulseOutline, path: "/tratamientos" },
+        { title: "Tratamientos", icon: pulseOutline, path: "/treatment" },
     ];
 
     return (

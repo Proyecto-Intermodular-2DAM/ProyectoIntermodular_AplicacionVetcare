@@ -67,7 +67,11 @@ const AnimalTreatment: React.FC = () => {
         },
     ];
 
-    const animal = animals.find(a => a.id === parseInt(animalId || '1'));
+    console.log("AnimalID Raw Params:", animalId);
+    // Parse the ID, defaulting to undefined/null if invalid to prevent false positives
+    const parsedId = animalId ? parseInt(animalId, 10) : -1;
+    console.log("Parsed ID:", parsedId);
+    const animal = animals.find(a => a.id === parsedId);
 
     if (!animal) {
         return (
