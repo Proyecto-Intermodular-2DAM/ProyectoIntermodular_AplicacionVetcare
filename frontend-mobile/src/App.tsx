@@ -13,6 +13,10 @@ import Adoptions from './pages/Adoptions';
 import SideMenu from './components/SideMenu';
 import EditProfile from './pages/EditProfile';
 import UserProfile from './pages/UserProfile';
+import Citas from './pages/Citas';
+import Historial from './pages/Historial';
+import Treatment from './pages/Treatment';
+import AnimalTreatment from './pages/AnimalTreatment';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -59,9 +63,9 @@ const App: React.FC = () => (
         <Route path="/login" component={Login} exact />
         <Route path="/error-page" component={ErrorPage} exact />
         <Route path="/legal-terms" component={LegalTerms} exact />
+        <Route path="/adoption" component={Adoptions} exact />
         <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
-        <Route path="/adoption" component={Adoptions} exact />
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
         <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
         <Route path="/signUpFailed" component={SignUpFailed} exact />
