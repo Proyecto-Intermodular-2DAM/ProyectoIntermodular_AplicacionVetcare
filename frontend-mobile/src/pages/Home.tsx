@@ -38,7 +38,7 @@ const MenuPage: React.FC = () => {
     // Definición de las opciones del menú
     const menuOptions: MenuOption[] = [
         { title: "Citas", icon: calendarOutline, path: "/citas" },
-        { title: "Adopción", icon: pawOutline, path: "/adopcion" },
+        { title: "Adopción", icon: pawOutline, path: "/adoption" },
         { title: "Historial", icon: documentTextOutline, path: "/historial" },
         { title: "Tratamientos", icon: pulseOutline, path: "/treatment" },
     ];
