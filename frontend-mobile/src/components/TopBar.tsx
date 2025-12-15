@@ -28,6 +28,10 @@ const TopBar: React.FC = () => {
         }
     };
 
+    const handleProfileClick = () => {
+        router.push('/user-profile', 'forward', 'push');
+    };
+
     return (
         <IonHeader className="ion-no-border">
             <div className="status-bar-spacer" />
@@ -44,7 +48,7 @@ const TopBar: React.FC = () => {
                 </IonButtons>
 
                 <IonButtons slot="end">
-                    <IonButton>
+                    <IonButton onClick={handleProfileClick}>
                         <IonIcon slot="icon-only" icon={personCircle} className="top-bar-icon-profile" />
                     </IonButton>
                     <IonMenuButton menu="main-menu" className="top-bar-icon-menu" />

@@ -9,9 +9,14 @@ import ErrorPage from './pages/ErrorPage';
 import LegalTerms from './pages/LegalTerms';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
+import Adoptions from './pages/Adoptions';
 import SideMenu from './components/SideMenu';
 import EditProfile from './pages/EditProfile';
 import UserProfile from './pages/UserProfile';
+import Citas from './pages/Citas';
+import Historial from './pages/Historial';
+import Treatment from './pages/Treatment';
+import AnimalTreatment from './pages/AnimalTreatment';
 
 
 /* Core CSS required for Ionic components to work properly */
@@ -59,6 +64,7 @@ const App: React.FC = () => (
         <Route path="/login" component={Login} exact />
         <Route path="/error-page" component={ErrorPage} exact />
         <Route path="/legal-terms" component={LegalTerms} exact />
+        <Route path="/adoption" component={Adoptions} exact />
         <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
@@ -67,6 +73,10 @@ const App: React.FC = () => (
         <Route path="/edit-profile" component={EditProfile} exact />
         <Route path="/user-profile" component={UserProfile} exact />
         <Route path="/contactUs" component={ContactUs} exact />
+        <Route path="/citas" component={Citas} exact />
+        <Route path="/historial" component={Historial} exact />
+        <Route path="/treatment" component={Treatment} exact />
+        <Route path="/animal-treatment/:animalId" component={AnimalTreatment} exact />
         <Redirect exact from="/" to="/login" />
       </IonRouterOutlet>
     </IonReactRouter>

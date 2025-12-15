@@ -7,34 +7,29 @@ import {
     IonCard,
     IonCardContent,
     IonItem,
-    IonCheckbox, // Nuevo componente
-    IonLabel, // Nuevo componente
-    IonGrid, // Nuevo componente
-    IonRow, // Nuevo componente
-    IonCol, // Nuevo componente
+    IonCheckbox,
+    IonLabel,
+    IonGrid,
+    IonRow,
+    IonCol,
 } from "@ionic/react";
 import { person, lockClosed, paw } from "ionicons/icons";
 import { useHistory } from "react-router-dom";
 import { useState } from "react";
 import "../theme/css/Login.css";
 
-// Importa el logo si lo necesitas. Usaremos 'paw' por ahora como icono.
-// import vector from "./vector.svg"; 
-
 const Login: React.FC = () => {
     const history = useHistory();
-    const [email, setEmail] = useState<string>(""); // Cambiado de 'user' a 'email'
+    const [email, setEmail] = useState<string>("");
     const [pass, setPass] = useState<string>("");
-    const [rememberMe, setRememberMe] = useState<boolean>(false); // Nuevo estado
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
 
     const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault(); // Previene el comportamiento por defecto del formulario
-        console.log("Formulario enviado:", { email, pass, rememberMe });
+        e.preventDefault();
+        console.log("LOGIN INTENT - State:", { email, pass });
 
-        // TODO: conectar con backend (AuthService)
-        if (email && pass) {
-            history.push("/home");
-        }
+        // Navegación directa como solicitado, sin validación estricta por ahora
+        history.push("/home");
     };
 
     const handleSignUp = () => {
@@ -44,7 +39,6 @@ const Login: React.FC = () => {
     const handleRecoverPassword = () => {
         console.log("Navegar a recuperación de contraseña");
         history.push("/passwordRecovery");
-        // history.push("/recover-password"); // Ejemplo de navegación
     };
 
     return (
@@ -84,7 +78,7 @@ const Login: React.FC = () => {
                                         placeholder="ejemplo@correo.com"
                                         type="email"
                                         value={email}
-                                        onIonChange={(e) => setEmail(e.detail.value!)}
+                                        onIonChange={(e) => setEmail(e.detail.value ?? '')}
                                         required
                                     />
                                 </IonItem>
@@ -98,7 +92,7 @@ const Login: React.FC = () => {
                                         placeholder="Contraseña"
                                         type="password"
                                         value={pass}
-                                        onIonChange={(e) => setPass(e.detail.value!)}
+                                        onIonChange={(e) => setPass(e.detail.value ?? '')}
                                         required
                                     />
                                 </IonItem>

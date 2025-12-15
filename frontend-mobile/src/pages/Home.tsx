@@ -1,4 +1,5 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 import {
     IonPage,
     IonContent,
@@ -26,19 +27,20 @@ interface MenuOption {
 }
 
 const MenuPage: React.FC = () => {
+    const history = useHistory();
 
-    // Función de navegación (simulada)
+    // Función de navegación
     const handleNavigation = (path: string) => {
         console.log(`Navegando a: ${path}`);
-        // En una aplicación real, usarías history.push(path) o useNavigate()
+        history.push(path);
     };
 
     // Definición de las opciones del menú
     const menuOptions: MenuOption[] = [
         { title: "Citas", icon: calendarOutline, path: "/citas" },
-        { title: "Adopción", icon: pawOutline, path: "/adopcion" },
+        { title: "Adopción", icon: pawOutline, path: "/adoption" },
         { title: "Historial", icon: documentTextOutline, path: "/historial" },
-        { title: "Tratamientos", icon: pulseOutline, path: "/tratamientos" },
+        { title: "Tratamientos", icon: pulseOutline, path: "/treatment" },
     ];
 
     return (
