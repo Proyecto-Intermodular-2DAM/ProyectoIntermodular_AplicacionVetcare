@@ -4,13 +4,14 @@ import TopBar from '../components/TopBar';
 import AppointmentCard, { Appointment } from '../components/AppointmentCard';
 import '../theme/css/Citas.css';
 
-const Citas: React.FC = () => {
-    const mockAppointments: Appointment[] = [
+const Historial: React.FC = () => {
+    // Mock data for past appointments
+    const pastAppointments: Appointment[] = [
         {
             id: '1',
-            title: 'Vacuna de la rabia',
-            date: new Date().toISOString(), // Today
-            time: '11:30 AM',
+            title: 'Revisión anual',
+            date: '2024-10-15',
+            time: '10:00 AM',
             veterinarian: {
                 name: 'Elvia Atkins',
                 avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg'
@@ -23,9 +24,24 @@ const Citas: React.FC = () => {
         },
         {
             id: '2',
-            title: 'Revisión',
-            date: '2025-12-15',
-            time: '16:30 AM',
+            title: 'Vacuna antirrábica',
+            date: '2024-09-20',
+            time: '14:30 PM',
+            veterinarian: {
+                name: 'Elvia Atkins',
+                avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg'
+            },
+            animal: {
+                name: 'Toby',
+                avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg',
+                type: 'Dog'
+            }
+        },
+        {
+            id: '3',
+            title: 'Chequeo general',
+            date: '2024-08-10',
+            time: '09:15 AM',
             veterinarian: {
                 name: 'Elvia Atkins',
                 avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg'
@@ -43,12 +59,7 @@ const Citas: React.FC = () => {
             <TopBar />
             <IonContent className="citas-content" fullscreen>
                 <div style={{ padding: '10px' }}>
-                    {/* Title or usage of existing structure? 
-                 Mockup 2 shows "Vetcare" header (TopBar) and then the cards.
-                 It doesn't show a specific page title like "Mis Citas", but I'll stick to just the cards 
-                 as per the "second image" visual which is mostly cards. 
-             */}
-                    {mockAppointments.map(app => (
+                    {pastAppointments.map(app => (
                         <AppointmentCard key={app.id} appointment={app} />
                     ))}
                 </div>
@@ -57,4 +68,4 @@ const Citas: React.FC = () => {
     );
 };
 
-export default Citas;
+export default Historial;

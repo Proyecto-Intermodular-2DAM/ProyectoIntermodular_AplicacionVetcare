@@ -13,6 +13,7 @@ import SideMenu from './components/SideMenu';
 import EditProfile from './pages/EditProfile';
 import UserProfile from './pages/UserProfile';
 import Citas from './pages/Citas';
+import Historial from './pages/Historial';
 
 import Treatment from './pages/Treatment';
 import AnimalTreatment from './pages/AnimalTreatment';
@@ -69,6 +70,7 @@ const App: React.FC = () => (
                 <Route path="/edit-profile" component={EditProfile} exact />
                 <Route path="/user-profile" component={UserProfile} exact />
                 <Route path="/citas" component={Citas} exact />
+                <Route path="/historial" component={Historial} exact />
                 <Route path="/treatment" component={Treatment} exact />
                 <Route path="/animal-treatment/:animalId" component={AnimalTreatment} exact />
                 <Redirect exact from="/" to="/login" />
