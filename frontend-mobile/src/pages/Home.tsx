@@ -31,6 +31,7 @@ const MenuPage: React.FC = () => {
 
     // Función de navegación
     const handleNavigation = (path: string) => {
+        console.log(`Navegando a: ${path}`);
         history.push(path);
     };
 
