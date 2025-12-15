@@ -42,7 +42,7 @@ const SideMenu: React.FC = () => {
                                 <IonIcon slot="start" icon={home} className="side-menu-item-icon" />
                                 <IonLabel className="side-menu-item-label">Home</IonLabel>
                             </IonItem>
-                            <IonItem button lines="none" detail={false} className="side-menu-item">
+                            <IonItem routerLink='/contactus' routerDirection="forward" lines="none" detail={false} className="side-menu-item">
                                 <IonIcon slot="start" icon={call} className="side-menu-item-icon" />
                                 <IonLabel className="side-menu-item-label">Contacta con nosotros</IonLabel>
                             </IonItem>

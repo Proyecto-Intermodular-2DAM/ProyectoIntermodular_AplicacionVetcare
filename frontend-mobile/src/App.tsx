@@ -50,6 +50,7 @@ import '@ionic/react/css/palettes/dark.system.css';
 import PasswordRecovery from './pages/PasswordRecovery';
 import SignUpSuccessful from './pages/SignUpSuccessful';
 import SignUpFailed from './pages/SignUpFailed';
+import ContactUs from './pages/ContactUs';
 
 
 
@@ -71,6 +72,7 @@ const App: React.FC = () => (
         <Route path="/signUpFailed" component={SignUpFailed} exact />
         <Route path="/edit-profile" component={EditProfile} exact />
         <Route path="/user-profile" component={UserProfile} exact />
+        <Route path="/contactUs" component={ContactUs} exact />
         <Route path="/citas" component={Citas} exact />
         <Route path="/historial" component={Historial} exact />
         <Route path="/treatment" component={Treatment} exact />
