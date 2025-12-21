@@ -10,7 +10,7 @@ import {
     IonIcon,
 } from '@ionic/react';
 import { arrowForward, medkit } from 'ionicons/icons';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import SideMenu from '../components/SideMenu';
 import '../theme/css/Treatment.css';
@@ -24,7 +24,7 @@ interface Animal {
 }
 
 const Treatment: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     // Mock data for animals
     const animals: Animal[] = [
         {
@@ -47,7 +47,7 @@ const Treatment: React.FC = () => {
     const animalsInTreatment = animals.filter(animal => animal.activeTreatments > 0).length;
 
     const handleAnimalClick = (animalId: number) => {
-        history.push(`/animal-treatment/${animalId}`);
+        navigate(`/animal-treatment/${animalId}`);
     };
 
     return (

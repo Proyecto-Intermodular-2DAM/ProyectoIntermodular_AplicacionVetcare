@@ -11,19 +11,19 @@ import {
     IonButtons,
 } from "@ionic/react";
 import { arrowBack, camera } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "../theme/css/EditProfile.css";
 
 const EditProfile: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const [name, setName] = useState<string>("Melissa Paters");
     const [email, setEmail] = useState<string>("melpeters@gmail.com");
     const [password, setPassword] = useState<string>("••••••••••••");
     const [profileImage, setProfileImage] = useState<string>("");
 
     const handleGoBack = () => {
-        history.goBack();
+        navigate(-1);
     };
 
     const handleSaveChanges = (e: React.FormEvent) => {

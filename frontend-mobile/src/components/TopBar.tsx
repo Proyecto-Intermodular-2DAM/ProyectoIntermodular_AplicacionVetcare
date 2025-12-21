@@ -5,31 +5,31 @@ import {
     IonButton,
     IonIcon,
     IonTitle,
-    useIonRouter,
     IonMenuButton
 } from '@ionic/react';
 import { arrowBack, personCircle } from 'ionicons/icons';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const TopBar: React.FC = () => {
     const location = useLocation();
-    const router = useIonRouter();
+    const navigate = useNavigate();
     const isHome = location.pathname === '/home';
 
     const handleLogoClick = () => {
-        router.push('/home', 'root', 'push');
+        navigate('/home');
     };
 
     const handleBackClick = () => {
-        if (router.canGoBack()) {
-            router.goBack();
+        // Simple back navigation logic for standard router
+        if (window.history.length > 1) {
+            navigate(-1);
         } else {
-            router.push('/home', 'root', 'replace');
+            navigate('/home', { replace: true });
         }
     };
 
     const handleProfileClick = () => {
-        router.push('/user-profile', 'forward', 'push');
+        navigate('/user-profile');
     };
 
     return (

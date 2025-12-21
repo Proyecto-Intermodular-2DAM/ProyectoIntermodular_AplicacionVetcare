@@ -9,22 +9,23 @@ import {
     IonItem,
 } from "@ionic/react";
 import { paw } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "../theme/css/Signup.css";
 
 const Signup: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const [name, setName] = useState<string>("");
     const [surname, setSurname] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [dni, setDni] = useState<string>("");
+    const [phone, setPhone] = useState<string>("");
     const [pass, setPass] = useState<string>("");
     const [confirmPass, setConfirmPass] = useState<string>("");
 
     const handleSignup = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Formulario de registro enviado:", { name, surname, email, dni, pass, confirmPass });
+        console.log("Formulario de registro enviado:", { name, surname, email, dni, phone, pass, confirmPass });
 
         if (pass !== confirmPass) {
             alert("Las contraseñas no coinciden");
@@ -32,13 +33,13 @@ const Signup: React.FC = () => {
         }
 
         // TODO: conectar con backend (AuthService) para registro
-        if (name && surname && email && dni && pass) {
-            history.push("/signUpSuccessful");
+        if (name && surname && email && dni && phone && pass) {
+            navigate("/signUpSuccessful");
         }
     };
 
     const handleLogin = () => {
-        history.push("/login");
+        navigate("/login");
     };
 
     return (
@@ -117,6 +118,19 @@ const Signup: React.FC = () => {
                                         type="text"
                                         value={dni}
                                         onIonChange={(e: any) => setDni(e.detail.value!)}
+                                        required
+                                    />
+                                </IonItem>
+
+                                {/* --- Número de Teléfono --- */}
+                                <IonItem className="signup-input" lines="none">
+                                    <IonInput
+                                        label="Número de teléfono"
+                                        labelPlacement="floating"
+                                        placeholder="Número de teléfono"
+                                        type="tel"
+                                        value={phone}
+                                        onIonChange={(e: any) => setPhone(e.detail.value!)}
                                         required
                                     />
                                 </IonItem>

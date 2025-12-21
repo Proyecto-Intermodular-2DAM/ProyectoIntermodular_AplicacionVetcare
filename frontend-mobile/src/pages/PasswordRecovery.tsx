@@ -8,14 +8,14 @@ import {
 } from "@ionic/react";
 import { paw } from "ionicons/icons";
 import "../theme/css/Login.css";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const PasswordRecovery: React.FC = () => {
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const goToLogin = () => {
-        history.push("/login");
+        navigate("/login");
     };
 
     return (
@@ -24,7 +24,7 @@ const PasswordRecovery: React.FC = () => {
                 <div className="login-center-container">
                     <IonCard className="login-card">
                         <IonCardContent className="login-card-content">
-                            
+
                             <header className="login-header-container">
                                 <IonIcon icon={paw} className="login-icon" />
                                 <h1 className="login-title">Recuperar contraseña</h1>
@@ -43,7 +43,7 @@ const PasswordRecovery: React.FC = () => {
                             <IonButton expand="block" className="login-button" onClick={goToLogin}>
                                 Sign in
                             </IonButton>
-                            
+
                         </IonCardContent>
                     </IonCard>
                 </div>

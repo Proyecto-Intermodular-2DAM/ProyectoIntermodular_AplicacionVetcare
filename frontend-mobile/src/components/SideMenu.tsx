@@ -7,15 +7,15 @@ import {
     IonLabel,
     IonIcon,
     IonMenuToggle,
-    useIonRouter,
     IonModal,
     IonButton,
     IonText
 } from '@ionic/react';
 import { home, call, documentText, logOut, close } from 'ionicons/icons';
+import { useNavigate } from 'react-router-dom';
 
 const SideMenu: React.FC = () => {
-    const router = useIonRouter();
+    const navigate = useNavigate();
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     const handleLogoutClick = () => {
@@ -24,7 +24,7 @@ const SideMenu: React.FC = () => {
 
     const confirmLogout = () => {
         setShowLogoutModal(false);
-        router.push('/login', 'root', 'replace');
+        navigate('/login', { replace: true });
     };
 
     return (

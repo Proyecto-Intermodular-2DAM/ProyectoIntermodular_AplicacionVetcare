@@ -14,12 +14,12 @@ import {
     IonCol,
 } from "@ionic/react";
 import { person, lockClosed, paw } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import "../theme/css/Login.css";
 
 const Login: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
     const [email, setEmail] = useState<string>("");
     const [pass, setPass] = useState<string>("");
     const [rememberMe, setRememberMe] = useState<boolean>(false);
@@ -29,16 +29,16 @@ const Login: React.FC = () => {
         console.log("LOGIN INTENT - State:", { email, pass });
 
         // Navegación directa como solicitado, sin validación estricta por ahora
-        history.push("/home");
+        navigate("/home");
     };
 
     const handleSignUp = () => {
-        history.push("/signup");
+        navigate("/signup");
     };
 
     const handleRecoverPassword = () => {
         console.log("Navegar a recuperación de contraseña");
-        history.push("/passwordRecovery");
+        navigate("/passwordRecovery");
     };
 
     return (
