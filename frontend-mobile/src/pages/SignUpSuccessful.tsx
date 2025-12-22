@@ -30,10 +30,15 @@ const SignUpSuccessful: React.FC = () => {
                                 <h1 className="login-title">Registro Exitoso</h1>
 
                                 <IonIcon icon={checkmarkCircle} className="signup-success" />
+
+                                <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--color-primary-design)' }}>
+                                    Hemos enviado un correo de verificación a tu bandeja de entrada.
+                                    Por favor, confirma tu cuenta antes de iniciar sesión.
+                                </p>
                             </header>
 
                             <IonButton expand="block" className="login-button" onClick={goToLogin}>
-                                Sign in
+                                Iniciar Sesión
                             </IonButton>
 
                         </IonCardContent>

@@ -1,21 +1,13 @@
-import { Route, Navigate, BrowserRouter, Routes } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { IonApp, setupIonicReact } from '@ionic/react';
 
-/* Theme variables */
-import Login from './pages/Login';
-import ErrorPage from './pages/ErrorPage';
-import LegalTerms from './pages/LegalTerms';
-import Signup from './pages/Signup';
-import Home from './pages/Home';
-import Adoptions from './pages/Adoptions';
-import SideMenu from './components/SideMenu';
-import EditProfile from './pages/EditProfile';
-import UserProfile from './pages/UserProfile';
-import Citas from './pages/Citas';
-import Historial from './pages/Historial';
-import Treatment from './pages/Treatment';
-import AnimalTreatment from './pages/AnimalTreatment';
 
+import SideMenu from './components/SideMenu';
+import AppRouter from './components/Router';
+
+/* Auth */
+import { AuthProvider } from './contexts/AuthContext';
+import DeepLinkHandler from './components/DeepLinkHandler';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -45,39 +37,20 @@ import '@ionic/react/css/display.css';
 /* import '@ionic/react/css/palettes/dark.always.css'; */
 /* import '@ionic/react/css/palettes/dark.class.css'; */
 import '@ionic/react/css/palettes/dark.system.css';
-import PasswordRecovery from './pages/PasswordRecovery';
-import SignUpSuccessful from './pages/SignUpSuccessful';
-import SignUpFailed from './pages/SignUpFailed';
-import ContactUs from './pages/ContactUs';
-
-
 
 setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
-    <BrowserRouter>
-      <SideMenu />
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/error-page" element={<ErrorPage />} />
-        <Route path="/legal-terms" element={<LegalTerms />} />
-        <Route path="/adoption" element={<Adoptions />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/home" element={<Home />} />
-        <Route path="/passwordRecovery" element={<PasswordRecovery />} />
-        <Route path="/signUpSuccessful" element={<SignUpSuccessful />} />
-        <Route path="/signUpFailed" element={<SignUpFailed />} />
-        <Route path="/edit-profile" element={<EditProfile />} />
-        <Route path="/user-profile" element={<UserProfile />} />
-        <Route path="/contactUs" element={<ContactUs />} />
-        <Route path="/citas" element={<Citas />} />
-        <Route path="/historial" element={<Historial />} />
-        <Route path="/treatment" element={<Treatment />} />
-        <Route path="/animal-treatment/:animalId" element={<AnimalTreatment />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <DeepLinkHandler />
+        <SideMenu />
+        <div id="main-content">
+          <AppRouter />
+        </div>
+      </BrowserRouter>
+    </AuthProvider>
   </IonApp>
 );
 

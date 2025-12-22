@@ -115,6 +115,7 @@
     margin-top: 30px;
     font-size: 16px;
 }
+
 .signup-success {
     font-size: 100px;
     color: green;
@@ -123,4 +124,17 @@
 .signup-failed {
     font-size: 100px;
     color: red;
+}
+
+/* 8. Mensajes de Error sobre los campos */
+.field-error-message {
+    color: #eb445a;
+    font-size: 13px;
+    margin-bottom: 2px;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.signup-input.ion-invalid {
+    border-color: #eb445a;
 }
