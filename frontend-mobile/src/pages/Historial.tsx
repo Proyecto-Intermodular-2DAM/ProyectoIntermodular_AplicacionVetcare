@@ -1,67 +1,53 @@
-import React from 'react';
-import { IonPage, IonContent } from '@ionic/react';
+
+import React, { useEffect, useState } from 'react';
+import { IonPage, IonContent, IonSpinner } from '@ionic/react';
 import TopBar from '../components/TopBar';
 import AppointmentCard, { Appointment } from '../components/AppointmentCard';
+import { vetService } from '../services/vetService';
 import '../theme/css/Citas.css';
 
 const Historial: React.FC = () => {
-    // Mock data for past appointments
-    const pastAppointments: Appointment[] = [
-        {
-            id: '1',
-            title: 'Revisión anual',
-            date: '2024-10-15',
-            time: '10:00 AM',
-            veterinarian: {
-                name: 'Elvia Atkins',
-                avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg'
-            },
-            animal: {
-                name: 'Toby',
-                avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg',
-                type: 'Dog'
+    const [appointments, setAppointments] = useState<Appointment[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchPastAppointments = async () => {
+            try {
+                const data = await vetService.getMyAppointments();
+                // Filter for past appointments (before today)
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+
+                const past = data.filter(app => new Date(app.date) < today);
+                setAppointments(past as Appointment[]);
+            } catch (error) {
+                console.error("Error fetching past appointments:", error);
+            } finally {
+                setLoading(false);
             }
-        },
-        {
-            id: '2',
-            title: 'Vacuna antirrábica',
-            date: '2024-09-20',
-            time: '14:30 PM',
-            veterinarian: {
-                name: 'Elvia Atkins',
-                avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg'
-            },
-            animal: {
-                name: 'Toby',
-                avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg',
-                type: 'Dog'
-            }
-        },
-        {
-            id: '3',
-            title: 'Chequeo general',
-            date: '2024-08-10',
-            time: '09:15 AM',
-            veterinarian: {
-                name: 'Elvia Atkins',
-                avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg'
-            },
-            animal: {
-                name: 'Toby',
-                avatar: 'https://ionicframework.com/docs/img/demos/avatar.svg',
-                type: 'Dog'
-            }
-        }
-    ];
+        };
+
+        fetchPastAppointments();
+    }, []);
 
     return (
         <IonPage className="citas-page">
             <TopBar />
             <IonContent className="citas-content" fullscreen>
                 <div style={{ padding: '10px' }}>
-                    {pastAppointments.map(app => (
-                        <AppointmentCard key={app.id} appointment={app} />
-                    ))}
+                    {loading ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                            <IonSpinner name="crescent" />
+                        </div>
+                    ) : appointments.length > 0 ? (
+                        appointments.map(app => (
+                            <AppointmentCard key={app.id} appointment={app} />
+                        ))
+                    ) : (
+                        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--ion-color-medium)' }}>
+                            <p>No tienes historial de citas.</p>
+                        </div>
+                    )}
                 </div>
             </IonContent>
         </IonPage>
