@@ -39,8 +39,8 @@
 
 /* SideMenu Styles */
 .side-menu {
-    top: 56px;
-    height: calc(100% - 56px);
+    top: 75px;
+    height: calc(100% - 75px);
     --background: var(--color-white) !important;
 }
 

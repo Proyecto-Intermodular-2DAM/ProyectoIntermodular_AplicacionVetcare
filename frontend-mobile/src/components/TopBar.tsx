@@ -16,11 +16,19 @@ const TopBar: React.FC = () => {
     const router = useIonRouter();
     const isHome = location.pathname === '/home';
 
+    const dismissKeyboardAndFocus = () => {
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+    };
+
     const handleLogoClick = () => {
+        dismissKeyboardAndFocus();
         router.push('/home', 'root', 'push');
     };
 
     const handleBackClick = () => {
+        dismissKeyboardAndFocus();
         if (router.canGoBack()) {
             router.goBack();
         } else {
@@ -29,6 +37,7 @@ const TopBar: React.FC = () => {
     };
 
     const handleProfileClick = () => {
+        dismissKeyboardAndFocus();
         router.push('/user-profile', 'forward', 'push');
     };
 

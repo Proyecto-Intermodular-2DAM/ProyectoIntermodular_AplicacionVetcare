@@ -10,6 +10,7 @@ import LegalTerms from './pages/LegalTerms';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
 import Adoptions from './pages/Adoptions';
+import AdoptionDetail from './pages/AdoptionDetail';
 import SideMenu from './components/SideMenu';
 import EditProfile from './pages/EditProfile';
 import UserProfile from './pages/UserProfile';
@@ -65,6 +66,7 @@ const App: React.FC = () => (
         <Route path="/error-page" component={ErrorPage} exact />
         <Route path="/legal-terms" component={LegalTerms} exact />
         <Route path="/adoption" component={Adoptions} exact />
+        <Route path="/adoption-detail/:id" component={AdoptionDetail} exact />
         <Route path="/signup" component={Signup} exact />
         <Route path="/home" component={Home} exact />
         <Route path="/passwordRecovery" component={PasswordRecovery} exact />
