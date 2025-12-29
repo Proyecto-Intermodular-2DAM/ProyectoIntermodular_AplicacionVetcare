@@ -1,0 +1,85 @@
+.adoption-detail-content {
+    --background: #fff;
+}
+
+.adoption-detail-image {
+    width: calc(100% - 32px);
+    margin: 40px 16px 0 16px;
+    height: 40vh;
+    object-fit: cover;
+    border-radius: 30px;
+}
+
+.adoption-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+}
+
+.adoption-name {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0;
+    color: #000;
+}
+
+.adopt-button {
+    --background: #006064;
+    /* Dark Teal */
+    --border-radius: 20px;
+    font-weight: bold;
+    text-transform: none;
+    font-size: 14px;
+    height: 40px;
+}
+
+.adoption-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    padding: 0 20px;
+    margin-bottom: 20px;
+}
+
+.stat-card {
+    background-color: #8ed1cc;
+    /* Light Teal */
+    border-radius: 15px;
+    padding: 10px 5px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.stat-label {
+    font-weight: 900;
+    font-size: 12px;
+    color: #000;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    font-size: 14px;
+    color: #333;
+}
+
+.adoption-info-section {
+    padding: 20px;
+}
+
+.info-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    margin-bottom: 10px;
+}
+
+.info-text {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+}

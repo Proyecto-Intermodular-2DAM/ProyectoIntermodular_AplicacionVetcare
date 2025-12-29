@@ -2,6 +2,14 @@ import { BrowserRouter } from 'react-router-dom';
 import { IonApp, setupIonicReact } from '@ionic/react';
 
 
+/* Theme variables */
+import Login from './pages/Login';
+import ErrorPage from './pages/ErrorPage';
+import LegalTerms from './pages/LegalTerms';
+import Signup from './pages/Signup';
+import Home from './pages/Home';
+import Adoptions from './pages/Adoptions';
+import AdoptionDetail from './pages/AdoptionDetail';
 import SideMenu from './components/SideMenu';
 import AppRouter from './components/Router';
 
