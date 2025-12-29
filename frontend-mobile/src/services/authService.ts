@@ -20,8 +20,8 @@ class AuthService {
     private getBaseUrl() {
         let baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
         
-        // Only strip a truly trailing slash if it's not part of the protocol (e.g. "com.app://")
-        if (baseUrl.endsWith('/') && !baseUrl.endsWith('://')) {
+        // Always strip trailing slash to ensure clean concatenation with paths starting with /
+        if (baseUrl.endsWith('/')) {
             baseUrl = baseUrl.slice(0, -1);
         }
         return baseUrl;
