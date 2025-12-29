@@ -12,7 +12,7 @@ import {
     IonAvatar,
 } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../theme/css/UserProfile.css";
 
 interface Pet {
@@ -23,7 +23,7 @@ interface Pet {
 }
 
 const UserProfile: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
 
     // Mock user data
     const user = {
@@ -49,17 +49,17 @@ const UserProfile: React.FC = () => {
     ];
 
     const handleGoBack = () => {
-        history.goBack();
+        navigate(-1);
     };
 
     const handleEditProfile = () => {
-        history.push("/edit-profile");
+        navigate("/edit-profile");
     };
 
     const handlePetClick = (petId: number) => {
         console.log("Navegando a detalles de mascota:", petId);
         // TODO: Navegar a página de detalles de mascota
-        // history.push(`/pet-details/${petId}`);
+        // navigate(`/pet-details/${petId}`);
     };
 
     return (
