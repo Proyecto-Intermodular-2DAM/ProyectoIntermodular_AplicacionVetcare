@@ -30,6 +30,9 @@ interface MenuOption {
 const MenuPage: React.FC = () => {
     const navigate = useNavigate();
 
+    // In the future, we could fetch a summary here (e.g., number of upcoming appointments)
+    // For now, it remains a main navigation hub.
+
     // Función de navegación
     const handleNavigation = (path: string) => {
         console.log(`Navegando a: ${path}`);
