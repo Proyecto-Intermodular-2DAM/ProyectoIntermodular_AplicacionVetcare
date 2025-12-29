@@ -1,0 +1,90 @@
+import React from 'react';
+import MainLayout from '../components/MainLayout';
+import { IonIcon } from '@ionic/react';
+import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
+import { useNavigate } from 'react-router-dom';
+import '../theme/css/ListEmployee.css';
+
+const ListEmployee: React.FC = () => {
+    const navigate = useNavigate();
+
+    const employees = [
+        { no: 1, dni: '12345678A', nombre: 'Paco', telefono: '611 11 11 11', sueldo: '2000 €', id: '1' },
+        { no: 2, dni: '12345678B', nombre: 'Marta', telefono: '622 22 22 22', sueldo: '2000 €', id: '2' },
+        { no: 3, dni: '12345678C', nombre: 'German', telefono: '633 33 33 33', sueldo: '1800 €', id: '3' },
+        { no: 4, dni: '12345678F', nombre: 'Paula', telefono: '644 44 44 44', sueldo: '1800 €', id: '4' },
+        { no: 5, dni: '12345678E', nombre: 'Juan', telefono: '655 55 55 55', sueldo: '2200 €', id: '5' },
+    ];
+
+    return (
+        <MainLayout>
+            <div className="list-employee-container">
+                <div className="list-employee-header">
+                    <h1>Listado Empleados</h1>
+                    <button
+                        className="btn-gestion-empleado"
+                        onClick={() => navigate('/empleados')}
+                    >
+                        Gestión Empleado <IonIcon icon={chevronForwardOutline} />
+                    </button>
+                </div>
+
+                <div className="list-tabs">
+                    <div className="tab-item">Listado Empleados</div>
+                </div>
+
+                <div className="list-controls">
+                    <div className="controls-left">
+                        <div className="filter-select">
+                            <IonIcon icon={calendarOutline} />
+                            Last 30 days
+                            <IonIcon icon={chevronForwardOutline} style={{ transform: 'rotate(90deg)', fontSize: '10px' }} />
+                        </div>
+                        <div className="filter-select">
+                            <IonIcon icon={filterOutline} />
+                            Filter by
+                            <IonIcon icon={chevronForwardOutline} style={{ transform: 'rotate(90deg)', fontSize: '10px' }} />
+                        </div>
+                    </div>
+
+                    <div className="controls-right">
+                        <div className="table-search-bar">
+                            <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
+                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                        </div>
+                        <button className="btn-eliminar-empleado">
+                            Eliminar Empleado <IonIcon icon={chevronForwardOutline} />
+                        </button>
+                    </div>
+                </div>
+
+                <table className="employee-table">
+                    <thead>
+                        <tr>
+                            <th className="col-no">No.</th>
+                            <th className="col-dni">DNI</th>
+                            <th className="col-nombre">Nombre</th>
+                            <th className="col-telefono">Teléfono</th>
+                            <th className="col-sueldo">Sueldo</th>
+                            <th className="col-id">ID Usuario</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {employees.map((emp) => (
+                            <tr key={emp.no}>
+                                <td className="col-no">{emp.no}</td>
+                                <td className="col-dni">{emp.dni}</td>
+                                <td className="col-nombre">{emp.nombre}</td>
+                                <td className="col-telefono">{emp.telefono}</td>
+                                <td className="col-sueldo">{emp.sueldo}</td>
+                                <td className="col-id">{emp.id}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </MainLayout>
+    );
+};
+
+export default ListEmployee;
