@@ -5,6 +5,7 @@ import Login from '../pages/Login';
 import Signup from '../pages/Signup';
 import Home from '../pages/Home';
 import Adoptions from '../pages/Adoptions';
+import AdoptionDetail from '../pages/AdoptionDetail';
 import EditProfile from '../pages/EditProfile';
 import UserProfile from '../pages/UserProfile';
 import Citas from '../pages/Citas';
@@ -101,6 +102,14 @@ export default function AppRouter() {
         element={
           <ProtectedRoute>
             <AnimalTreatment />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/adoption-detail/:id"
+        element={
+          <ProtectedRoute>
+            <AdoptionDetail />
           </ProtectedRoute>
         }
       />

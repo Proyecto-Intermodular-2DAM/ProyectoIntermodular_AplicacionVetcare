@@ -13,7 +13,7 @@ import {
     IonButtons,
     IonBackButton
 } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import '../theme/css/Adoptions.css';
 import TopBar from '../components/TopBar';
 
@@ -74,7 +74,7 @@ export const defaultAdoptions: AdoptionItem[] = [
 ];
 
 const Adoptions: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
 
     return (
         <IonPage>
@@ -96,7 +96,7 @@ const Adoptions: React.FC = () => {
                                 if (document.activeElement instanceof HTMLElement) {
                                     document.activeElement.blur();
                                 }
-                                history.push(`/adoption-detail/${item.id}`);
+                                navigate(`/adoption-detail/${item.id}`);
                             }}
                         >
                             <div className="card-image-container">

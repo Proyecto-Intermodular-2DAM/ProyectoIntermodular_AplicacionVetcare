@@ -8,8 +8,6 @@ import ErrorPage from './pages/ErrorPage';
 import LegalTerms from './pages/LegalTerms';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
-import Adoptions from './pages/Adoptions';
-import AdoptionDetail from './pages/AdoptionDetail';
 import SideMenu from './components/SideMenu';
 import AppRouter from './components/Router';
 
@@ -44,7 +42,7 @@ import '@ionic/react/css/display.css';
 
 /* import '@ionic/react/css/palettes/dark.always.css'; */
 /* import '@ionic/react/css/palettes/dark.class.css'; */
-import '@ionic/react/css/palettes/dark.system.css';
+/* import '@ionic/react/css/palettes/dark.system.css'; */
 
 setupIonicReact();
 
