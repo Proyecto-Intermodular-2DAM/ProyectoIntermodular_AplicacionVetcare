@@ -1,0 +1,160 @@
+/* ListEmployee.css */
+.list-employee-container {
+    padding: 20px 40px;
+    background-color: #ffffff;
+    min-height: 100%;
+}
+
+.list-employee-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.list-employee-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.btn-gestion-empleado {
+    background-color: #00695c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.list-tabs {
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 20px;
+}
+
+.tab-item {
+    display: inline-block;
+    padding: 10px 20px;
+    color: #3b82f6;
+    font-weight: 600;
+    border-bottom: 3px solid #3b82f6;
+    cursor: pointer;
+}
+
+.list-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 16px;
+}
+
+.controls-left {
+    display: flex;
+    gap: 12px;
+}
+
+.filter-select {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #dcdcdc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    gap: 8px;
+}
+
+.controls-right {
+    display: flex;
+    gap: 16px;
+    flex: 1;
+    justify-content: flex-end;
+}
+
+.table-search-bar {
+    display: flex;
+    align-items: center;
+    background-color: #f1f3f4;
+    border-radius: 8px;
+    padding: 8px 16px;
+    width: 350px;
+}
+
+.table-search-bar input {
+    background: transparent;
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 14px;
+}
+
+.btn-eliminar-empleado {
+    background-color: #00695c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.employee-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.employee-table th {
+    text-align: left;
+    padding: 12px 16px;
+    color: #888;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.employee-table td {
+    padding: 20px 16px;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.employee-table tr:last-child td {
+    border-bottom: none;
+}
+
+.col-no {
+    width: 60px;
+    color: #333;
+    font-weight: 700;
+}
+
+.col-dni {
+    width: 140px;
+}
+
+.col-nombre {
+    width: 140px;
+}
+
+.col-telefono {
+    width: 140px;
+}
+
+.col-sueldo {
+    width: 110px;
+}
+
+.col-id {
+    width: 90px;
+}

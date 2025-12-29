@@ -1,0 +1,22 @@
+.main-layout {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.main-content-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #f8f9fa;
+    /* Light grey background for content area */
+}
+
+.main-scrollable-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+}
