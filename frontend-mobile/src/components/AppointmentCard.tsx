@@ -20,14 +20,14 @@ export interface Appointment {
     title: string;
     date: string; // ISO string 2024-11-05
     time: string; // e.g., "16:30 AM"
-    veterinarian: {
+    veterinarian?: {
         name: string;
-        avatar: string;
+        avatar?: string;
     };
-    animal: {
+    animal?: {
         name: string;
-        avatar: string;
-        type: string;
+        avatar?: string;
+        type?: string;
     };
 }
 
@@ -100,9 +100,9 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment }) => {
                             <strong>Veterinario</strong>
                             <IonChip className="custom-chip">
                                 <IonAvatar>
-                                    <img alt={appointment.veterinarian.name} src={appointment.veterinarian.avatar} />
+                                    <img alt={appointment.veterinarian?.name || "Sin asignar"} src={appointment.veterinarian?.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} />
                                 </IonAvatar>
-                                <IonLabel>{appointment.veterinarian.name}</IonLabel>
+                                <IonLabel>{appointment.veterinarian?.name || "Sin asignar"}</IonLabel>
                             </IonChip>
                         </div>
 
@@ -111,9 +111,9 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment }) => {
                             <strong>Animal</strong>
                             <IonChip className="custom-chip">
                                 <IonAvatar>
-                                    <img alt={appointment.animal.name} src={appointment.animal.avatar} />
+                                    <img alt={appointment.animal?.name || "Mascota"} src={appointment.animal?.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} />
                                 </IonAvatar>
-                                <IonLabel>{appointment.animal.name}</IonLabel>
+                                <IonLabel>{appointment.animal?.name || "Mascota"}</IonLabel>
                             </IonChip>
                         </div>
                     </div>
