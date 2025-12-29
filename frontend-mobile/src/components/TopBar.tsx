@@ -15,6 +15,12 @@ const TopBar: React.FC = () => {
     const navigate = useNavigate();
     const isHome = location.pathname === '/home';
 
+    const dismissKeyboardAndFocus = () => {
+        if (document.activeElement instanceof HTMLElement) {
+            document.activeElement.blur();
+        }
+    };
+
     const handleLogoClick = () => {
         navigate('/home');
     };

@@ -207,3 +207,49 @@
     font-weight: var(--text-large-font-weight);
     color: var(--color-error);
 }
+
+/* Dark Mode Overrides - DISABLED */
+/*
+@media (prefers-color-scheme: dark) {
+    .animal-treatment-name {
+        color: var(--color-white);
+    }
+
+    .animal-treatment-breed {
+        color: var(--color-grey-4);
+    }
+
+    .animal-treatment-active-card,
+    .animal-treatment-card {
+        background: var(--color-black-3);
+    }
+
+    .animal-treatment-active-label {
+        color: var(--color-grey-3);
+    }
+
+    .animal-treatment-active-value {
+        color: var(--color-white);
+    }
+
+    .animal-treatment-card-title {
+        color: var(--color-white);
+    }
+
+    .animal-treatment-card-subtitle {
+        color: var(--color-grey-3);
+    }
+
+    .animal-treatment-instructions {
+        color: var(--color-grey-3);
+    }
+
+    .animal-treatment-instructions strong {
+        color: var(--color-white);
+    }
+
+    .animal-treatment-no-treatments-text {
+        color: var(--color-grey-3);
+    }
+}
+*/
