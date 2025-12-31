@@ -5,7 +5,7 @@ import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
 import '../theme/css/Employee.css';
 
-const Employee: React.FC = () => {
+const Appointment: React.FC = () => {
     const navigate = useNavigate();
 
     const [idCita, setIdCita] = useState<string>(""); //TODO cambiar tipo a id
@@ -205,4 +205,4 @@ const Employee: React.FC = () => {
     );
 };
 
-export default Employee;
+export default Appointment;
