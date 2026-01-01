@@ -18,10 +18,40 @@ const Treatment: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    const markTouched = (field: string) => {
+        setTouched(prev => ({ ...prev, [field]: true }));
+    };
+
+    const validateDNI = (dni: string) => {
+        const regex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
+        if (!regex.test(dni)) return false;
+        const lookup = "TRWAGMYFPDXBNJZSQVHLCKE";
+        const number = parseInt(dni.substring(0, 8), 10);
+        const letter = dni.charAt(8).toUpperCase();
+        return lookup.charAt(number % 23) === letter;
+    };
 
     const handleAction = async (type: 'create' | 'update') => {
-        if (!dniCliente || !nombreAnimal || !medicamento) {
-            setMessage("Por favor, completa los campos obligatorios");
+        setMessage("");
+        const allTouched = {
+            dniCliente: true,
+            nombreAnimal: true,
+            medicamento: true,
+            psologia: true,
+            descripcion: true
+        };
+        setTouched(allTouched);
+
+        if (!dniCliente || !nombreAnimal || !medicamento || !psologia || !descripcion) {
+            setMessage("Por favor, completa todos los campos obligatorios");
+            setShowToast(true);
+            return;
+        }
+
+        if (!validateDNI(dniCliente)) {
+            setMessage("El DNI introducido no es válido");
             setShowToast(true);
             return;
         }
@@ -68,55 +98,75 @@ const Treatment: React.FC = () => {
                     {/* Left Column */}
                     <div className="form-group">
                         <label>DNi Cliente</label>
+                        {touched.dniCliente && !validateDNI(dniCliente) && (
+                            <div className="field-error-message">DNI no válido (8 números y letra)</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
                             placeholder="Insertar DNI Cliente"
                             value={dniCliente}
                             onChange={(e) => setDniCliente(e.target.value)}
+                            onBlur={() => markTouched('dniCliente')}
                         />
                     </div>
 
                     {/* Right Column */}
                     <div className="form-group">
                         <label>Medicamento</label>
+                        {touched.medicamento && !medicamento && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.medicamento && !medicamento ? 'input-invalid' : ''}`}
                             placeholder="Insertar Medicamento"
                             value={medicamento}
                             onChange={(e) => setMedicamento(e.target.value)}
+                            onBlur={() => markTouched('medicamento')}
                         />
                     </div>
 
                     {/* Left Column */}
                     <div className="form-group">
                         <label>Nombre Animal</label>
+                        {touched.nombreAnimal && !nombreAnimal && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.nombreAnimal && !nombreAnimal ? 'input-invalid' : ''}`}
                             placeholder="Insertar Nombre Animal"
                             value={nombreAnimal}
                             onChange={(e) => setNombreAnimal(e.target.value)}
+                            onBlur={() => markTouched('nombreAnimal')}
                         />
                     </div>
 
                     {/* Right Column */}
                     <div className="form-group">
                         <label>Psologia</label>
+                        {touched.psologia && !psologia && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.psologia && !psologia ? 'input-invalid' : ''}`}
                             placeholder="Insertar Psologia"
                             value={psologia}
                             onChange={(e) => setPsologia(e.target.value)}
+                            onBlur={() => markTouched('psologia')}
                         />
                     </div>
 
                     {/* Left Column */}
                     <div className="form-group">
                         <label>Descripcion</label>
+                        {touched.descripcion && !descripcion && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.descripcion && !descripcion ? 'input-invalid' : ''}`}
                             placeholder="Insertar Descripcion"
                             value={descripcion}
                             onChange={(e) => setDescripcion(e.target.value)}
+                            onBlur={() => markTouched('descripcion')}
                         />
                     </div>
 

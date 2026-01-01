@@ -23,7 +23,7 @@ import Clients from '../pages/Clients';
 import ListClients from '../pages/ListClients';
 import Roles from '../pages/Roles';
 import Users from '../pages/Users';
-import ListCenter from '../pages/Center';
+import ListCenter from '../pages/ListCenter';
 
 const AppRouter: React.FC = () => (
     <BrowserRouter>
