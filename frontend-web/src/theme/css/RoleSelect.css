@@ -1,0 +1,66 @@
+/* RoleSelect.css */
+.role-select-container {
+    position: relative;
+    width: 180px;
+    font-family: inherit;
+}
+
+.role-select-trigger {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: border-color 0.2s;
+}
+
+.role-select-trigger:hover {
+    border-color: #00695c;
+}
+
+.role-select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 100;
+    margin-top: 4px;
+    overflow: hidden;
+}
+
+.role-option {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.role-option:last-child {
+    border-bottom: none;
+}
+
+.role-option:hover {
+    background-color: #f0f0f0;
+}
+
+.role-option.selected {
+    background-color: #00695c;
+    /* Teal color from image */
+    color: #ffffff;
+}
+
+.chevron-icon {
+    font-size: 14px;
+    color: #888;
+}

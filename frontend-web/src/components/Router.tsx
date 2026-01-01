@@ -19,7 +19,11 @@ import ListRooms from '../pages/ListRooms';
 import ListTreatment from '../pages/ListTreatment';
 import Adoption from '../pages/Adoption';
 import ListAdoption from '../pages/ListAdoption';
-import ListCenter from '../pages/ListCenter';
+import Clients from '../pages/Clients';
+import ListClients from '../pages/ListClients';
+import Roles from '../pages/Roles';
+import Users from '../pages/Users';
+import ListCenter from '../pages/Center';
 
 const AppRouter: React.FC = () => (
     <BrowserRouter>
@@ -38,6 +42,10 @@ const AppRouter: React.FC = () => (
             <Route path="/gestion-tratamiento" element={<Treatment />} />
             <Route path="/historial-adopciones" element={<Adoption />} />
             <Route path="/gestion-adopcion" element={<Adoption />} />
+            <Route path="/clientes" element={<Clients />} />
+            <Route path="/gestion-clientes" element={<Clients />} />
+            <Route path="/usuarios" element={<Users />} />
+            <Route path="/ajustes" element={<Roles />} />
             <Route path="/citas" element={<DatePage />} />
             <Route path="/date" element={<DatePage />} />
             <Route path="/listado-empleados" element={<ListEmployee />} />
@@ -46,6 +54,7 @@ const AppRouter: React.FC = () => (
             <Route path="/listado-salas" element={<ListRooms />} />
             <Route path="/listado-tratamientos" element={<ListTreatment />} />
             <Route path="/listado-adopcion" element={<ListAdoption />} />
+            <Route path="/listado-clientes" element={<ListClients />} />
             <Route path="/listado-centros" element={<ListCenter />} />
             <Route path="/" element={<Navigate to="/login" replace />} />
             <Route path="*" element={<ErrorPage />} />

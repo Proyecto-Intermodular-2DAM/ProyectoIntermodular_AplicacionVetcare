@@ -3,34 +3,34 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
-import '../theme/css/ListEmployee.css';
+import '../theme/css/ListEmployee.css'; // Reusing common list styles
 
-const ListEmployee: React.FC = () => {
+const ListClients: React.FC = () => {
     const navigate = useNavigate();
 
-    const employees = [
-        { no: 1, dni: '12345678A', nombre: 'Paco', telefono: '611 11 11 11', sueldo: '2000 €', id: '1' },
-        { no: 2, dni: '12345678B', nombre: 'Marta', telefono: '622 22 22 22', sueldo: '2000 €', id: '2' },
-        { no: 3, dni: '12345678C', nombre: 'German', telefono: '633 33 33 33', sueldo: '1800 €', id: '3' },
-        { no: 4, dni: '12345678F', nombre: 'Paula', telefono: '644 44 44 44', sueldo: '1800 €', id: '4' },
-        { no: 5, dni: '12345678E', nombre: 'Juan', telefono: '655 55 55 55', sueldo: '2200 €', id: '5' },
+    const clients = [
+        { id: 1, dni: '12345678A', nombre: 'Juan Carlos', email: 'jc@gmial.com', fecha: '11/09/2025', tel: '966 66 66 66' },
+        { id: 2, dni: '12345678B', nombre: 'Ruben', email: 'ruben@gmail.com', fecha: '02/05/2024', tel: '966 69 69 69' },
+        { id: 3, dni: '12345678C', nombre: 'Martin', email: 'martin@gmail.com', fecha: '19/06/2015', tel: '966 66 66 62' },
+        { id: 4, dni: '12345678F', nombre: 'Raul', email: 'raul@gmail.com', fecha: '06/01/2016', tel: '966 66 66 63' },
+        { id: 5, dni: '12345678E', nombre: 'Alma', email: 'alma@gmail.com', fecha: '01/05/2020', tel: '966 66 66 64' },
     ];
 
     return (
         <MainLayout>
             <div className="list-employee-container">
                 <div className="list-employee-header">
-                    <h1>Listado Empleados</h1>
-                    <button 
+                    <h1>Listado Cliente</h1>
+                    <button
                         className="btn-gestion-empleado"
-                        onClick={() => navigate('/empleados')}
+                        onClick={() => navigate('/gestion-clientes')}
                     >
-                        Gestión Empleado <IonIcon icon={chevronForwardOutline} />
+                        Gestión Cliente <IonIcon icon={chevronForwardOutline} />
                     </button>
                 </div>
 
                 <div className="list-tabs">
-                    <div className="tab-item">Listado Empleados</div>
+                    <div className="tab-item selected">Listado Cliente</div>
                 </div>
 
                 <div className="list-controls">
@@ -53,7 +53,7 @@ const ListEmployee: React.FC = () => {
                             <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
                         </div>
                         <button className="btn-eliminar-empleado">
-                            Eliminar Empleado <IonIcon icon={chevronForwardOutline} />
+                            Eliminar Cliente <IonIcon icon={chevronForwardOutline} />
                         </button>
                     </div>
                 </div>
@@ -61,23 +61,23 @@ const ListEmployee: React.FC = () => {
                 <table className="employee-table">
                     <thead>
                         <tr>
-                            <th className="col-no">No.</th>
-                            <th className="col-dni">DNI</th>
+                            <th className="col-no">Id</th>
+                            <th className="col-dni">DNI Cliente</th>
                             <th className="col-nombre">Nombre</th>
-                            <th className="col-telefono">Teléfono</th>
-                            <th className="col-sueldo">Sueldo</th>
-                            <th className="col-id">ID Usuario</th>
+                            <th className="col-email">Email</th>
+                            <th className="col-fecha">Fecha</th>
+                            <th className="col-tel">Telefono</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {employees.map((emp) => (
-                            <tr key={emp.no}>
-                                <td className="col-no">{emp.no}</td>
-                                <td className="col-dni">{emp.dni}</td>
-                                <td className="col-nombre">{emp.nombre}</td>
-                                <td className="col-telefono">{emp.telefono}</td>
-                                <td className="col-sueldo">{emp.sueldo}</td>
-                                <td className="col-id">{emp.id}</td>
+                        {clients.map((c) => (
+                            <tr key={c.id}>
+                                <td className="col-no">{c.id}</td>
+                                <td className="col-dni">{c.dni}</td>
+                                <td className="col-nombre">{c.nombre}</td>
+                                <td className="col-email"><strong>{c.email}</strong></td>
+                                <td className="col-fecha"><strong>{c.fecha}</strong></td>
+                                <td className="col-tel"><strong>{c.tel}</strong></td>
                             </tr>
                         ))}
                     </tbody>
@@ -87,4 +87,4 @@ const ListEmployee: React.FC = () => {
     );
 };
 
-export default ListEmployee;
+export default ListClients;
