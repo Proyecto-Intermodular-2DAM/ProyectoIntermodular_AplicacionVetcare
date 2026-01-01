@@ -17,10 +17,54 @@ const Clients: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    const markTouched = (field: string) => {
+        setTouched(prev => ({ ...prev, [field]: true }));
+    };
+
+    const validateDNI = (dni: string) => {
+        const regex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
+        if (!regex.test(dni)) return false;
+        const lookup = "TRWAGMYFPDXBNJZSQVHLCKE";
+        const number = parseInt(dni.substring(0, 8), 10);
+        const letter = dni.charAt(8).toUpperCase();
+        return lookup.charAt(number % 23) === letter;
+    };
+
+    const validatePhone = (phone: string) => {
+        return /^[0-9]{9}$/.test(phone);
+    };
+
+    const validateEmail = (email: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
 
     const handleAction = async (type: 'create' | 'update') => {
-        if (!dniCliente || !nombreCliente) {
-            setMessage("Por favor, completa los campos obligatorios");
+        setMessage("");
+        const allTouched = { dniCliente: true, nombreCliente: true, email: true, telefono: true };
+        setTouched(allTouched);
+
+        if (!dniCliente || !nombreCliente || !email || !telefono) {
+            setMessage("Por favor, completa todos los campos obligatorios");
+            setShowToast(true);
+            return;
+        }
+
+        if (!validateDNI(dniCliente)) {
+            setMessage("El DNI introducido no es válido");
+            setShowToast(true);
+            return;
+        }
+
+        if (!validatePhone(telefono)) {
+            setMessage("El teléfono debe tener 9 dígitos");
+            setShowToast(true);
+            return;
+        }
+
+        if (!validateEmail(email)) {
+            setMessage("El email introducido no es válido");
             setShowToast(true);
             return;
         }
@@ -67,31 +111,43 @@ const Clients: React.FC = () => {
                     {/* Row 1 */}
                     <div className="form-group">
                         <label>DNi Cliente</label>
+                        {touched.dniCliente && !validateDNI(dniCliente) && (
+                            <div className="field-error-message">DNI no válido (8 números y letra)</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
                             placeholder="Insertar DNI Cliente"
                             value={dniCliente}
                             onChange={(e) => setDniCliente(e.target.value)}
+                            onBlur={() => markTouched('dniCliente')}
                         />
                     </div>
                     <div className="form-group">
                         <label>Telefono</label>
+                        {touched.telefono && !validatePhone(telefono) && (
+                            <div className="field-error-message">Teléfono no válido (9 dígitos)</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.telefono && !validatePhone(telefono) ? 'input-invalid' : ''}`}
                             placeholder="Insertar Telefono"
                             value={telefono}
                             onChange={(e) => setTelefono(e.target.value)}
+                            onBlur={() => markTouched('telefono')}
                         />
                     </div>
 
                     {/* Row 2 */}
                     <div className="form-group">
                         <label>Nombre Cliente</label>
+                        {touched.nombreCliente && !nombreCliente && (
+                            <div className="field-error-message">El nombre es obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.nombreCliente && !nombreCliente ? 'input-invalid' : ''}`}
                             placeholder="Insertar Nombre Cliente"
                             value={nombreCliente}
                             onChange={(e) => setNombreCliente(e.target.value)}
+                            onBlur={() => markTouched('nombreCliente')}
                         />
                     </div>
                     {/* Empty placeholder field on the right as per image */}
@@ -102,11 +158,15 @@ const Clients: React.FC = () => {
                     {/* Row 3 */}
                     <div className="form-group">
                         <label>Email</label>
+                        {touched.email && !validateEmail(email) && (
+                            <div className="field-error-message">Email no válido</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.email && !validateEmail(email) ? 'input-invalid' : ''}`}
                             placeholder="Insertar Email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
+                            onBlur={() => markTouched('email')}
                         />
                     </div>
                     <div></div>

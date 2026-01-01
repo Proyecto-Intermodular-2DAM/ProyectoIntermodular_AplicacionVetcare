@@ -27,6 +27,15 @@ const Animal: React.FC = () => {
         setTouched(prev => ({ ...prev, [field]: true }));
     };
 
+    const validateDNI = (dni: string) => {
+        const regex = /^[0-9]{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/i;
+        if (!regex.test(dni)) return false;
+        const lookup = "TRWAGMYFPDXBNJZSQVHLCKE";
+        const number = parseInt(dni.substring(0, 8), 10);
+        const letter = dni.charAt(8).toUpperCase();
+        return lookup.charAt(number % 23) === letter;
+    };
+
     const handleAction = async (type: 'create' | 'update') => {
         setMessage("");
         const allTouched = {
@@ -43,6 +52,12 @@ const Animal: React.FC = () => {
 
         if (!dniCliente || !nombre || !especie || !estado || !codigoEdad || !sexo || !descripcion || !foto) {
             setMessage("Por favor, completa todos los campos obligatorios");
+            setShowToast(true);
+            return;
+        }
+
+        if (!validateDNI(dniCliente)) {
+            setMessage("El DNI introducido no es válido");
             setShowToast(true);
             return;
         }
@@ -90,8 +105,11 @@ const Animal: React.FC = () => {
                     {/* Left Column */}
                     <div className="form-group">
                         <label>DNI Cliente</label>
+                        {touched.dniCliente && !validateDNI(dniCliente) && (
+                            <div className="field-error-message">DNI no válido (8 números y letra)</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
                             placeholder="Insertar Codigo"
                             value={dniCliente}
                             onChange={(e) => setDniCliente(e.target.value)}
@@ -102,8 +120,11 @@ const Animal: React.FC = () => {
                     {/* Right Column */}
                     <div className="form-group">
                         <label>Codigo Edad</label>
+                        {touched.codigoEdad && !codigoEdad && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.codigoEdad && !codigoEdad ? 'input-invalid' : ''}`}
                             placeholder="Insertar Edad"
                             value={codigoEdad}
                             onChange={(e) => setCodigoEdad(e.target.value)}
@@ -114,8 +135,11 @@ const Animal: React.FC = () => {
                     {/* Left Column */}
                     <div className="form-group">
                         <label>Nombre</label>
+                        {touched.nombre && !nombre && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.nombre && !nombre ? 'input-invalid' : ''}`}
                             placeholder="Insertar Nombre"
                             value={nombre}
                             onChange={(e) => setNombre(e.target.value)}
@@ -126,8 +150,11 @@ const Animal: React.FC = () => {
                     {/* Right Column */}
                     <div className="form-group">
                         <label>Sexo</label>
+                        {touched.sexo && !sexo && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.sexo && !sexo ? 'input-invalid' : ''}`}
                             placeholder="Insertar Sexo"
                             value={sexo}
                             onChange={(e) => setSexo(e.target.value)}
@@ -138,8 +165,11 @@ const Animal: React.FC = () => {
                     {/* Left Column */}
                     <div className="form-group">
                         <label>Especie</label>
+                        {touched.especie && !especie && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.especie && !especie ? 'input-invalid' : ''}`}
                             placeholder="Insertar Especie"
                             value={especie}
                             onChange={(e) => setEspecie(e.target.value)}
@@ -150,8 +180,11 @@ const Animal: React.FC = () => {
                     {/* Right Column */}
                     <div className="form-group">
                         <label>Descripcion</label>
+                        {touched.descripcion && !descripcion && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.descripcion && !descripcion ? 'input-invalid' : ''}`}
                             placeholder="Insertar descripcion"
                             value={descripcion}
                             onChange={(e) => setDescripcion(e.target.value)}
@@ -162,8 +195,11 @@ const Animal: React.FC = () => {
                     {/* Left Column */}
                     <div className="form-group">
                         <label>Estado</label>
+                        {touched.estado && !estado && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.estado && !estado ? 'input-invalid' : ''}`}
                             placeholder="Insertar Estado"
                             value={estado}
                             onChange={(e) => setEstado(e.target.value)}
@@ -174,8 +210,11 @@ const Animal: React.FC = () => {
                     {/* Right Column */}
                     <div className="form-group">
                         <label>foto</label>
+                        {touched.foto && !foto && (
+                            <div className="field-error-message">Campo obligatorio</div>
+                        )}
                         <input
-                            className="custom-input"
+                            className={`custom-input ${touched.foto && !foto ? 'input-invalid' : ''}`}
                             placeholder="Insertar foto"
                             value={foto}
                             onChange={(e) => setFoto(e.target.value)}
