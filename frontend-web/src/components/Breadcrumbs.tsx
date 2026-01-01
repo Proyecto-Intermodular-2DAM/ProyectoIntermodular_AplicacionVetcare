@@ -18,7 +18,8 @@ const routeMap: { [key: string]: string } = {
     'gestion-tratamiento': 'Gestión Tratamiento',
     'historial-adopciones': 'Gestión Adopción',
     'gestion-adopcion': 'Gestión Adopción',
-    'clientes': 'Clientes',
+    'clientes': 'Gestión Clientes',
+    'gestion-clientes': 'Gestión Clientes',
     'usuarios': 'Usuarios',
     'ajustes': 'Ajustes Roles y Permisos',
     'listado-empleados': 'Listado Empleados',
@@ -27,6 +28,7 @@ const routeMap: { [key: string]: string } = {
     'listado-salas': 'Listado Salas',
     'listado-tratamientos': 'Listado Tratamiento',
     'listado-adopcion': 'Historial Adopción',
+    'listado-clientes': 'Listado Cliente',
     'home': 'Home'
 };
 
@@ -37,11 +39,11 @@ const parentMap: { [key: string]: string } = {
     'listado-citas': 'citas',
     'listado-animales': 'animales',
     'listado-salas': 'salas',
-    'listado-tratamientos': 'tratamientos',
-    'listado-adopcion': 'adopcion',
-    'gestion-salas': 'Manufacturing',
-    'gestion-tratamiento': 'Manufacturing',
-    'gestion-adopcion': 'Manufacturing',
+    'listado-tratamientos': 'empleados',
+    'listado-adopcion': 'empleados',
+    'listado-clientes': 'clientes',
+    'usuarios': 'empleados',
+    'ajustes': 'empleados',
     'gestion-animal': 'centros'
 };
 
