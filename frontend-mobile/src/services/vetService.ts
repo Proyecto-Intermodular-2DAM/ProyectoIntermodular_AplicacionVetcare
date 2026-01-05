@@ -214,5 +214,13 @@ class VetService {
             return [];
         }
     }
+
+    /**
+     * Clear all caches
+     */
+    clearCache() {
+        this.animalsCache = null;
+        this.appointmentsCache = null;
+    }
 }
 export const vetService = new VetService();
