@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
+import { vetService } from './vetService';
 
 export interface SignUpData {
     email: string;
@@ -17,6 +18,10 @@ export interface AuthResponse {
 }
 
 class AuthService {
+    private userProfile: any | null = null;
+    private userIdCache: string | null = null;
+    private profilePromise: Promise<any> | null = null;
+
     private getBaseUrl() {
         let baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
         
@@ -92,10 +97,17 @@ class AuthService {
     async signOut(): Promise<{ error: AuthError | null }> {
         try {
             const { error } = await supabase.auth.signOut();
+            this.clearCache();
+            vetService.clearCache();
             return { error };
         } catch (error) {
             return { error: error as AuthError };
         }
+    }
+
+    private clearCache() {
+        this.userProfile = null;
+        this.userIdCache = null;
     }
 
     /**
@@ -185,42 +197,43 @@ class AuthService {
      * Get the public user profile from the database
      */
     async getPublicUserProfile() {
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                console.log('No auth user found in getPublicUserProfile');
+        if (this.userProfile) return this.userProfile;
+        if (this.profilePromise) return this.profilePromise;
+
+        this.profilePromise = (async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return null;
+
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('id, first_name, last_name, phone_number, user_image, dni, auth_id')
+                    .eq('auth_id', user.id)
+                    .maybeSingle(); 
+
+                if (error) throw error;
+                
+                if (data) {
+                    this.userProfile = data;
+                    this.userIdCache = data.id;
+                }
+                return data;
+            } catch (error) {
+                console.error('[Diagnostic] Error in getPublicUserProfile:', error);
                 return null;
+            } finally {
+                this.profilePromise = null;
             }
+        })();
 
-            console.log(`[Diagnostic] Querying public.users for auth_id: ${user.id}`);
-            // Query public.users using auth_id
-            const { data, error } = await supabase
-                .from('users')
-                .select('id, first_name, last_name, phone_number, user_image, dni, auth_id')
-                .eq('auth_id', user.id)
-                .maybeSingle(); 
-
-            if (error) {
-                console.error('[Diagnostic] Error fetching public profile:', JSON.stringify(error, null, 2));
-                // If we get the 400 error, it's likely header size. No easy fix but to report it.
-                return null;
-            }
-            
-            if (!data) {
-                console.warn(`[Diagnostic] No public.users record found for auth_id: ${user.id}`);
-            }
-
-            return data;
-        } catch (error) {
-            console.error('[Diagnostic] Unexpected error in getPublicUserProfile:', error);
-            return null;
-        }
+        return this.profilePromise;
     }
 
     /**
      * Get the internal public.users.id
      */
     async getPublicUserId(): Promise<string | null> {
+        if (this.userIdCache) return this.userIdCache;
         const profile = await this.getPublicUserProfile();
         return profile?.id || null;
     }

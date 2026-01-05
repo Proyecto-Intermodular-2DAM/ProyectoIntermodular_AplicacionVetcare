@@ -39,16 +39,17 @@ const UserProfile: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // 1. Fetch Public Profile
-                const profile = await authService.getPublicUserProfile();
-                setPublicProfile(profile);
+                // Fetch Public Profile and Pets in parallel
+                const [profile, petsData] = await Promise.all([
+                    authService.getPublicUserProfile(),
+                    vetService.getMyAnimals()
+                ]);
 
-                // 2. Fetch Pets
-                const petsData = await vetService.getMyAnimals();
+                setPublicProfile(profile);
                 setPets(petsData);
 
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error("Error fetching UserProfile data:", error);
             }
         };
 

@@ -121,19 +121,19 @@ const Adoptions: React.FC = () => {
                             <div className="card-image-container">
                                 <img
                                     alt={item.name}
-                                    src={item.image_url || item.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'}
+                                    src={item.animal_image || item.image_url || item.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'}
                                     onError={(e) => {
                                         (e.target as HTMLImageElement).src = 'https://ionicframework.com/docs/img/demos/card-media.png';
                                     }}
                                 />
                             </div>
                             <IonCardHeader>
-                                <IonCardSubtitle className="adoption-date">{item.breed || 'Unknown Breed'}</IonCardSubtitle>
+                                <IonCardSubtitle className="adoption-date">{item.breed || item.species || 'Unknown Breed'}</IonCardSubtitle>
                                 <IonCardTitle className="adoption-title">Adopta a {item.name}</IonCardTitle>
                             </IonCardHeader>
 
                             <IonCardContent className="adoption-content">
-                                {item.description || `Conoce a ${item.name}, busca un hogar lleno de amor.`}
+                                {item.information || item.description || `Conoce a ${item.name}, busca un hogar lleno de amor.`}
                                 <br />
                                 <span className="read-more-link">Ler más</span>
                             </IonCardContent>

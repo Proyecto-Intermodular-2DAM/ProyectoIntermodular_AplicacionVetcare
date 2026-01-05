@@ -13,6 +13,25 @@ import { vetService } from '../services/vetService';
 import '../theme/css/AdoptionDetail.css';
 import TopBar from '../components/TopBar';
 
+const calculateAge = (birthDate: string) => {
+    if (!birthDate) return 'Desconocida';
+    const birth = new Date(birthDate);
+    const now = new Date();
+    let age = now.getFullYear() - birth.getFullYear();
+    const monthDiff = now.getMonth() - birth.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+        age--;
+    }
+
+    if (age < 1) {
+        const months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+        return months <= 1 ? '1 mes' : `${months} meses`;
+    }
+
+    return age === 1 ? '1 año' : `${age} años`;
+};
+
 const AdoptionDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [adoptionItem, setAdoptionItem] = React.useState<any | null>(null);
@@ -23,7 +42,8 @@ const AdoptionDetail: React.FC = () => {
         const fetchAnimal = async () => {
             if (!id) return;
             try {
-                const animal = await vetService.getAnimalById(parseInt(id));
+                const animal = await vetService.getAnimalById(id);
+                console.log("[Diagnostic] Fetched Animal for detail:", animal);
                 setAdoptionItem(animal);
             } catch (error) {
                 console.error("Error fetching animal details:", error);
@@ -63,7 +83,7 @@ const AdoptionDetail: React.FC = () => {
             <TopBar />
             <IonContent className="adoption-detail-content">
                 <img
-                    src={adoptionItem.image_url || adoptionItem.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'}
+                    src={adoptionItem.animal_image || adoptionItem.image_url || adoptionItem.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'}
                     alt={adoptionItem.name}
                     className="adoption-detail-image"
                     onError={(e) => {
@@ -73,7 +93,11 @@ const AdoptionDetail: React.FC = () => {
 
                 <div className="adoption-header-row">
                     <h1 className="adoption-name">{adoptionItem.name}</h1>
-                    <IonButton className="adopt-button" shape="round">
+                    <IonButton
+                        className="adopt-button"
+                        shape="round"
+                        onClick={() => navigate('/contactUs')}
+                    >
                         Solicitar<br />Adopción
                     </IonButton>
                 </div>
@@ -88,8 +112,8 @@ const AdoptionDetail: React.FC = () => {
                         <span className="stat-value">{adoptionItem.sex || 'Unknown'}</span>
                     </div>
                     <div className="stat-card">
-                        <span className="stat-label">NACIMIENTO</span>
-                        <span className="stat-value">{adoptionItem.birth_date || 'Unknown'}</span>
+                        <span className="stat-label">EDAD</span>
+                        <span className="stat-value">{calculateAge(adoptionItem.birth_date)}</span>
                     </div>
                     <div className="stat-card">
                         <span className="stat-label">PESO</span>
@@ -100,7 +124,7 @@ const AdoptionDetail: React.FC = () => {
                 <div className="adoption-info-section">
                     <h3 className="info-title">Información</h3>
                     <p className="info-text">
-                        {adoptionItem.description || "No description available."}
+                        {adoptionItem.information || adoptionItem.description || "No hay información adicional disponible."}
                     </p>
                 </div>
 

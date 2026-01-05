@@ -27,7 +27,7 @@ const ContactUs: React.FC = () => {
 
                             <IonCard className="cards">
                                 <IonIcon icon={mailOutline} className="card-icon" />
-                                vetcare2000@gmail.com
+                                contacto@vetcare.dpdns.org
                             </IonCard>
 
                             <IonCard className="cards">

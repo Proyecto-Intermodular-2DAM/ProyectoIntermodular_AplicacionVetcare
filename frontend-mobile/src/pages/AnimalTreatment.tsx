@@ -11,7 +11,7 @@ import {
     IonIcon,
     IonSpinner,
 } from '@ionic/react';
-import { medkit, time, calendar } from 'ionicons/icons';
+import { medkit, time, calendar, briefcase } from 'ionicons/icons';
 import { useParams } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import SideMenu from '../components/SideMenu';
@@ -42,6 +42,75 @@ const AnimalTreatment: React.FC = () => {
     const [animal, setAnimal] = React.useState<Animal | null>(null);
     const [loading, setLoading] = React.useState(true);
 
+    const getFrequencyInfo = (treatment: ServiceTreatment) => {
+        if (treatment.frequency_hours) return { value: treatment.frequency_hours, unit: 'horas', type: 'hours' as const };
+        if (treatment.frequency_days) return { value: treatment.frequency_days, unit: 'días', type: 'days' as const };
+        if (treatment.frequency_months) return { value: treatment.frequency_months, unit: 'meses', type: 'months' as const };
+        if (treatment.frequency_years) return { value: treatment.frequency_years, unit: 'años', type: 'years' as const };
+        return null;
+    };
+
+    const calculateSchedule = (createdAt: string, treatment: ServiceTreatment) => {
+        const freq = getFrequencyInfo(treatment);
+        if (!freq) return 'Horario no definido';
+
+        const start = new Date(createdAt);
+
+        // For hours, show 24h cycle
+        if (freq.type === 'hours') {
+            const hours = [];
+            for (let i = 0; i < 24; i += freq.value) {
+                const d = new Date(start.getTime() + i * 3600000);
+                hours.push(d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
+            }
+            return hours.join(', ');
+        }
+
+        // For days/months/years, just show the time
+        return start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const calculateNextDose = (createdAt: string, treatment: ServiceTreatment) => {
+        const freq = getFrequencyInfo(treatment);
+        if (!freq) return 'Pendiente';
+
+        const start = new Date(createdAt);
+        const now = new Date();
+
+        let next = new Date(start);
+
+        // Add frequency until we're in the future
+        if (freq.type === 'hours') {
+            while (next <= now) {
+                next.setHours(next.getHours() + freq.value);
+            }
+        } else if (freq.type === 'days') {
+            while (next <= now) {
+                next.setDate(next.getDate() + freq.value);
+            }
+        } else if (freq.type === 'months') {
+            while (next <= now) {
+                next.setMonth(next.getMonth() + freq.value);
+            }
+        } else if (freq.type === 'years') {
+            while (next <= now) {
+                next.setFullYear(next.getFullYear() + freq.value);
+            }
+        }
+
+        const timeStr = next.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        const isToday = next.toDateString() === now.toDateString();
+
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const isTomorrow = next.toDateString() === tomorrow.toDateString();
+
+        if (isToday) return `Hoy a las ${timeStr}`;
+        if (isTomorrow) return `Mañana a las ${timeStr}`;
+
+        return next.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) + ' a las ' + timeStr;
+    };
+
     React.useEffect(() => {
         const fetchAnimalAndTreatments = async () => {
             if (!animalId) return;
@@ -61,15 +130,18 @@ const AnimalTreatment: React.FC = () => {
                         breed: foundAnimal.breed || (foundAnimal as any).species || 'Desconocida',
                         image: foundAnimal.animal_image || (foundAnimal as any).avatar || "https://ionicframework.com/docs/img/demos/avatar.svg",
                         activeTreatments: animalTreatments.length,
-                        treatments: animalTreatments.map((t: ServiceTreatment) => ({
-                            id: t.id,
-                            name: t.medication || t.description || 'Tratamiento',
-                            dosage: t.dosage || 'Consultar',
-                            frequency: 'N/A',
-                            times: 'Ver detalles',
-                            nextDose: t.date || 'Pendiente',
-                            instructions: t.description || 'Sin instrucciones adicionales'
-                        }))
+                        treatments: animalTreatments.map((t: ServiceTreatment) => {
+                            const freq = getFrequencyInfo(t);
+                            return {
+                                id: t.id,
+                                name: t.medication || t.description || 'Tratamiento',
+                                dosage: t.dosage || 'Consultar',
+                                frequency: freq ? `Cada ${freq.value} ${freq.unit}` : 'N/A',
+                                times: calculateSchedule(t.created_at || t.date || new Date().toISOString(), t),
+                                nextDose: calculateNextDose(t.created_at || t.date || new Date().toISOString(), t),
+                                instructions: t.description || 'Sin instrucciones adicionales'
+                            };
+                        })
                     });
                 }
             } catch (error) {
@@ -157,14 +229,14 @@ const AnimalTreatment: React.FC = () => {
                                                     {treatment.name}
                                                 </IonCardTitle>
                                             </div>
-                                            <IonCardSubtitle className="animal-treatment-card-subtitle">
-                                                <IonIcon icon={medkit} className="animal-treatment-subtitle-icon" />
-                                                {treatment.dosage}
-                                            </IonCardSubtitle>
-                                            <IonCardSubtitle className="animal-treatment-card-subtitle">
+                                            <div className="animal-treatment-card-subtitle">
+                                                <IonIcon icon={briefcase} className="animal-treatment-subtitle-icon" />
+                                                {treatment.dosage} - {treatment.frequency}
+                                            </div>
+                                            <div className="animal-treatment-card-subtitle">
                                                 <IonIcon icon={time} className="animal-treatment-subtitle-icon" />
                                                 {treatment.times}
-                                            </IonCardSubtitle>
+                                            </div>
                                         </IonCardHeader>
 
                                         <IonCardContent className="animal-treatment-card-content">
@@ -178,7 +250,7 @@ const AnimalTreatment: React.FC = () => {
 
                                             {/* Instructions */}
                                             <div className="animal-treatment-instructions">
-                                                <strong>Instrucciones:</strong> {treatment.instructions}
+                                                Instrucciones: {treatment.instructions}
                                             </div>
                                         </IonCardContent>
                                     </IonCard>
