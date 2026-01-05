@@ -37,7 +37,7 @@ const SideMenu: React.FC = () => {
 
     const secondaryMenuItems = [
         { label: 'Usuarios', icon: globeOutline, path: '/usuarios' }, // globeOutline as placeholder for Usuarios (which was displayed with a web/globe icon in thought process, or maybe circle)
-        { label: 'AjustRoles Y Permisos', icon: settingsOutline, path: '/ajustes' },
+        { label: 'Roles Y Permisos', icon: settingsOutline, path: '/ajustes' },
     ];
 
     return (
