@@ -15,6 +15,7 @@ import { arrowBack } from "ionicons/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { vetService, Animal } from "../services/vetService";
+import { authService } from "../services/authService";
 import { useEffect, useState } from "react";
 import "../theme/css/UserProfile.css";
 
@@ -22,29 +23,37 @@ const UserProfile: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
     const [pets, setPets] = useState<Animal[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [publicProfile, setPublicProfile] = useState<any>(null);
 
-    // Derived user info from Auth Metadata
+    // Derived info with fallback
     const userInfo = {
-        name: `${user?.user_metadata?.name || ''} ${user?.user_metadata?.surname || ''}`.trim() || user?.email || "Usuario de VetCare",
+        name: publicProfile?.first_name && publicProfile?.last_name
+            ? `${publicProfile.first_name} ${publicProfile.last_name}`
+            : `${user?.user_metadata?.name || ''} ${user?.user_metadata?.surname || ''}`.trim() || user?.email || "Usuario de VetCare",
         email: user?.email || "",
-        profileImage: user?.user_metadata?.avatar_url || "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+        phone: publicProfile?.phone_number || user?.user_metadata?.phone || "",
+        dni: publicProfile?.dni || user?.user_metadata?.dni || "",
+        profileImage: publicProfile?.user_image || user?.user_metadata?.avatar_url || "https://ionicframework.com/docs/img/demos/avatar.svg"
     };
 
     useEffect(() => {
-        const fetchPets = async () => {
+        const fetchData = async () => {
             try {
-                const data = await vetService.getMyAnimals();
-                setPets(data);
+                // 1. Fetch Public Profile
+                const profile = await authService.getPublicUserProfile();
+                setPublicProfile(profile);
+
+                // 2. Fetch Pets
+                const petsData = await vetService.getMyAnimals();
+                setPets(petsData);
+
             } catch (error) {
-                console.error("Error fetching pets:", error);
-            } finally {
-                setLoading(false);
+                console.error("Error fetching data:", error);
             }
         };
 
         if (user) {
-            fetchPets();
+            fetchData();
         }
     }, [user]);
 
@@ -56,7 +65,7 @@ const UserProfile: React.FC = () => {
         navigate("/edit-profile");
     };
 
-    const handlePetClick = (petId: number) => {
+    const handlePetClick = (petId: string) => {
         console.log("Navegando a detalles de mascota:", petId);
     };
 
@@ -82,6 +91,8 @@ const UserProfile: React.FC = () => {
                         </div>
                         <h1 className="user-profile-name">{userInfo.name}</h1>
                         <p className="user-profile-email">{userInfo.email}</p>
+                        {userInfo.phone && <p className="user-profile-detail">📞 {userInfo.phone}</p>}
+                        {userInfo.dni && <p className="user-profile-detail">🆔 {userInfo.dni}</p>}
 
                         <IonButton
                             onClick={handleEditProfile}
@@ -106,11 +117,11 @@ const UserProfile: React.FC = () => {
                                 >
                                     <IonCardContent className="user-profile-pet-card-content">
                                         <IonAvatar className="user-profile-pet-avatar">
-                                            <img src={pet.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} alt={pet.name} />
+                                            <img src={pet.animal_image || pet.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} alt={pet.name} />
                                         </IonAvatar>
                                         <div className="user-profile-pet-info">
                                             <h3 className="user-profile-pet-name">{pet.name}</h3>
-                                            <p className="user-profile-pet-breed">{pet.breed || pet.type}</p>
+                                            <p className="user-profile-pet-breed">{pet.breed || pet.species}</p>
                                         </div>
                                     </IonCardContent>
                                 </IonCard>

@@ -139,6 +139,93 @@ class AuthService {
     }
 
     /**
+     * Update current user profile metadata
+     */
+    async updateProfile(updates: { name?: string; surname?: string; phone?: string; avatar_url?: string; password?: string; dni?: string }) {
+        try {
+            const { name, surname, phone, avatar_url, password, dni } = updates;
+            
+            // 1. Update Supabase Auth metadata
+            const authUpdateData: any = {
+                data: {}
+            };
+            if (name) authUpdateData.data.name = name;
+            if (surname) authUpdateData.data.surname = surname;
+            if (phone) authUpdateData.data.phone = phone;
+            if (password) authUpdateData.password = password;
+
+            const { data: authData, error: authError } = await supabase.auth.updateUser(authUpdateData);
+            if (authError) throw authError;
+
+            // 2. Update public.users table
+            const userId = await this.getPublicUserId();
+            if (userId) {
+                const dbUpdateData: any = {};
+                if (name) dbUpdateData.first_name = name;
+                if (surname) dbUpdateData.last_name = surname;
+                if (phone) dbUpdateData.phone_number = phone;
+                if (avatar_url) dbUpdateData.user_image = avatar_url;
+                if (dni) dbUpdateData.dni = dni;
+
+                const { error: dbError } = await supabase
+                    .from('users')
+                    .update(dbUpdateData)
+                    .eq('id', userId);
+                
+                if (dbError) console.error('Error updating public.users:', dbError);
+            }
+
+            return { user: authData.user, error: null };
+        } catch (error) {
+            return { user: null, error: error as AuthError };
+        }
+    }
+
+    /**
+     * Get the public user profile from the database
+     */
+    async getPublicUserProfile() {
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                console.log('No auth user found in getPublicUserProfile');
+                return null;
+            }
+
+            console.log(`[Diagnostic] Querying public.users for auth_id: ${user.id}`);
+            // Query public.users using auth_id
+            const { data, error } = await supabase
+                .from('users')
+                .select('id, first_name, last_name, phone_number, user_image, dni, auth_id')
+                .eq('auth_id', user.id)
+                .maybeSingle(); 
+
+            if (error) {
+                console.error('[Diagnostic] Error fetching public profile:', JSON.stringify(error, null, 2));
+                // If we get the 400 error, it's likely header size. No easy fix but to report it.
+                return null;
+            }
+            
+            if (!data) {
+                console.warn(`[Diagnostic] No public.users record found for auth_id: ${user.id}`);
+            }
+
+            return data;
+        } catch (error) {
+            console.error('[Diagnostic] Unexpected error in getPublicUserProfile:', error);
+            return null;
+        }
+    }
+
+    /**
+     * Get the internal public.users.id
+     */
+    async getPublicUserId(): Promise<string | null> {
+        const profile = await this.getPublicUserProfile();
+        return profile?.id || null;
+    }
+
+    /**
      * Subscribe to auth state changes
      */
     onAuthStateChange(callback: (user: User | null) => void) {

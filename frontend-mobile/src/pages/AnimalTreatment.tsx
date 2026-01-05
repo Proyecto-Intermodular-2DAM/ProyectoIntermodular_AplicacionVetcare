@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     IonPage,
     IonContent,
@@ -8,15 +9,17 @@ import {
     IonCardContent,
     IonAvatar,
     IonIcon,
+    IonSpinner,
 } from '@ionic/react';
 import { medkit, time, calendar } from 'ionicons/icons';
 import { useParams } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import SideMenu from '../components/SideMenu';
+import { vetService, Animal as ServiceAnimal, Treatment as ServiceTreatment } from '../services/vetService';
 import '../theme/css/AnimalTreatment.css';
 
 interface Treatment {
-    id: number;
+    id: string;
     name: string;
     dosage: string;
     frequency: string;
@@ -26,7 +29,7 @@ interface Treatment {
 }
 
 interface Animal {
-    id: number;
+    id: string;
     name: string;
     breed: string;
     image: string;
@@ -36,42 +39,67 @@ interface Animal {
 
 const AnimalTreatment: React.FC = () => {
     const { animalId } = useParams<{ animalId: string }>();
+    const [animal, setAnimal] = React.useState<Animal | null>(null);
+    const [loading, setLoading] = React.useState(true);
 
-    // Mock data for animals and their treatments
-    const animals: Animal[] = [
-        {
-            id: 1,
-            name: 'Max',
-            breed: 'Golden Retriever',
-            image: 'https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=200&h=200&fit=crop',
-            activeTreatments: 1,
-            treatments: [
-                {
-                    id: 1,
-                    name: 'Antibiótico Amoxicilina',
-                    dosage: '250 mg - Cada 12 horas',
-                    frequency: 'Cada 12 horas',
-                    times: '08:00, 20:00',
-                    nextDose: 'Hoy a las 20:00',
-                    instructions: 'Administrar con comida. No suspender el tratamiento antes de tiempo.',
-                },
-            ],
-        },
-        {
-            id: 2,
-            name: 'Peluso',
-            breed: 'Siames',
-            image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=200&h=200&fit=crop',
-            activeTreatments: 0,
-            treatments: [],
-        },
-    ];
+    React.useEffect(() => {
+        const fetchAnimalAndTreatments = async () => {
+            if (!animalId) return;
+            try {
+                const animals = await vetService.getMyAnimals();
+                const treatments = await vetService.getMyTreatments();
 
-    console.log("AnimalID Raw Params:", animalId);
-    // Parse the ID, defaulting to undefined/null if invalid to prevent false positives
-    const parsedId = animalId ? parseInt(animalId, 10) : -1;
-    console.log("Parsed ID:", parsedId);
-    const animal = animals.find(a => a.id === parsedId);
+                console.log("[Diagnostic] All user animals:", animals);
+                console.log("[Diagnostic] All user treatments:", treatments);
+
+                const foundAnimal = animals.find((a: ServiceAnimal) => a.id === animalId);
+                if (foundAnimal) {
+                    const animalTreatments = treatments.filter((t: ServiceTreatment) => t.animal_id === animalId);
+                    setAnimal({
+                        id: foundAnimal.id,
+                        name: foundAnimal.name,
+                        breed: foundAnimal.breed || (foundAnimal as any).species || 'Desconocida',
+                        image: foundAnimal.animal_image || (foundAnimal as any).avatar || "https://ionicframework.com/docs/img/demos/avatar.svg",
+                        activeTreatments: animalTreatments.length,
+                        treatments: animalTreatments.map((t: ServiceTreatment) => ({
+                            id: t.id,
+                            name: t.medication || t.description || 'Tratamiento',
+                            dosage: t.dosage || 'Consultar',
+                            frequency: 'N/A',
+                            times: 'Ver detalles',
+                            nextDose: t.date || 'Pendiente',
+                            instructions: t.description || 'Sin instrucciones adicionales'
+                        }))
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching animal treatments:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnimalAndTreatments();
+    }, [animalId]);
+
+    console.log("AnimalID Params:", animalId);
+    console.log("Current Animal State:", animal);
+
+    if (loading) {
+        return (
+            <>
+                <SideMenu />
+                <IonPage id="main-content">
+                    <TopBar />
+                    <IonContent>
+                        <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                            <IonSpinner name="crescent" />
+                        </div>
+                    </IonContent>
+                </IonPage>
+            </>
+        );
+    }
 
     if (!animal) {
         return (

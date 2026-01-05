@@ -8,14 +8,43 @@ import {
     IonHeader,
     IonToolbar
 } from '@ionic/react';
-import { useParams } from 'react-router-dom';
-import { defaultAdoptions } from './Adoptions';
+import { useNavigate, useParams } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/AdoptionDetail.css';
 import TopBar from '../components/TopBar';
 
 const AdoptionDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const adoptionItem = defaultAdoptions.find(item => item.id === parseInt(id));
+    const [adoptionItem, setAdoptionItem] = React.useState<any | null>(null);
+    const [loading, setLoading] = React.useState(true);
+    const navigate = useNavigate();
+
+    React.useEffect(() => {
+        const fetchAnimal = async () => {
+            if (!id) return;
+            try {
+                const animal = await vetService.getAnimalById(parseInt(id));
+                setAdoptionItem(animal);
+            } catch (error) {
+                console.error("Error fetching animal details:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnimal();
+    }, [id]);
+
+    if (loading) {
+        return (
+            <IonPage>
+                <TopBar />
+                <IonContent className="ion-padding">
+                    <div>Loading...</div>
+                </IonContent>
+            </IonPage>
+        );
+    }
 
     if (!adoptionItem) {
         return (
@@ -23,6 +52,7 @@ const AdoptionDetail: React.FC = () => {
                 <TopBar />
                 <IonContent>
                     <div style={{ padding: 20 }}>Adoption not found</div>
+                    <IonButton onClick={() => navigate('/adoptions')}>Back to Adoptions</IonButton>
                 </IonContent>
             </IonPage>
         );
@@ -32,7 +62,14 @@ const AdoptionDetail: React.FC = () => {
         <IonPage>
             <TopBar />
             <IonContent className="adoption-detail-content">
-                <img src={adoptionItem.image} alt={adoptionItem.name} className="adoption-detail-image" />
+                <img
+                    src={adoptionItem.image_url || adoptionItem.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'}
+                    alt={adoptionItem.name}
+                    className="adoption-detail-image"
+                    onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://ionicframework.com/docs/img/demos/card-media.png';
+                    }}
+                />
 
                 <div className="adoption-header-row">
                     <h1 className="adoption-name">{adoptionItem.name}</h1>
@@ -44,26 +81,26 @@ const AdoptionDetail: React.FC = () => {
                 <div className="adoption-stats-grid">
                     <div className="stat-card">
                         <span className="stat-label">RAZA</span>
-                        <span className="stat-value">{adoptionItem.race}</span>
+                        <span className="stat-value">{adoptionItem.breed || 'Unknown'}</span>
                     </div>
                     <div className="stat-card">
                         <span className="stat-label">SEXO</span>
-                        <span className="stat-value">{adoptionItem.sex}</span>
+                        <span className="stat-value">{adoptionItem.sex || 'Unknown'}</span>
                     </div>
                     <div className="stat-card">
-                        <span className="stat-label">EDAD</span>
-                        <span className="stat-value">{adoptionItem.age}</span>
+                        <span className="stat-label">NACIMIENTO</span>
+                        <span className="stat-value">{adoptionItem.birth_date || 'Unknown'}</span>
                     </div>
                     <div className="stat-card">
                         <span className="stat-label">PESO</span>
-                        <span className="stat-value">{adoptionItem.weight}</span>
+                        <span className="stat-value">{adoptionItem.weight ? `${adoptionItem.weight}kg` : 'Unknown'}</span>
                     </div>
                 </div>
 
                 <div className="adoption-info-section">
                     <h3 className="info-title">Información</h3>
                     <p className="info-text">
-                        {adoptionItem.detailedDescription}
+                        {adoptionItem.description || "No description available."}
                     </p>
                 </div>
 

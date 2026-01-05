@@ -18,7 +18,10 @@ const Citas: React.FC = () => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
-                const upcoming = data.filter(app => new Date(app.date) >= today);
+                const upcoming = data.filter(app => {
+                    const appDate = new Date(app.date);
+                    return appDate >= today;
+                });
                 setAppointments(upcoming as Appointment[]);
             } catch (error) {
                 console.error("Error fetching appointments:", error);

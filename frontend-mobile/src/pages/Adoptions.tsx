@@ -14,6 +14,7 @@ import {
     IonBackButton
 } from '@ionic/react';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Adoptions.css';
 import TopBar from '../components/TopBar';
 
@@ -76,18 +77,36 @@ export const defaultAdoptions: AdoptionItem[] = [
 const Adoptions: React.FC = () => {
     const navigate = useNavigate();
 
+    const [adoptions, setAdoptions] = React.useState<any[]>([]);
+    const [loading, setLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        const fetchAdoptions = async () => {
+            try {
+                const animals = await vetService.getAnimalsForAdoption();
+                setAdoptions(animals);
+            } catch (error) {
+                console.error("Error fetching adoptions:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAdoptions();
+    }, []);
+
     return (
         <IonPage>
             <TopBar />
             <IonContent fullscreen>
                 <div className="adoptions-container">
                     <div className="adoptions-header">
-                        <span>{defaultAdoptions.length} Articles</span>
-                        <span className="filter-text">Filter v</span>
+                        <span>{adoptions.length} {adoptions.length === 1 ? 'Pet' : 'Pets'} Available</span>
+                        {/* <span className="filter-text">Filter v</span> */}
                     </div>
-                    <h2 className="sort-by-title">Sort by</h2>
+                    {/* <h2 className="sort-by-title">Sort by</h2> */}
 
-                    {defaultAdoptions.map((item) => (
+                    {adoptions.map((item) => (
                         <IonCard
                             key={item.id}
                             className="adoption-card"
@@ -100,17 +119,23 @@ const Adoptions: React.FC = () => {
                             }}
                         >
                             <div className="card-image-container">
-                                <img alt={item.title} src={item.image} />
+                                <img
+                                    alt={item.name}
+                                    src={item.image_url || item.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'}
+                                    onError={(e) => {
+                                        (e.target as HTMLImageElement).src = 'https://ionicframework.com/docs/img/demos/card-media.png';
+                                    }}
+                                />
                             </div>
                             <IonCardHeader>
-                                <IonCardSubtitle className="adoption-date">{item.date}</IonCardSubtitle>
-                                <IonCardTitle className="adoption-title">{item.title}</IonCardTitle>
+                                <IonCardSubtitle className="adoption-date">{item.breed || 'Unknown Breed'}</IonCardSubtitle>
+                                <IonCardTitle className="adoption-title">Adopta a {item.name}</IonCardTitle>
                             </IonCardHeader>
 
                             <IonCardContent className="adoption-content">
-                                {item.description}
+                                {item.description || `Conoce a ${item.name}, busca un hogar lleno de amor.`}
                                 <br />
-                                <span className="read-more-link">Read more</span>
+                                <span className="read-more-link">Ler más</span>
                             </IonCardContent>
                         </IonCard>
                     ))}
