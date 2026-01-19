@@ -12,9 +12,15 @@
     "lint": "eslint",
     "ionic:build": "pnpm run build",
     "ionic:serve": "pnpm run dev -- --open",
-    "preinstall": "npx only-allow pnpm"   
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
+    "@capacitor/app": "latest",
+    "@capacitor/core": "latest",
+    "@capacitor/haptics": "latest",
+    "@capacitor/keyboard": "latest",
+    "@capacitor/status-bar": "latest",
+    "@ionic/cli": "^7.2.1",
     "@ionic/react": "^8.5.0",
     "@ionic/react-router": "^8.5.0",
     "@types/react-router": "^5.1.20",
@@ -23,14 +29,10 @@
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-router": "^5.3.4",
-    "react-router-dom": "^5.3.4",
-    "@capacitor/app": "latest",
-    "@capacitor/core": "latest",
-    "@capacitor/keyboard": "latest",
-    "@capacitor/haptics": "latest",
-    "@capacitor/status-bar": "latest"
+    "react-router-dom": "^5.3.4"
   },
   "devDependencies": {
+    "@capacitor/cli": "latest",
     "@testing-library/dom": ">=7.21.4",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^16.2.0",
@@ -50,8 +52,7 @@
     "typescript": "^5.1.6",
     "typescript-eslint": "^8.24.0",
     "vite": "~5.2.0",
-    "vitest": "^0.34.6",
-    "@capacitor/cli": "latest"
+    "vitest": "^0.34.6"
   },
   "overrides": {
     "rollup": "4.44.0"
