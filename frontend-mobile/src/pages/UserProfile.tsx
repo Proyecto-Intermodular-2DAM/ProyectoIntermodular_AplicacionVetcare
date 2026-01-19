@@ -12,54 +12,62 @@ import {
     IonAvatar,
 } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { vetService, Animal } from "../services/vetService";
+import { authService } from "../services/authService";
+import { useEffect, useState } from "react";
 import "../theme/css/UserProfile.css";
 
-interface Pet {
-    id: number;
-    name: string;
-    breed: string;
-    image: string;
-}
-
 const UserProfile: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
+    const { user } = useAuth();
+    const [pets, setPets] = useState<Animal[]>([]);
+    const [publicProfile, setPublicProfile] = useState<any>(null);
 
-    // Mock user data
-    const user = {
-        name: "Melissa Peters",
-        email: "melpeters@gmail.com",
-        profileImage: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+    // Derived info with fallback
+    const userInfo = {
+        name: publicProfile?.first_name && publicProfile?.last_name
+            ? `${publicProfile.first_name} ${publicProfile.last_name}`
+            : `${user?.user_metadata?.name || ''} ${user?.user_metadata?.surname || ''}`.trim() || user?.email || "Usuario de VetCare",
+        email: user?.email || "",
+        phone: publicProfile?.phone_number || user?.user_metadata?.phone || "",
+        dni: publicProfile?.dni || user?.user_metadata?.dni || "",
+        profileImage: publicProfile?.user_image || user?.user_metadata?.avatar_url || "https://ionicframework.com/docs/img/demos/avatar.svg"
     };
 
-    // Mock pets data
-    const pets: Pet[] = [
-        {
-            id: 1,
-            name: "Max",
-            breed: "Golden Retriever",
-            image: "https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=200&h=200&fit=crop"
-        },
-        {
-            id: 2,
-            name: "Peluso",
-            breed: "Gato Siamés",
-            image: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=200&h=200&fit=crop"
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Fetch Public Profile and Pets in parallel
+                const [profile, petsData] = await Promise.all([
+                    authService.getPublicUserProfile(),
+                    vetService.getMyAnimals()
+                ]);
+
+                setPublicProfile(profile);
+                setPets(petsData);
+
+            } catch (error) {
+                console.error("Error fetching UserProfile data:", error);
+            }
+        };
+
+        if (user) {
+            fetchData();
         }
-    ];
+    }, [user]);
 
     const handleGoBack = () => {
-        history.goBack();
+        navigate(-1);
     };
 
     const handleEditProfile = () => {
-        history.push("/edit-profile");
+        navigate("/edit-profile");
     };
 
-    const handlePetClick = (petId: number) => {
+    const handlePetClick = (petId: string) => {
         console.log("Navegando a detalles de mascota:", petId);
-        // TODO: Navegar a página de detalles de mascota
-        // history.push(`/pet-details/${petId}`);
     };
 
     return (
@@ -80,10 +88,12 @@ const UserProfile: React.FC = () => {
                     {/* User Info Section */}
                     <div className="user-profile-info-section">
                         <div className="user-profile-picture">
-                            <img src={user.profileImage} alt={user.name} />
+                            <img src={userInfo.profileImage} alt={userInfo.name} />
                         </div>
-                        <h1 className="user-profile-name">{user.name}</h1>
-                        <p className="user-profile-email">{user.email}</p>
+                        <h1 className="user-profile-name">{userInfo.name}</h1>
+                        <p className="user-profile-email">{userInfo.email}</p>
+                        {userInfo.phone && <p className="user-profile-detail">📞 {userInfo.phone}</p>}
+                        {userInfo.dni && <p className="user-profile-detail">🆔 {userInfo.dni}</p>}
 
                         <IonButton
                             onClick={handleEditProfile}
@@ -108,11 +118,11 @@ const UserProfile: React.FC = () => {
                                 >
                                     <IonCardContent className="user-profile-pet-card-content">
                                         <IonAvatar className="user-profile-pet-avatar">
-                                            <img src={pet.image} alt={pet.name} />
+                                            <img src={pet.animal_image || pet.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} alt={pet.name} />
                                         </IonAvatar>
                                         <div className="user-profile-pet-info">
                                             <h3 className="user-profile-pet-name">{pet.name}</h3>
-                                            <p className="user-profile-pet-breed">{pet.breed}</p>
+                                            <p className="user-profile-pet-breed">{pet.breed || pet.species}</p>
                                         </div>
                                     </IonCardContent>
                                 </IonCard>

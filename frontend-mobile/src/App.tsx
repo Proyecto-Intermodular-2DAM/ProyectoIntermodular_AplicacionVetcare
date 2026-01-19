@@ -1,7 +1,6 @@
-import { Redirect, Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact, IonMenu, IonContent, IonList, IonItem, IonLabel, IonMenuToggle, IonIcon } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
-import { home, call, documentText, logOut, close } from 'ionicons/icons';
+import { BrowserRouter } from 'react-router-dom';
+import { IonApp, setupIonicReact } from '@ionic/react';
+
 
 /* Theme variables */
 import Login from './pages/Login';
@@ -9,15 +8,12 @@ import ErrorPage from './pages/ErrorPage';
 import LegalTerms from './pages/LegalTerms';
 import Signup from './pages/Signup';
 import Home from './pages/Home';
-import Adoptions from './pages/Adoptions';
 import SideMenu from './components/SideMenu';
-import EditProfile from './pages/EditProfile';
-import UserProfile from './pages/UserProfile';
-import Citas from './pages/Citas';
-import Historial from './pages/Historial';
-import Treatment from './pages/Treatment';
-import AnimalTreatment from './pages/AnimalTreatment';
+import AppRouter from './components/Router';
 
+/* Auth */
+import { AuthProvider } from './contexts/AuthContext';
+import DeepLinkHandler from './components/DeepLinkHandler';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -46,41 +42,25 @@ import '@ionic/react/css/display.css';
 
 /* import '@ionic/react/css/palettes/dark.always.css'; */
 /* import '@ionic/react/css/palettes/dark.class.css'; */
-import '@ionic/react/css/palettes/dark.system.css';
-import PasswordRecovery from './pages/PasswordRecovery';
-import SignUpSuccessful from './pages/SignUpSuccessful';
-import SignUpFailed from './pages/SignUpFailed';
-import ContactUs from './pages/ContactUs';
-
-
+/* import '@ionic/react/css/palettes/dark.system.css'; */
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <IonReactRouter>
-      <SideMenu />
-      <IonRouterOutlet id="main-content">
-        <Route path="/login" component={Login} exact />
-        <Route path="/error-page" component={ErrorPage} exact />
-        <Route path="/legal-terms" component={LegalTerms} exact />
-        <Route path="/adoption" component={Adoptions} exact />
-        <Route path="/signup" component={Signup} exact />
-        <Route path="/home" component={Home} exact />
-        <Route path="/passwordRecovery" component={PasswordRecovery} exact />
-        <Route path="/signUpSuccessful" component={SignUpSuccessful} exact />
-        <Route path="/signUpFailed" component={SignUpFailed} exact />
-        <Route path="/edit-profile" component={EditProfile} exact />
-        <Route path="/user-profile" component={UserProfile} exact />
-        <Route path="/contactUs" component={ContactUs} exact />
-        <Route path="/citas" component={Citas} exact />
-        <Route path="/historial" component={Historial} exact />
-        <Route path="/treatment" component={Treatment} exact />
-        <Route path="/animal-treatment/:animalId" component={AnimalTreatment} exact />
-        <Redirect exact from="/" to="/login" />
-      </IonRouterOutlet>
-    </IonReactRouter>
-  </IonApp>
-);
+const App: React.FC = () => {
+  const IonAppAny = IonApp as any;
+  return (
+    <IonAppAny>
+      <AuthProvider>
+        <BrowserRouter>
+          <DeepLinkHandler />
+          <SideMenu />
+          <div id="main-content">
+            <AppRouter />
+          </div>
+        </BrowserRouter>
+      </AuthProvider>
+    </IonAppAny>
+  );
+};
 
 export default App;

@@ -11,26 +11,65 @@ import {
     IonButtons,
 } from "@ionic/react";
 import { arrowBack, camera } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
+import { authService } from "../services/authService";
 import "../theme/css/EditProfile.css";
 
 const EditProfile: React.FC = () => {
-    const history = useHistory();
-    const [name, setName] = useState<string>("Melissa Paters");
-    const [email, setEmail] = useState<string>("melpeters@gmail.com");
-    const [password, setPassword] = useState<string>("••••••••••••");
+    const { user } = useAuth();
+    const navigate = useNavigate();
+    const [name, setName] = useState<string>("");
+    const [surname, setSurname] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [phone, setPhone] = useState<string>("");
+    const [dni, setDni] = useState<string>("");
+    const [password, setPassword] = useState<string>("");
     const [profileImage, setProfileImage] = useState<string>("");
+    const [loading, setLoading] = useState<boolean>(false);
+
+    // Load initial data
+    useState(() => {
+        if (user) {
+            setName(user.user_metadata?.name || user.user_metadata?.first_name || "");
+            setSurname(user.user_metadata?.surname || user.user_metadata?.last_name || "");
+            setEmail(user.email || "");
+            setPhone(user.user_metadata?.phone || user.user_metadata?.phone_number || "");
+            setDni(user.user_metadata?.dni || "");
+            setProfileImage(user.user_metadata?.avatar_url || user.user_metadata?.user_image || "");
+        }
+    });
 
     const handleGoBack = () => {
-        history.goBack();
+        navigate(-1);
     };
 
-    const handleSaveChanges = (e: React.FormEvent) => {
+    const handleSaveChanges = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Guardando cambios:", { name, email, password });
-        // TODO: conectar con backend para actualizar perfil
-        alert("Cambios guardados exitosamente");
+        setLoading(true);
+
+        const updates: any = {
+            name,
+            surname,
+            phone,
+            dni,
+            avatar_url: profileImage
+        };
+
+        if (password && password.trim() !== "") {
+            updates.password = password;
+        }
+
+        const { error } = await authService.updateProfile(updates);
+        setLoading(false);
+
+        if (error) {
+            alert("Error al actualizar perfil: " + error.message);
+        } else {
+            alert("Cambios guardados exitosamente");
+            navigate(-1);
+        }
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +107,7 @@ const EditProfile: React.FC = () => {
                                 ) : (
                                     <div className="edit-profile-picture-placeholder">
                                         <img
-                                            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop"
+                                            src="https://ionicframework.com/docs/img/demos/avatar.svg"
                                             alt="Profile placeholder"
                                         />
                                     </div>
@@ -100,6 +139,48 @@ const EditProfile: React.FC = () => {
                             </IonItem>
                         </div>
 
+                        {/* Surname Field */}
+                        <div className="edit-profile-field">
+                            <label className="edit-profile-label">Apellidos</label>
+                            <IonItem className="edit-profile-input" lines="none">
+                                <IonInput
+                                    placeholder="Apellidos"
+                                    type="text"
+                                    value={surname}
+                                    onIonChange={(e: any) => setSurname(e.detail.value!)}
+                                    required
+                                />
+                            </IonItem>
+                        </div>
+
+                        {/* Phone Field */}
+                        <div className="edit-profile-field">
+                            <label className="edit-profile-label">Teléfono</label>
+                            <IonItem className="edit-profile-input" lines="none">
+                                <IonInput
+                                    placeholder="Teléfono"
+                                    type="tel"
+                                    value={phone}
+                                    onIonChange={(e: any) => setPhone(e.detail.value!)}
+                                    required
+                                />
+                            </IonItem>
+                        </div>
+
+                        {/* DNI Field */}
+                        <div className="edit-profile-field">
+                            <label className="edit-profile-label">DNI</label>
+                            <IonItem className="edit-profile-input" lines="none">
+                                <IonInput
+                                    placeholder="DNI"
+                                    type="text"
+                                    value={dni}
+                                    onIonChange={(e: any) => setDni(e.detail.value!)}
+                                    required
+                                />
+                            </IonItem>
+                        </div>
+
                         {/* Email Field */}
                         <div className="edit-profile-field">
                             <label className="edit-profile-label">Email</label>
@@ -108,22 +189,20 @@ const EditProfile: React.FC = () => {
                                     placeholder="Email"
                                     type="email"
                                     value={email}
-                                    onIonChange={(e: any) => setEmail(e.detail.value!)}
-                                    required
+                                    readonly // Email usually shouldn't be changed easily in basic profile edit
                                 />
                             </IonItem>
                         </div>
 
                         {/* Password Field */}
                         <div className="edit-profile-field">
-                            <label className="edit-profile-label">Contraseña</label>
+                            <label className="edit-profile-label">Nueva Contraseña (Opcional)</label>
                             <IonItem className="edit-profile-input" lines="none">
                                 <IonInput
-                                    placeholder="Contraseña"
+                                    placeholder="Dejar en blanco para mantener"
                                     type="password"
                                     value={password}
                                     onIonChange={(e: any) => setPassword(e.detail.value!)}
-                                    required
                                 />
                             </IonItem>
                         </div>
@@ -134,8 +213,9 @@ const EditProfile: React.FC = () => {
                             expand="block"
                             className="edit-profile-save-button"
                             aria-label="Guardar cambios"
+                            disabled={loading}
                         >
-                            Guardar cambios
+                            {loading ? "Guardando..." : "Guardar cambios"}
                         </IonButton>
                     </form>
                 </div>

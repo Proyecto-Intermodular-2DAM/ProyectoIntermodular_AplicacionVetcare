@@ -1,0 +1,40 @@
+/* Breadcrumbs.css */
+.custom-breadcrumbs-container {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+    /* Space from the A icon */
+}
+
+.breadcrumb-separator-start {
+    font-size: 16px;
+    color: #9e9e9e;
+    margin-right: 10px;
+}
+
+.custom-ion-breadcrumbs {
+    padding: 0;
+    margin: 0;
+    --color: #424242;
+    --color-active: #222;
+}
+
+.breadcrumb-item {
+    font-size: 14px;
+    font-weight: 500;
+    color: #424242;
+    --color: #424242;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item.active {
+    color: #212121;
+    /* Darker for active */
+    --color: #212121;
+}
+
+ion-breadcrumb {
+    --separator-color: #9e9e9e;
+}

@@ -1,0 +1,1 @@
+﻿src/pages/PasswordRecovery.tsx(43,36): error TS2339: Property 'message' does not exist on type 'never'.

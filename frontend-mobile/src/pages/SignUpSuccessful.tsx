@@ -8,14 +8,14 @@ import {
 } from "@ionic/react";
 import { paw, checkmarkCircle } from "ionicons/icons";
 import "../theme/css/SignUp.css";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const SignUpSuccessful: React.FC = () => {
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const goToLogin = () => {
-        history.push("/login");
+        navigate("/login");
     };
 
     return (
@@ -24,18 +24,23 @@ const SignUpSuccessful: React.FC = () => {
                 <div className="login-center-container">
                     <IonCard className="login-card">
                         <IonCardContent className="login-card-content">
-                            
+
                             <header className="login-header-container">
                                 <IonIcon icon={paw} className="login-icon" />
                                 <h1 className="login-title">Registro Exitoso</h1>
 
                                 <IonIcon icon={checkmarkCircle} className="signup-success" />
+
+                                <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--color-primary-design)' }}>
+                                    Hemos enviado un correo de verificación a tu bandeja de entrada.
+                                    Por favor, confirma tu cuenta antes de iniciar sesión.
+                                </p>
                             </header>
 
                             <IonButton expand="block" className="login-button" onClick={goToLogin}>
-                                Sign in
+                                Iniciar Sesión
                             </IonButton>
-                            
+
                         </IonCardContent>
                     </IonCard>
                 </div>
