@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
 import { vetService } from './vetService';
+import apiClient from './apiClient';
 
 export interface SignUpData {
     email: string;
@@ -17,15 +18,23 @@ export interface AuthResponse {
     error: AuthError | null;
 }
 
+export interface UserProfile {
+    id: string;
+    first_name: string;
+    last_name: string;
+    phone_number: string;
+    user_image: string;
+    dni: string;
+    auth_id: string;
+}
+
 class AuthService {
-    private userProfile: any | null = null;
+    private userProfile: UserProfile | null = null;
     private userIdCache: string | null = null;
-    private profilePromise: Promise<any> | null = null;
+    private profilePromise: Promise<UserProfile | null> | null = null;
 
     private getBaseUrl() {
         let baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
-        
-        // Always strip trailing slash to ensure clean concatenation with paths starting with /
         if (baseUrl.endsWith('/')) {
             baseUrl = baseUrl.slice(0, -1);
         }
@@ -169,7 +178,7 @@ class AuthService {
             const { data: authData, error: authError } = await supabase.auth.updateUser(authUpdateData);
             if (authError) throw authError;
 
-            // 2. Update public.users table
+            // 2. Update public.users table using Axios
             const userId = await this.getPublicUserId();
             if (userId) {
                 const dbUpdateData: any = {};
@@ -179,12 +188,11 @@ class AuthService {
                 if (avatar_url) dbUpdateData.user_image = avatar_url;
                 if (dni) dbUpdateData.dni = dni;
 
-                const { error: dbError } = await supabase
-                    .from('users')
-                    .update(dbUpdateData)
-                    .eq('id', userId);
-                
-                if (dbError) console.error('Error updating public.users:', dbError);
+                await apiClient.patch(`/users`, dbUpdateData, {
+                    params: {
+                        id: `eq.${userId}`
+                    }
+                });
             }
 
             return { user: authData.user, error: null };
@@ -196,23 +204,26 @@ class AuthService {
     /**
      * Get the public user profile from the database
      */
-    async getPublicUserProfile() {
+    async getPublicUserProfile(): Promise<UserProfile | null> {
         if (this.userProfile) return this.userProfile;
         if (this.profilePromise) return this.profilePromise;
 
         this.profilePromise = (async () => {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
+                const user = await this.getCurrentUser();
                 if (!user) return null;
 
-                const { data, error } = await supabase
-                    .from('users')
-                    .select('id, first_name, last_name, phone_number, user_image, dni, auth_id')
-                    .eq('auth_id', user.id)
-                    .maybeSingle(); 
-
-                if (error) throw error;
+                const response = await apiClient.get<UserProfile[]>(`/users`, {
+                    params: {
+                        select: 'id,first_name,last_name,phone_number,user_image,dni,auth_id',
+                        auth_id: `eq.${user.id}`
+                    },
+                    headers: {
+                        'Accept': 'application/vnd.pgrst.object+json'
+                    }
+                });
                 
+                const data = response.data as unknown as UserProfile;
                 if (data) {
                     this.userProfile = data;
                     this.userIdCache = data.id;

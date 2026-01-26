@@ -1,34 +1,19 @@
-
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import { IonPage, IonContent, IonSpinner } from '@ionic/react';
 import TopBar from '../components/TopBar';
-import AppointmentCard, { Appointment } from '../components/AppointmentCard';
-import { vetService } from '../services/vetService';
+import AppointmentCard from '../components/AppointmentCard';
+import { useAppointments } from '../hooks/useVet';
 import '../theme/css/Citas.css';
 
 const Historial: React.FC = () => {
-    const [appointments, setAppointments] = useState<Appointment[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { appointments, loading, error } = useAppointments();
 
-    useEffect(() => {
-        const fetchPastAppointments = async () => {
-            try {
-                const data = await vetService.getMyAppointments();
-                // Filter for past appointments (before today)
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+    const pastAppointments = useMemo(() => {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-                const past = data.filter(app => new Date(app.date) < today);
-                setAppointments(past as Appointment[]);
-            } catch (error) {
-                console.error("Error fetching past appointments:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchPastAppointments();
-    }, []);
+        return appointments?.filter(app => new Date(app.date) < today) || [];
+    }, [appointments]);
 
     return (
         <IonPage className="citas-page">
@@ -39,8 +24,12 @@ const Historial: React.FC = () => {
                         <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
                             <IonSpinner name="crescent" />
                         </div>
-                    ) : appointments.length > 0 ? (
-                        appointments.map(app => (
+                    ) : error ? (
+                        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--ion-color-danger)' }}>
+                            <p>{error}</p>
+                        </div>
+                    ) : pastAppointments.length > 0 ? (
+                        pastAppointments.map(app => (
                             <AppointmentCard key={app.id} appointment={app} />
                         ))
                     ) : (
