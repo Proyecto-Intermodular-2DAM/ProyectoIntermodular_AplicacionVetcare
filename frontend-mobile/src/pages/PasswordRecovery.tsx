@@ -96,7 +96,7 @@ const PasswordRecovery: React.FC = () => {
                                             placeholder="ejemplo@correo.com"
                                             type="email"
                                             value={email}
-                                            onIonChange={(e) => setEmail(e.detail.value ?? '')}
+                                            onIonChange={(e: CustomEvent) => setEmail(e.detail.value ?? '')}
                                             required
                                         />
                                     </IonItem>

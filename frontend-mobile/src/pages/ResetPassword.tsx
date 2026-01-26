@@ -135,7 +135,7 @@ const ResetPassword: React.FC = () => {
                                             placeholder="Nueva contraseña"
                                             type="password"
                                             value={newPassword}
-                                            onIonInput={(e) => setNewPassword(e.detail.value ?? '')}
+                                            onIonInput={(e: CustomEvent) => setNewPassword(e.detail.value ?? '')}
                                             onIonBlur={() => markTouched('newPassword')}
                                             required
                                         />
@@ -152,7 +152,7 @@ const ResetPassword: React.FC = () => {
                                             placeholder="Confirmar contraseña"
                                             type="password"
                                             value={confirmPassword}
-                                            onIonInput={(e) => setConfirmPassword(e.detail.value ?? '')}
+                                            onIonInput={(e: CustomEvent) => setConfirmPassword(e.detail.value ?? '')}
                                             onIonBlur={() => markTouched('confirmPassword')}
                                             required
                                         />

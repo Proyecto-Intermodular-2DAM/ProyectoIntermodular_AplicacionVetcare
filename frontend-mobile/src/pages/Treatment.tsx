@@ -33,11 +33,15 @@ const Treatment: React.FC = () => {
                 const myAnimals = await vetService.getMyAnimals();
                 const myTreatments = await vetService.getMyTreatments();
 
+                console.log("[Diagnostic] My Animals:", myAnimals);
+                console.log("[Diagnostic] My Treatments:", myTreatments);
+
                 const animalsWithCount = myAnimals.map(animal => {
-                    const activeCount = myTreatments.filter(t => t.animal_id === animal.id).length;
+                    const animalTreatments = myTreatments.filter(t => t.animal_id === animal.id);
+                    console.log(`[Diagnostic] Animal ${animal.name} (${animal.id}) has treatments:`, animalTreatments);
                     return {
                         ...animal,
-                        activeTreatments: activeCount
+                        activeTreatments: animalTreatments.length
                     };
                 });
 
@@ -55,7 +59,7 @@ const Treatment: React.FC = () => {
     const totalAnimals = animals.length;
     const animalsInTreatment = animals.filter(animal => animal.activeTreatments > 0).length;
 
-    const handleAnimalClick = (animalId: number) => {
+    const handleAnimalClick = (animalId: string) => {
         navigate(`/animal-treatment/${animalId}`);
     };
 
@@ -106,11 +110,11 @@ const Treatment: React.FC = () => {
                                         <IonCardContent className="treatment-card-content">
                                             <div className="treatment-card-left">
                                                 <IonAvatar className="treatment-avatar">
-                                                    <img src={animal.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} alt={animal.name} />
+                                                    <img src={animal.animal_image || animal.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} alt={animal.name} />
                                                 </IonAvatar>
                                                 <div className="treatment-info">
                                                     <h2 className="treatment-name">{animal.name}</h2>
-                                                    <p className="treatment-breed">{animal.breed || animal.type}</p>
+                                                    <p className="treatment-breed">{animal.breed || animal.species}</p>
                                                 </div>
                                             </div>
                                             <div className="treatment-card-right">

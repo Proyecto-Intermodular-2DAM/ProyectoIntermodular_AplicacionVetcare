@@ -6,25 +6,59 @@ import '../theme/css/Breadcrumbs.css';
 
 const routeMap: { [key: string]: string } = {
     'empleados': 'Empleados',
-    'citas': 'Citas',
+    'citas': 'Gestión Citas',
+    'date': 'Gestión Citas',
     'centros': 'Centros',
-    'animales': 'Animales',
-    'salas': 'Salas',
-    'tratamientos': 'Tratamientos',
-    'historial-adopciones': 'Historial Adopciones',
-    'clientes': 'Clientes',
+    'animales': 'Gestión Animal',
+    'gestion-animal': 'Gestión Animal',
+    'Manufacturing': 'Manufacturing',
+    'salas': 'Gestión Salas',
+    'gestion-salas': 'Gestión Salas',
+    'tratamientos': 'Gestión Tratamiento',
+    'gestion-tratamiento': 'Gestión Tratamiento',
+    'historial-adopciones': 'Gestión Adopción',
+    'gestion-adopcion': 'Gestión Adopción',
+    'clientes': 'Gestión Clientes',
+    'gestion-clientes': 'Gestión Clientes',
     'usuarios': 'Usuarios',
     'ajustes': 'Ajustes Roles y Permisos',
     'listado-empleados': 'Listado Empleados',
+    'listado-citas': 'Listado Citas',
+    'listado-animales': 'Listado Animales',
+    'listado-salas': 'Listado Salas',
+    'listado-tratamientos': 'Listado Tratamiento',
+    'listado-adopcion': 'Historial Adopción',
+    'listado-clientes': 'Listado Cliente',
     'home': 'Home'
+};
+
+// Map to define virtual parents for flat routes
+const parentMap: { [key: string]: string } = {
+    'listado-empleados': 'empleados',
+    'listado-centros': 'centros',
+    'listado-citas': 'citas',
+    'listado-animales': 'animales',
+    'listado-salas': 'salas',
+    'listado-tratamientos': 'empleados',
+    'listado-adopcion': 'empleados',
+    'listado-clientes': 'clientes',
+    'usuarios': 'empleados',
+    'ajustes': 'empleados',
+    'gestion-animal': 'centros'
 };
 
 const Breadcrumbs: React.FC = () => {
     const location = useLocation();
-    const pathnames = location.pathname.split('/').filter((x) => x);
+    const rawPathnames = location.pathname.split('/').filter((x) => x);
+
+    // Virtualize hierarchy if it's a flat list/management route
+    let pathnames = [...rawPathnames];
+    if (pathnames.length === 1 && parentMap[pathnames[0]]) {
+        pathnames = [parentMap[pathnames[0]], pathnames[0]];
+    }
 
     // Don't show breadcrumbs on home or login
-    if (pathnames.length === 0 || pathnames[0] === 'home' || pathnames[0] === 'login') {
+    if (rawPathnames.length === 0 || rawPathnames[0] === 'home' || rawPathnames[0] === 'login') {
         return null;
     }
 
@@ -44,7 +78,7 @@ const Breadcrumbs: React.FC = () => {
 
                     return (
                         <IonBreadcrumb
-                            key={value}
+                            key={`${value}-${index}`}
                             className={`breadcrumb-item ${last ? 'active' : ''}`}
                         >
                             {label}

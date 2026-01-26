@@ -1,3 +1,4 @@
+import React from 'react';
 import {
     IonPage,
     IonContent,
@@ -8,15 +9,17 @@ import {
     IonCardContent,
     IonAvatar,
     IonIcon,
+    IonSpinner,
 } from '@ionic/react';
-import { medkit, time, calendar } from 'ionicons/icons';
+import { medkit, time, calendar, briefcase } from 'ionicons/icons';
 import { useParams } from 'react-router-dom';
 import TopBar from '../components/TopBar';
 import SideMenu from '../components/SideMenu';
+import { vetService, Animal as ServiceAnimal, Treatment as ServiceTreatment } from '../services/vetService';
 import '../theme/css/AnimalTreatment.css';
 
 interface Treatment {
-    id: number;
+    id: string;
     name: string;
     dosage: string;
     frequency: string;
@@ -26,7 +29,7 @@ interface Treatment {
 }
 
 interface Animal {
-    id: number;
+    id: string;
     name: string;
     breed: string;
     image: string;
@@ -36,42 +39,139 @@ interface Animal {
 
 const AnimalTreatment: React.FC = () => {
     const { animalId } = useParams<{ animalId: string }>();
+    const [animal, setAnimal] = React.useState<Animal | null>(null);
+    const [loading, setLoading] = React.useState(true);
 
-    // Mock data for animals and their treatments
-    const animals: Animal[] = [
-        {
-            id: 1,
-            name: 'Max',
-            breed: 'Golden Retriever',
-            image: 'https://images.unsplash.com/photo-1633722715463-d30f4f325e24?w=200&h=200&fit=crop',
-            activeTreatments: 1,
-            treatments: [
-                {
-                    id: 1,
-                    name: 'Antibiótico Amoxicilina',
-                    dosage: '250 mg - Cada 12 horas',
-                    frequency: 'Cada 12 horas',
-                    times: '08:00, 20:00',
-                    nextDose: 'Hoy a las 20:00',
-                    instructions: 'Administrar con comida. No suspender el tratamiento antes de tiempo.',
-                },
-            ],
-        },
-        {
-            id: 2,
-            name: 'Peluso',
-            breed: 'Siames',
-            image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=200&h=200&fit=crop',
-            activeTreatments: 0,
-            treatments: [],
-        },
-    ];
+    const getFrequencyInfo = (treatment: ServiceTreatment) => {
+        if (treatment.frequency_hours) return { value: treatment.frequency_hours, unit: 'horas', type: 'hours' as const };
+        if (treatment.frequency_days) return { value: treatment.frequency_days, unit: 'días', type: 'days' as const };
+        if (treatment.frequency_months) return { value: treatment.frequency_months, unit: 'meses', type: 'months' as const };
+        if (treatment.frequency_years) return { value: treatment.frequency_years, unit: 'años', type: 'years' as const };
+        return null;
+    };
 
-    console.log("AnimalID Raw Params:", animalId);
-    // Parse the ID, defaulting to undefined/null if invalid to prevent false positives
-    const parsedId = animalId ? parseInt(animalId, 10) : -1;
-    console.log("Parsed ID:", parsedId);
-    const animal = animals.find(a => a.id === parsedId);
+    const calculateSchedule = (createdAt: string, treatment: ServiceTreatment) => {
+        const freq = getFrequencyInfo(treatment);
+        if (!freq) return 'Horario no definido';
+
+        const start = new Date(createdAt);
+
+        // For hours, show 24h cycle
+        if (freq.type === 'hours') {
+            const hours = [];
+            for (let i = 0; i < 24; i += freq.value) {
+                const d = new Date(start.getTime() + i * 3600000);
+                hours.push(d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }));
+            }
+            return hours.join(', ');
+        }
+
+        // For days/months/years, just show the time
+        return start.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    };
+
+    const calculateNextDose = (createdAt: string, treatment: ServiceTreatment) => {
+        const freq = getFrequencyInfo(treatment);
+        if (!freq) return 'Pendiente';
+
+        const start = new Date(createdAt);
+        const now = new Date();
+
+        let next = new Date(start);
+
+        // Add frequency until we're in the future
+        if (freq.type === 'hours') {
+            while (next <= now) {
+                next.setHours(next.getHours() + freq.value);
+            }
+        } else if (freq.type === 'days') {
+            while (next <= now) {
+                next.setDate(next.getDate() + freq.value);
+            }
+        } else if (freq.type === 'months') {
+            while (next <= now) {
+                next.setMonth(next.getMonth() + freq.value);
+            }
+        } else if (freq.type === 'years') {
+            while (next <= now) {
+                next.setFullYear(next.getFullYear() + freq.value);
+            }
+        }
+
+        const timeStr = next.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+        const isToday = next.toDateString() === now.toDateString();
+
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const isTomorrow = next.toDateString() === tomorrow.toDateString();
+
+        if (isToday) return `Hoy a las ${timeStr}`;
+        if (isTomorrow) return `Mañana a las ${timeStr}`;
+
+        return next.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }) + ' a las ' + timeStr;
+    };
+
+    React.useEffect(() => {
+        const fetchAnimalAndTreatments = async () => {
+            if (!animalId) return;
+            try {
+                const animals = await vetService.getMyAnimals();
+                const treatments = await vetService.getMyTreatments();
+
+                console.log("[Diagnostic] All user animals:", animals);
+                console.log("[Diagnostic] All user treatments:", treatments);
+
+                const foundAnimal = animals.find((a: ServiceAnimal) => a.id === animalId);
+                if (foundAnimal) {
+                    const animalTreatments = treatments.filter((t: ServiceTreatment) => t.animal_id === animalId);
+                    setAnimal({
+                        id: foundAnimal.id,
+                        name: foundAnimal.name,
+                        breed: foundAnimal.breed || (foundAnimal as any).species || 'Desconocida',
+                        image: foundAnimal.animal_image || (foundAnimal as any).avatar || "https://ionicframework.com/docs/img/demos/avatar.svg",
+                        activeTreatments: animalTreatments.length,
+                        treatments: animalTreatments.map((t: ServiceTreatment) => {
+                            const freq = getFrequencyInfo(t);
+                            return {
+                                id: t.id,
+                                name: t.medication || t.description || 'Tratamiento',
+                                dosage: t.dosage || 'Consultar',
+                                frequency: freq ? `Cada ${freq.value} ${freq.unit}` : 'N/A',
+                                times: calculateSchedule(t.created_at || t.date || new Date().toISOString(), t),
+                                nextDose: calculateNextDose(t.created_at || t.date || new Date().toISOString(), t),
+                                instructions: t.description || 'Sin instrucciones adicionales'
+                            };
+                        })
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching animal treatments:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchAnimalAndTreatments();
+    }, [animalId]);
+
+    console.log("AnimalID Params:", animalId);
+    console.log("Current Animal State:", animal);
+
+    if (loading) {
+        return (
+            <>
+                <SideMenu />
+                <IonPage id="main-content">
+                    <TopBar />
+                    <IonContent>
+                        <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
+                            <IonSpinner name="crescent" />
+                        </div>
+                    </IonContent>
+                </IonPage>
+            </>
+        );
+    }
 
     if (!animal) {
         return (
@@ -129,14 +229,14 @@ const AnimalTreatment: React.FC = () => {
                                                     {treatment.name}
                                                 </IonCardTitle>
                                             </div>
-                                            <IonCardSubtitle className="animal-treatment-card-subtitle">
-                                                <IonIcon icon={medkit} className="animal-treatment-subtitle-icon" />
-                                                {treatment.dosage}
-                                            </IonCardSubtitle>
-                                            <IonCardSubtitle className="animal-treatment-card-subtitle">
+                                            <div className="animal-treatment-card-subtitle">
+                                                <IonIcon icon={briefcase} className="animal-treatment-subtitle-icon" />
+                                                {treatment.dosage} - {treatment.frequency}
+                                            </div>
+                                            <div className="animal-treatment-card-subtitle">
                                                 <IonIcon icon={time} className="animal-treatment-subtitle-icon" />
                                                 {treatment.times}
-                                            </IonCardSubtitle>
+                                            </div>
                                         </IonCardHeader>
 
                                         <IonCardContent className="animal-treatment-card-content">
@@ -150,7 +250,7 @@ const AnimalTreatment: React.FC = () => {
 
                                             {/* Instructions */}
                                             <div className="animal-treatment-instructions">
-                                                <strong>Instrucciones:</strong> {treatment.instructions}
+                                                Instrucciones: {treatment.instructions}
                                             </div>
                                         </IonCardContent>
                                     </IonCard>

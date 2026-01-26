@@ -46,18 +46,21 @@ import '@ionic/react/css/display.css';
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <AuthProvider>
-      <BrowserRouter>
-        <DeepLinkHandler />
-        <SideMenu />
-        <div id="main-content">
-          <AppRouter />
-        </div>
-      </BrowserRouter>
-    </AuthProvider>
-  </IonApp>
-);
+const App: React.FC = () => {
+  const IonAppAny = IonApp as any;
+  return (
+    <IonAppAny>
+      <AuthProvider>
+        <BrowserRouter>
+          <DeepLinkHandler />
+          <SideMenu />
+          <div id="main-content">
+            <AppRouter />
+          </div>
+        </BrowserRouter>
+      </AuthProvider>
+    </IonAppAny>
+  );
+};
 
 export default App;

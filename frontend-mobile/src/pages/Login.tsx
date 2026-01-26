@@ -146,7 +146,7 @@ const Login: React.FC = () => {
                                         placeholder="ejemplo@correo.com"
                                         type="email"
                                         value={email}
-                                        onIonInput={(e) => setEmail(e.detail.value ?? '')}
+                                        onIonInput={(e: CustomEvent) => setEmail(e.detail.value ?? '')}
                                         onIonBlur={() => markTouched('email')}
                                         required
                                     />
@@ -164,7 +164,7 @@ const Login: React.FC = () => {
                                         placeholder="Contraseña"
                                         type="password"
                                         value={pass}
-                                        onIonInput={(e) => setPass(e.detail.value ?? '')}
+                                        onIonInput={(e: CustomEvent) => setPass(e.detail.value ?? '')}
                                         onIonBlur={() => markTouched('pass')}
                                         required
                                     />
@@ -177,7 +177,7 @@ const Login: React.FC = () => {
                                             <IonItem lines="none" className="ion-no-padding login-remember-me">
                                                 <IonCheckbox
                                                     checked={rememberMe}
-                                                    onIonChange={(e) => setRememberMe(e.detail.checked)}
+                                                    onIonChange={(e: CustomEvent) => setRememberMe(e.detail.checked)}
                                                     labelPlacement="end"
                                                     aria-label="Recordarme"
                                                     color="primary"

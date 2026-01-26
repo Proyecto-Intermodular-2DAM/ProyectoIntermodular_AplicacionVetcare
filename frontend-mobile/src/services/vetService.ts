@@ -1,60 +1,132 @@
 import { supabase } from '../lib/supabase';
+import { authService } from './authService';
 
 export interface Animal {
-    id: number;
+    id: string; // Changed to string (UUID in SQL)
     name: string;
-    type: string;
+    species: string; // Changed from type
     breed?: string;
     avatar?: string;
     owner_id: string;
+    description?: string;
+    birth_date?: string;
+    weight?: number;
+    height?: number;
+    sex?: string;
+    status?: string; 
+    animal_image?: string; // Correct column name
+    information?: string; // Added field for adoption details
 }
 
 export interface Appointment {
     id: string;
-    title: string;
-    date: string;
-    time: string;
-    veterinarian_id?: string;
-    animal_id: number;
+    appointment_date: string;
+    appointment_time: string;
+    reason: string;
+    status: string;
+    client_id: string;
+    animal_id: string;
+    date: string; // Alias for UI
+    time: string; // Alias for UI
+    title?: string; // Add title for UI compatibility
     animal?: {
         name: string;
-        avatar?: string;
-        type?: string;
-    };
-    veterinarian?: {
-        name: string;
-        avatar?: string;
+        animal_image?: string;
+        species?: string;
     };
 }
 
 export interface Treatment {
-    id: string;
-    title: string;
+    id: string; // UUID
     description: string;
-    date: string;
-    animal_id: number;
+    medication?: string;
+    dosage?: string;
+    appointment_id: string;
+    employee_id: string;
+    animal_id?: string;
     animal_name?: string;
+    date?: string;
+    created_at?: string;
+    frequency_hours?: number;
+    frequency_days?: number;
+    frequency_months?: number;
+    frequency_years?: number;
+    animal?: {
+        name: string;
+    };
 }
 
 class VetService {
+    private animalsCache: Animal[] | null = null;
+    private appointmentsCache: Appointment[] | null = null;
+    private animalsPromise: Promise<Animal[]> | null = null;
+    private appointmentsPromise: Promise<Appointment[]> | null = null;
+
     /**
      * Fetch all animals belonging to the current user
      */
     async getMyAnimals() {
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) throw new Error('No user logged in');
+        if (this.animalsCache) return this.animalsCache;
+        if (this.animalsPromise) return this.animalsPromise;
 
+        this.animalsPromise = (async () => {
+            try {
+                const userId = await authService.getPublicUserId();
+                if (!userId) return [];
+
+                const { data, error } = await supabase
+                    .from('animal')
+                    .select('*')
+                    .eq('client_id', userId);
+
+                if (error) throw error;
+                this.animalsCache = data as Animal[];
+                return this.animalsCache;
+            } catch (error) {
+                console.error('Error fetching animals:', error);
+                return [];
+            } finally {
+                this.animalsPromise = null;
+            }
+        })();
+
+        return this.animalsPromise;
+    }
+
+    /**
+     * Fetch all animals available for adoption
+     */
+    async getAnimalsForAdoption() {
+        try {
             const { data, error } = await supabase
                 .from('animal')
                 .select('*')
-                .eq('owner_id', user.id);
+                .eq('status', 'READY_FOR_ADOPTION'); // Only show animals ready for adoption
 
             if (error) throw error;
             return data as Animal[];
         } catch (error) {
-            console.error('Error fetching animals:', error);
+            console.error('Error fetching adoption animals:', error);
             return [];
+        }
+    }
+
+    /**
+     * Fetch a single animal by ID
+     */
+    async getAnimalById(id: string) {
+        try {
+            const { data, error } = await supabase
+                .from('animal')
+                .select('*')
+                .eq('id', id)
+                .single();
+
+            if (error) throw error;
+            return data as Animal;
+        } catch (error) {
+            console.error(`Error fetching animal ${id}:`, error);
+            return null;
         }
     }
 
@@ -62,28 +134,43 @@ class VetService {
      * Fetch all appointments for the current user's animals
      */
     async getMyAppointments() {
-        try {
-            const animals = await this.getMyAnimals();
-            if (animals.length === 0) return [];
+        if (this.appointmentsCache) return this.appointmentsCache;
+        if (this.appointmentsPromise) return this.appointmentsPromise;
 
-            const animalIds = animals.map(a => a.id);
+        this.appointmentsPromise = (async () => {
+            try {
+                const userId = await authService.getPublicUserId();
+                if (!userId) return [];
 
-            // Fetch appointments joins with animal info if possible
-            const { data, error } = await supabase
-                .from('appointments')
-                .select(`
-                    *,
-                    animal:animal_id (name, avatar, type)
-                `)
-                .in('animal_id', animalIds)
-                .order('date', { ascending: true });
+                const { data, error } = await supabase
+                    .from('appointments')
+                    .select(`
+                        *,
+                        animal:animal_id (name, animal_image, species)
+                    `)
+                    .eq('client_id', userId)
+                    .order('appointment_date', { ascending: true });
 
-            if (error) throw error;
-            return data as Appointment[];
-        } catch (error) {
-            console.error('Error fetching appointments:', error);
-            return [];
-        }
+                if (error) throw error;
+
+                const mapped = data.map((item: any) => ({
+                    ...item,
+                    date: item.appointment_date,
+                    time: item.appointment_time,
+                    title: item.reason || 'Sin motivo'
+                })) as Appointment[];
+
+                this.appointmentsCache = mapped;
+                return mapped;
+            } catch (error) {
+                console.error('Error fetching appointments:', error);
+                return [];
+            } finally {
+                this.appointmentsPromise = null;
+            }
+        })();
+
+        return this.appointmentsPromise;
     }
 
     /**
@@ -91,27 +178,49 @@ class VetService {
      */
     async getMyTreatments() {
         try {
-            const animals = await this.getMyAnimals();
-            if (animals.length === 0) return [];
+            const userId = await authService.getPublicUserId();
+            if (!userId) return [];
 
-            const animalIds = animals.map(a => a.id);
+            // 1. Get user's appointments first to get IDs
+            const myApps = await this.getMyAppointments();
+            const appIds = myApps.map(a => a.id);
+            
+            if (appIds.length === 0) return [];
 
+            // 2. Fetch treatments linked to those appointments
             const { data, error } = await supabase
                 .from('treatments')
                 .select(`
                     *,
-                    animal:animal_id (name)
+                    appointment:appointment_id (
+                        appointment_date,
+                        animal:animal_id (id, name)
+                    )
                 `)
-                .in('animal_id', animalIds)
-                .order('date', { ascending: false });
+                .in('appointment_id', appIds)
+                .order('created_at', { ascending: false });
 
             if (error) throw error;
-            return data as (Treatment & { animal: { name: string } })[];
+
+            return data.map((t: any) => ({
+                ...t,
+                animal_id: t.appointment?.animal?.id,
+                animal_name: t.appointment?.animal?.name,
+                animal: t.appointment?.animal,
+                date: t.appointment?.appointment_date || t.created_at
+            })) as Treatment[];
         } catch (error) {
             console.error('Error fetching treatments:', error);
             return [];
         }
     }
-}
 
+    /**
+     * Clear all caches
+     */
+    clearCache() {
+        this.animalsCache = null;
+        this.appointmentsCache = null;
+    }
+}
 export const vetService = new VetService();

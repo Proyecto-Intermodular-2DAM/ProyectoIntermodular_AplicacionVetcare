@@ -1,0 +1,163 @@
+/* Date.css */
+.date-page-container {
+    padding: 20px 40px;
+    background-color: #ffffff;
+    min-height: 100%;
+}
+
+.date-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.date-header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.secondary-search-container {
+    display: flex;
+    align-items: center;
+    background-color: #f1f3f4;
+    border-radius: 8px;
+    padding: 8px 16px;
+    width: 400px;
+    margin-bottom: 30px;
+}
+
+.secondary-search-icon {
+    color: #5f6368;
+    margin-right: 12px;
+}
+
+.secondary-search-container input {
+    background: transparent;
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 16px;
+    color: #3c4043;
+}
+
+.btn-listado-citas {
+    background-color: #00695c;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-listado-citas:hover {
+    background-color: #004d40;
+}
+
+.divider {
+    height: 1px;
+    background-color: #f0f0f0;
+    margin: 30px 0;
+}
+
+.date-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 40px;
+    max-width: 1000px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 8px;
+}
+
+.custom-input {
+    background-color: #e8eaed;
+    border-radius: 12px;
+    padding: 16px 24px;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #3c4043;
+}
+
+.custom-input::placeholder {
+    color: #9aa0a6;
+}
+
+.form-actions {
+    grid-column: span 2;
+    display: flex;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 40px;
+    margin-bottom: 40px;
+}
+
+.btn-action {
+    background-color: #00695c;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 15px;
+    min-width: 150px;
+}
+
+.btn-action:hover {
+    background-color: #004d40;
+}
+
+.field-error-message {
+    color: #eb445a;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    margin-left: 4px;
+}
+
+.input-invalid {
+    border: 1px solid #eb445a !important;
+    background-color: #fff1f2 !important;
+}
+
+@media (max-width: 768px) {
+    .date-form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+
+    .form-actions {
+        grid-column: span 1;
+        flex-direction: column;
+    }
+
+    .secondary-search-container {
+        width: 100%;
+    }
+}

@@ -3,34 +3,34 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
-import '../theme/css/ListEmployee.css';
+import '../theme/css/ListEmployee.css'; // Reusing common list styles
 
-const ListEmployee: React.FC = () => {
+const ListAdoption: React.FC = () => {
     const navigate = useNavigate();
 
-    const employees = [
-        { no: 1, dni: '12345678A', nombre: 'Paco', telefono: '611 11 11 11', sueldo: '2000 €', id: '1' },
-        { no: 2, dni: '12345678B', nombre: 'Marta', telefono: '622 22 22 22', sueldo: '2000 €', id: '2' },
-        { no: 3, dni: '12345678C', nombre: 'German', telefono: '633 33 33 33', sueldo: '1800 €', id: '3' },
-        { no: 4, dni: '12345678F', nombre: 'Paula', telefono: '644 44 44 44', sueldo: '1800 €', id: '4' },
-        { no: 5, dni: '12345678E', nombre: 'Juan', telefono: '655 55 55 55', sueldo: '2200 €', id: '5' },
+    const adoptions = [
+        { id: 1, dniCli: '12345678A', animal: 'Anakin', idAnimal: '145', fecha: '11/09/2025', comentario: '' },
+        { id: 2, dniCli: '12345678B', animal: 'Pelusa', idAnimal: '99', fecha: '02/05/2024', comentario: '' },
+        { id: 3, dniCli: '12345678C', animal: 'Mustio', idAnimal: '15', fecha: '19/06/2015', comentario: '' },
+        { id: 4, dniCli: '12345678F', animal: 'Bola', idAnimal: '120', fecha: '06/01/2016', comentario: '' },
+        { id: 5, dniCli: '12345678E', animal: 'camilo', idAnimal: '75', fecha: '01/05/2020', comentario: '' },
     ];
 
     return (
         <MainLayout>
             <div className="list-employee-container">
                 <div className="list-employee-header">
-                    <h1>Listado Empleados</h1>
-                    <button 
+                    <h1>Historial Adopción</h1>
+                    <button
                         className="btn-gestion-empleado"
-                        onClick={() => navigate('/empleados')}
+                        onClick={() => navigate('/gestion-adopcion')}
                     >
-                        Gestión Empleado <IonIcon icon={chevronForwardOutline} />
+                        Gestión Adopción <IonIcon icon={chevronForwardOutline} />
                     </button>
                 </div>
 
                 <div className="list-tabs">
-                    <div className="tab-item">Listado Empleados</div>
+                    <div className="tab-item selected">Listado Adopcion</div>
                 </div>
 
                 <div className="list-controls">
@@ -53,7 +53,7 @@ const ListEmployee: React.FC = () => {
                             <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
                         </div>
                         <button className="btn-eliminar-empleado">
-                            Eliminar Empleado <IonIcon icon={chevronForwardOutline} />
+                            Eliminar Adopcion <IonIcon icon={chevronForwardOutline} />
                         </button>
                     </div>
                 </div>
@@ -61,23 +61,23 @@ const ListEmployee: React.FC = () => {
                 <table className="employee-table">
                     <thead>
                         <tr>
-                            <th className="col-no">No.</th>
-                            <th className="col-dni">DNI</th>
-                            <th className="col-nombre">Nombre</th>
-                            <th className="col-telefono">Teléfono</th>
-                            <th className="col-sueldo">Sueldo</th>
-                            <th className="col-id">ID Usuario</th>
+                            <th className="col-no">Id</th>
+                            <th className="col-dni">DNI Cliente</th>
+                            <th className="col-nombre">Nombre Animal</th>
+                            <th className="col-id-animal">Id Animal</th>
+                            <th className="col-fecha">Fecha</th>
+                            <th className="col-comentario">Comentario</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {employees.map((emp) => (
-                            <tr key={emp.no}>
-                                <td className="col-no">{emp.no}</td>
-                                <td className="col-dni">{emp.dni}</td>
-                                <td className="col-nombre">{emp.nombre}</td>
-                                <td className="col-telefono">{emp.telefono}</td>
-                                <td className="col-sueldo">{emp.sueldo}</td>
-                                <td className="col-id">{emp.id}</td>
+                        {adoptions.map((ad) => (
+                            <tr key={ad.id}>
+                                <td className="col-no">{ad.id}</td>
+                                <td className="col-dni">{ad.dniCli}</td>
+                                <td className="col-nombre">{ad.animal}</td>
+                                <td className="col-id-animal"><strong>{ad.idAnimal}</strong></td>
+                                <td className="col-fecha"><strong>{ad.fecha}</strong></td>
+                                <td className="col-comentario">{ad.comentario}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -87,4 +87,4 @@ const ListEmployee: React.FC = () => {
     );
 };
 
-export default ListEmployee;
+export default ListAdoption;

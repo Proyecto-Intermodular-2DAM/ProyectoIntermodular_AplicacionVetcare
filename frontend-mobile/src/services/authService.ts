@@ -1,5 +1,6 @@
 import { supabase } from '../lib/supabase';
 import type { User, Session, AuthError } from '@supabase/supabase-js';
+import { vetService } from './vetService';
 
 export interface SignUpData {
     email: string;
@@ -17,6 +18,10 @@ export interface AuthResponse {
 }
 
 class AuthService {
+    private userProfile: any | null = null;
+    private userIdCache: string | null = null;
+    private profilePromise: Promise<any> | null = null;
+
     private getBaseUrl() {
         let baseUrl = import.meta.env.VITE_SITE_URL || window.location.origin;
         
@@ -92,10 +97,17 @@ class AuthService {
     async signOut(): Promise<{ error: AuthError | null }> {
         try {
             const { error } = await supabase.auth.signOut();
+            this.clearCache();
+            vetService.clearCache();
             return { error };
         } catch (error) {
             return { error: error as AuthError };
         }
+    }
+
+    private clearCache() {
+        this.userProfile = null;
+        this.userIdCache = null;
     }
 
     /**
@@ -136,6 +148,94 @@ class AuthService {
             console.error('Error getting session:', error);
             return null;
         }
+    }
+
+    /**
+     * Update current user profile metadata
+     */
+    async updateProfile(updates: { name?: string; surname?: string; phone?: string; avatar_url?: string; password?: string; dni?: string }) {
+        try {
+            const { name, surname, phone, avatar_url, password, dni } = updates;
+            
+            // 1. Update Supabase Auth metadata
+            const authUpdateData: any = {
+                data: {}
+            };
+            if (name) authUpdateData.data.name = name;
+            if (surname) authUpdateData.data.surname = surname;
+            if (phone) authUpdateData.data.phone = phone;
+            if (password) authUpdateData.password = password;
+
+            const { data: authData, error: authError } = await supabase.auth.updateUser(authUpdateData);
+            if (authError) throw authError;
+
+            // 2. Update public.users table
+            const userId = await this.getPublicUserId();
+            if (userId) {
+                const dbUpdateData: any = {};
+                if (name) dbUpdateData.first_name = name;
+                if (surname) dbUpdateData.last_name = surname;
+                if (phone) dbUpdateData.phone_number = phone;
+                if (avatar_url) dbUpdateData.user_image = avatar_url;
+                if (dni) dbUpdateData.dni = dni;
+
+                const { error: dbError } = await supabase
+                    .from('users')
+                    .update(dbUpdateData)
+                    .eq('id', userId);
+                
+                if (dbError) console.error('Error updating public.users:', dbError);
+            }
+
+            return { user: authData.user, error: null };
+        } catch (error) {
+            return { user: null, error: error as AuthError };
+        }
+    }
+
+    /**
+     * Get the public user profile from the database
+     */
+    async getPublicUserProfile() {
+        if (this.userProfile) return this.userProfile;
+        if (this.profilePromise) return this.profilePromise;
+
+        this.profilePromise = (async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) return null;
+
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('id, first_name, last_name, phone_number, user_image, dni, auth_id')
+                    .eq('auth_id', user.id)
+                    .maybeSingle(); 
+
+                if (error) throw error;
+                
+                if (data) {
+                    this.userProfile = data;
+                    this.userIdCache = data.id;
+                }
+                return data;
+            } catch (error) {
+                console.error('[Diagnostic] Error in getPublicUserProfile:', error);
+                return null;
+            } finally {
+                this.profilePromise = null;
+            }
+        })();
+
+        return this.profilePromise;
+    }
+
+    /**
+     * Get the internal public.users.id
+     */
+    async getPublicUserId(): Promise<string | null> {
+        if (this.userIdCache) return this.userIdCache;
+        const profile = await this.getPublicUserProfile();
+        return profile?.id || null;
     }
 
     /**

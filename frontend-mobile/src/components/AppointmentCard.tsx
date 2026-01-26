@@ -26,8 +26,8 @@ export interface Appointment {
     };
     animal?: {
         name: string;
-        avatar?: string;
-        type?: string;
+        animal_image?: string;
+        species?: string;
     };
 }
 
@@ -111,7 +111,13 @@ const AppointmentCard: React.FC<AppointmentCardProps> = ({ appointment }) => {
                             <strong>Animal</strong>
                             <IonChip className="custom-chip">
                                 <IonAvatar>
-                                    <img alt={appointment.animal?.name || "Mascota"} src={appointment.animal?.avatar || "https://ionicframework.com/docs/img/demos/avatar.svg"} />
+                                    <img
+                                        alt={appointment.animal?.name || "Mascota"}
+                                        src={appointment.animal?.animal_image || "https://ionicframework.com/docs/img/demos/avatar.svg"}
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = 'https://ionicframework.com/docs/img/demos/avatar.svg';
+                                        }}
+                                    />
                                 </IonAvatar>
                                 <IonLabel>{appointment.animal?.name || "Mascota"}</IonLabel>
                             </IonChip>
