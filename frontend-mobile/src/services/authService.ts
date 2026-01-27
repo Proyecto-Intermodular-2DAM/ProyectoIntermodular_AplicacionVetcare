@@ -28,6 +28,16 @@ export interface UserProfile {
     auth_id: string;
 }
 
+const mapProfileFromAPI = (data: any): UserProfile => ({
+    id: data.id,
+    first_name: data.first_name,
+    last_name: data.last_name,
+    phone_number: data.phone_number,
+    user_image: data.user_image,
+    dni: data.dni,
+    auth_id: data.auth_id,
+});
+
 class AuthService {
     private userProfile: UserProfile | null = null;
     private userIdCache: string | null = null;
@@ -62,17 +72,16 @@ class AuthService {
                 },
             });
 
+            if (error) throw error;
+
             return {
                 user: authData.user,
                 session: authData.session,
-                error,
+                error: null,
             };
-        } catch (error) {
-            return {
-                user: null,
-                session: null,
-                error: error as AuthError,
-            };
+        } catch (error: any) {
+            console.error("Error al registrarse:", error);
+            throw new Error(error.message || "No se pudo completar el registro.");
         }
     }
 
@@ -86,17 +95,16 @@ class AuthService {
                 password,
             });
 
+            if (error) throw error;
+
             return {
                 user: data.user,
                 session: data.session,
-                error,
+                error: null,
             };
-        } catch (error) {
-            return {
-                user: null,
-                session: null,
-                error: error as AuthError,
-            };
+        } catch (error: any) {
+            console.error("Error al iniciar sesión:", error);
+            throw new Error(error.message || "No se pudo iniciar sesión.");
         }
     }
 
@@ -106,11 +114,13 @@ class AuthService {
     async signOut(): Promise<{ error: AuthError | null }> {
         try {
             const { error } = await supabase.auth.signOut();
+            if (error) throw error;
             this.clearCache();
             vetService.clearCache();
-            return { error };
-        } catch (error) {
-            return { error: error as AuthError };
+            return { error: null };
+        } catch (error: any) {
+            console.error("Error al cerrar sesión:", error);
+            throw new Error(error.message || "No se pudo cerrar la sesión.");
         }
     }
 
@@ -127,9 +137,11 @@ class AuthService {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
                 redirectTo: `${this.getBaseUrl()}/auth/callback`,
             });
-            return { error };
-        } catch (error) {
-            return { error: error as AuthError };
+            if (error) throw error;
+            return { error: null };
+        } catch (error: any) {
+            console.error("Error al restablecer contraseña:", error);
+            throw new Error(error.message || "No se pudo enviar el correo de restablecimiento.");
         }
     }
 
@@ -165,7 +177,7 @@ class AuthService {
     async updateProfile(updates: { name?: string; surname?: string; phone?: string; avatar_url?: string; password?: string; dni?: string }) {
         try {
             const { name, surname, phone, avatar_url, password, dni } = updates;
-            
+
             // 1. Update Supabase Auth metadata
             const authUpdateData: any = {
                 data: {}
@@ -196,8 +208,9 @@ class AuthService {
             }
 
             return { user: authData.user, error: null };
-        } catch (error) {
-            return { user: null, error: error as AuthError };
+        } catch (error: any) {
+            console.error("Error al actualizar perfil:", error);
+            throw new Error(error.response?.data?.message || error.message || "No se pudo actualizar el perfil.");
         }
     }
 
@@ -222,16 +235,18 @@ class AuthService {
                         'Accept': 'application/vnd.pgrst.object+json'
                     }
                 });
-                
-                const data = response.data as unknown as UserProfile;
+
+                const data = response.data as unknown as any;
                 if (data) {
-                    this.userProfile = data;
-                    this.userIdCache = data.id;
+                    const mappedProfile = mapProfileFromAPI(data);
+                    this.userProfile = mappedProfile;
+                    this.userIdCache = mappedProfile.id;
+                    return mappedProfile;
                 }
-                return data;
-            } catch (error) {
-                console.error('[Diagnostic] Error in getPublicUserProfile:', error);
                 return null;
+            } catch (error: any) {
+                console.error('[Diagnostic] Error in getPublicUserProfile:', error);
+                throw new Error(error.response?.data?.message || "No se pudo obtener el perfil público.");
             } finally {
                 this.profilePromise = null;
             }
