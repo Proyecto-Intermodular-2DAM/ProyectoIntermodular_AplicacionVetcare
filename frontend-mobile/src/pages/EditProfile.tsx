@@ -12,14 +12,17 @@ import {
 } from "@ionic/react";
 import { arrowBack, camera } from "ionicons/icons";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { authService } from "../services/authService";
+import { useProfile } from "../hooks/useProfile";
 import "../theme/css/EditProfile.css";
 
 const EditProfile: React.FC = () => {
     const { user } = useAuth();
+    const { profile: publicProfile } = useProfile();
     const navigate = useNavigate();
+
     const [name, setName] = useState<string>("");
     const [surname, setSurname] = useState<string>("");
     const [email, setEmail] = useState<string>("");
@@ -27,19 +30,27 @@ const EditProfile: React.FC = () => {
     const [dni, setDni] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [profileImage, setProfileImage] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(false);
+    const [updating, setUpdating] = useState<boolean>(false);
 
-    // Load initial data
-    useState(() => {
-        if (user) {
+    // Initial load from profile data
+    useEffect(() => {
+        if (publicProfile) {
+            setName(publicProfile.first_name || "");
+            setSurname(publicProfile.last_name || "");
+            setPhone(publicProfile.phone_number || "");
+            setDni(publicProfile.dni || "");
+            setProfileImage(publicProfile.user_image || "");
+        } else if (user) {
             setName(user.user_metadata?.name || user.user_metadata?.first_name || "");
             setSurname(user.user_metadata?.surname || user.user_metadata?.last_name || "");
-            setEmail(user.email || "");
             setPhone(user.user_metadata?.phone || user.user_metadata?.phone_number || "");
             setDni(user.user_metadata?.dni || "");
             setProfileImage(user.user_metadata?.avatar_url || user.user_metadata?.user_image || "");
         }
-    });
+        if (user) {
+            setEmail(user.email || "");
+        }
+    }, [user, publicProfile]);
 
     const handleGoBack = () => {
         navigate(-1);
@@ -47,7 +58,7 @@ const EditProfile: React.FC = () => {
 
     const handleSaveChanges = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        setUpdating(true);
 
         const updates: any = {
             name,
@@ -61,14 +72,16 @@ const EditProfile: React.FC = () => {
             updates.password = password;
         }
 
-        const { error } = await authService.updateProfile(updates);
-        setLoading(false);
+        try {
+            const { error } = await authService.updateProfile(updates);
+            if (error) throw error;
 
-        if (error) {
-            alert("Error al actualizar perfil: " + error.message);
-        } else {
             alert("Cambios guardados exitosamente");
             navigate(-1);
+        } catch (error: any) {
+            alert("Error al actualizar perfil: " + (error.message || error.userMessage));
+        } finally {
+            setUpdating(false);
         }
     };
 
@@ -213,9 +226,9 @@ const EditProfile: React.FC = () => {
                             expand="block"
                             className="edit-profile-save-button"
                             aria-label="Guardar cambios"
-                            disabled={loading}
+                            disabled={updating}
                         >
-                            {loading ? "Guardando..." : "Guardar cambios"}
+                            {updating ? "Guardando..." : "Guardar cambios"}
                         </IonButton>
                     </form>
                 </div>

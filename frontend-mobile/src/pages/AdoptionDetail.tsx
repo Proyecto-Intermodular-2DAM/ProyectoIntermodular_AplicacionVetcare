@@ -2,14 +2,11 @@ import React from 'react';
 import {
     IonContent,
     IonPage,
-    IonButtons,
-    IonBackButton,
     IonButton,
-    IonHeader,
-    IonToolbar
+    IonSpinner
 } from '@ionic/react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { vetService } from '../services/vetService';
+import { useAnimal } from '../hooks/useVet';
 import '../theme/css/AdoptionDetail.css';
 import TopBar from '../components/TopBar';
 
@@ -34,45 +31,31 @@ const calculateAge = (birthDate: string) => {
 
 const AdoptionDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const [adoptionItem, setAdoptionItem] = React.useState<any | null>(null);
-    const [loading, setLoading] = React.useState(true);
+    const { animal: adoptionItem, loading, error } = useAnimal(id);
     const navigate = useNavigate();
-
-    React.useEffect(() => {
-        const fetchAnimal = async () => {
-            if (!id) return;
-            try {
-                const animal = await vetService.getAnimalById(id);
-                console.log("[Diagnostic] Fetched Animal for detail:", animal);
-                setAdoptionItem(animal);
-            } catch (error) {
-                console.error("Error fetching animal details:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAnimal();
-    }, [id]);
 
     if (loading) {
         return (
             <IonPage>
                 <TopBar />
                 <IonContent className="ion-padding">
-                    <div>Loading...</div>
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '50px' }}>
+                        <IonSpinner name="crescent" />
+                    </div>
                 </IonContent>
             </IonPage>
         );
     }
 
-    if (!adoptionItem) {
+    if (error || !adoptionItem) {
         return (
             <IonPage>
                 <TopBar />
                 <IonContent>
-                    <div style={{ padding: 20 }}>Adoption not found</div>
-                    <IonButton onClick={() => navigate('/adoptions')}>Back to Adoptions</IonButton>
+                    <div style={{ padding: 20, textAlign: 'center' }}>
+                        <p>{error || "Adopción no encontrada"}</p>
+                        <IonButton fill="outline" onClick={() => navigate('/adoptions')}>Volver a Adopciones</IonButton>
+                    </div>
                 </IonContent>
             </IonPage>
         );
@@ -83,7 +66,7 @@ const AdoptionDetail: React.FC = () => {
             <TopBar />
             <IonContent className="adoption-detail-content">
                 <img
-                    src={adoptionItem.animal_image || adoptionItem.image_url || adoptionItem.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'}
+                    src={adoptionItem.animal_image || adoptionItem.avatar || 'https://ionicframework.com/docs/img/demos/card-media.png'}
                     alt={adoptionItem.name}
                     className="adoption-detail-image"
                     onError={(e) => {
@@ -105,19 +88,19 @@ const AdoptionDetail: React.FC = () => {
                 <div className="adoption-stats-grid">
                     <div className="stat-card">
                         <span className="stat-label">RAZA</span>
-                        <span className="stat-value">{adoptionItem.breed || 'Unknown'}</span>
+                        <span className="stat-value">{adoptionItem.breed || adoptionItem.species || 'Desconocida'}</span>
                     </div>
                     <div className="stat-card">
                         <span className="stat-label">SEXO</span>
-                        <span className="stat-value">{adoptionItem.sex || 'Unknown'}</span>
+                        <span className="stat-value">{adoptionItem.sex || 'Desconocido'}</span>
                     </div>
                     <div className="stat-card">
                         <span className="stat-label">EDAD</span>
-                        <span className="stat-value">{calculateAge(adoptionItem.birth_date)}</span>
+                        <span className="stat-value">{calculateAge(adoptionItem.birth_date || '')}</span>
                     </div>
                     <div className="stat-card">
                         <span className="stat-label">PESO</span>
-                        <span className="stat-value">{adoptionItem.weight ? `${adoptionItem.weight}kg` : 'Unknown'}</span>
+                        <span className="stat-value">{adoptionItem.weight ? `${adoptionItem.weight}kg` : 'Desconocido'}</span>
                     </div>
                 </div>
 

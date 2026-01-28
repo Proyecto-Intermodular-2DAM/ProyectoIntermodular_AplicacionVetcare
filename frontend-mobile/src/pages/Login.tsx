@@ -78,18 +78,11 @@ const Login: React.FC = () => {
         setLoading(true);
 
         try {
-            const { error: authError } = await authService.signIn(email, pass);
-
-            if (authError) {
-                setError("Credenciales inválidas. Por favor, revisa tu email y contraseña.");
-                setShowToast(true);
-                setLoading(false);
-                return;
-            }
+            await authService.signIn(email, pass);
 
             navigate("/home");
-        } catch (err) {
-            setError("Error inesperado al iniciar sesión");
+        } catch (err: any) {
+            setError(err.message || "Error inesperado al iniciar sesión");
             setShowToast(true);
         } finally {
             setLoading(false);
