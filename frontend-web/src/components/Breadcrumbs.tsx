@@ -39,12 +39,10 @@ const parentMap: { [key: string]: string } = {
     'listado-citas': 'citas',
     'listado-animales': 'animales',
     'listado-salas': 'salas',
-    'listado-tratamientos': 'empleados',
-    'listado-adopcion': 'empleados',
+    'listado-tratamientos': 'tratamientos',
+    'listado-adopcion': 'adopcion',
     'listado-clientes': 'clientes',
-    'usuarios': 'empleados',
-    'ajustes': 'empleados',
-    'gestion-animal': 'centros'
+    'gestion-animal': 'animales'
 };
 
 const Breadcrumbs: React.FC = () => {
