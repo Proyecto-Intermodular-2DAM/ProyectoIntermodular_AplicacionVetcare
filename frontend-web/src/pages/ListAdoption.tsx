@@ -1,20 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/MainLayout';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonLoading, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
-import '../theme/css/ListEmployee.css'; // Reusing common list styles
+import { vetService } from '../services/vetService';
+import '../theme/css/ListEmployee.css';
 
 const ListAdoption: React.FC = () => {
     const navigate = useNavigate();
+    const [adoptions, setAdoptions] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
-    const adoptions = [
-        { id: 1, dniCli: '12345678A', animal: 'Anakin', idAnimal: '145', fecha: '11/09/2025', comentario: '' },
-        { id: 2, dniCli: '12345678B', animal: 'Pelusa', idAnimal: '99', fecha: '02/05/2024', comentario: '' },
-        { id: 3, dniCli: '12345678C', animal: 'Mustio', idAnimal: '15', fecha: '19/06/2015', comentario: '' },
-        { id: 4, dniCli: '12345678F', animal: 'Bola', idAnimal: '120', fecha: '06/01/2016', comentario: '' },
-        { id: 5, dniCli: '12345678E', animal: 'camilo', idAnimal: '75', fecha: '01/05/2020', comentario: '' },
-    ];
+    useEffect(() => {
+        const fetchAdoptions = async () => {
+            try {
+                const data = await vetService.getAdoptionHistory();
+                setAdoptions(data || []);
+            } catch (err: any) {
+                setToastMessage(err.message || 'Error al cargar historial');
+                setShowToast(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAdoptions();
+    }, []);
+
+    if (loading) {
+        return <IonLoading isOpen={true} message="Cargando historial..." />;
+    }
 
     return (
         <MainLayout>
@@ -52,9 +68,6 @@ const ListAdoption: React.FC = () => {
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
                             <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
                         </div>
-                        <button className="btn-eliminar-empleado">
-                            Eliminar Adopcion <IonIcon icon={chevronForwardOutline} />
-                        </button>
                     </div>
                 </div>
 
@@ -73,16 +86,24 @@ const ListAdoption: React.FC = () => {
                         {adoptions.map((ad) => (
                             <tr key={ad.id}>
                                 <td className="col-no">{ad.id}</td>
-                                <td className="col-dni">{ad.dniCli}</td>
-                                <td className="col-nombre">{ad.animal}</td>
-                                <td className="col-id-animal"><strong>{ad.idAnimal}</strong></td>
-                                <td className="col-fecha"><strong>{ad.fecha}</strong></td>
-                                <td className="col-comentario">{ad.comentario}</td>
+                                <td className="col-dni">{ad.client?.dni || 'N/A'}</td>
+                                <td className="col-nombre">{ad.animal?.name || 'N/A'}</td>
+                                <td className="col-id-animal"><strong>{ad.animal_id}</strong></td>
+                                <td className="col-fecha"><strong>{new Date(ad.adoption_date).toLocaleDateString()}</strong></td>
+                                <td className="col-comentario">{ad.comments}</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={3000}
+                color="danger"
+                position="top"
+            />
         </MainLayout>
     );
 };

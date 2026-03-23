@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Animal.css';
 
 const Animal: React.FC = () => {
@@ -20,7 +21,7 @@ const Animal: React.FC = () => {
 
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
-    const [showToast, setShowToast] = useState<boolean>(false);
+    const [showToast, setShowToast] = useState<boolean>(false); 
     const [touched, setTouched] = useState<Record<string, boolean>>({});
 
     const markTouched = (field: string) => {
@@ -64,17 +65,30 @@ const Animal: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} animal:`, {
-                dniCliente, nombre, especie, estado, codigoEdad, sexo, descripcion, foto
-            });
+            const animalData = {
+                client_dni: dniCliente,
+                name: nombre,
+                species: especie,
+                status: estado,
+                age_code: codigoEdad,
+                sex: sexo,
+                description: descripcion,
+                photo_url: foto
+            };
 
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            setMessage(`Animal ${type === 'create' ? 'creado' : 'actualizado'} correctamente`);
+            if (type === 'create') {
+                await vetService.createAnimal(animalData);
+                setMessage("Animal creado correctamente");
+            } else {
+                // In a real app, we'd have the animal_code from URL
+                // For this demo, we'll assume we can update if we had the code
+                // await vetService.updateAnimal(codigo, animalData);
+                setMessage("Actualización de animal no implementada por falta de ID en esta vista");
+            }
             setShowToast(true);
-        } catch (err) {
-            setMessage("Error al procesar la solicitud");
+            if (type === 'create') setTimeout(() => navigate('/listado-animales'), 1500);
+        } catch (err: any) {
+            setMessage(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);
