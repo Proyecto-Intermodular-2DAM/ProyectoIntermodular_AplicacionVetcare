@@ -77,7 +77,7 @@ export const vetService = {
 
     // Treatments
     async getTreatments() {
-        const { data } = await apiClient.get('/treatments');
+        const { data } = await apiClient.get('/treatments?select=*,appointment:appointment_id(animal:animal_id(name),client:client_id(dni))');
         return data;
     },
     async createTreatment(data: any) {
@@ -86,7 +86,7 @@ export const vetService = {
 
     // Adoption History
     async getAdoptionHistory() {
-        const { data } = await apiClient.get('/adoption_history');
+        const { data } = await apiClient.get('/adoption_history?select=*,animal:animal_id(name),client:adopter_id(dni)');
         return data;
     },
     async createAdoption(data: any) {

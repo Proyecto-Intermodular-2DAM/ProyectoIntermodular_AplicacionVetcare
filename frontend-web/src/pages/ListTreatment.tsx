@@ -91,15 +91,16 @@ const ListTreatment: React.FC = () => {
                     <tbody>
                         {treatments
                             .filter(tr => 
-                                tr.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                tr.appointment?.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
                                 tr.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                tr.medication?.toLowerCase().includes(searchTerm.toLowerCase())
+                                tr.medication?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                tr.appointment?.client?.dni?.toLowerCase().includes(searchTerm.toLowerCase())
                             )
                             .map((tr) => (
                                 <tr key={tr.id}>
                                     <td className="col-no">{tr.id.substring(0, 8)}</td>
-                                    <td className="col-dni">{tr.animal?.client_dni || 'N/A'}</td>
-                                    <td className="col-nombre">{tr.animal?.name || 'N/A'}</td>
+                                    <td className="col-dni">{tr.appointment?.client?.dni || 'N/A'}</td>
+                                    <td className="col-nombre">{tr.appointment?.animal?.name || 'N/A'}</td>
                                     <td className="col-desc"><strong>{tr.description}</strong></td>
                                     <td className="col-med"><strong>{tr.medication}</strong></td>
                                     <td className="col-psol">{tr.dosage}</td>
