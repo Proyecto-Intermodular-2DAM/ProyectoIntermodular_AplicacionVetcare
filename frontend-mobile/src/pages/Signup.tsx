@@ -99,7 +99,7 @@ const Signup: React.FC = () => {
         setLoading(true);
 
         try {
-            await authService.signUp({
+            const { error: authError } = await authService.signUp({
                 email,
                 password: pass,
                 name,
@@ -108,9 +108,15 @@ const Signup: React.FC = () => {
                 phone,
             });
 
+            if (authError) {
+                setError(authError.message || "Error al registrarse");
+                setShowToast(true);
+                return;
+            }
+
             navigate("/signUpSuccessful");
-        } catch (err: any) {
-            setError(err.message || "Error inesperado al registrarse");
+        } catch (err) {
+            setError("Error inesperado al registrarse");
             setShowToast(true);
         } finally {
             setLoading(false);
