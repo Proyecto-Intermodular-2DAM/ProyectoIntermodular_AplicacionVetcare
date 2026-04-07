@@ -82,10 +82,10 @@ const ListCenter: React.FC = () => {
                     </thead>
                     <tbody>
                         {centers.map((center) => (
-                            <tr key={center.center_code}>
-                                <td className="col-no">{center.center_code}</td>
+                            <tr key={center.id}>
+                                <td className="col-no">{center.id.substring(0, 8)}</td>
                                 <td className="col-dni">{center.name}</td>
-                                <td className="col-nombre">{center.postal_code}</td>
+                                <td className="col-nombre">{center.postcode}</td>
                                 <td className="col-sueldo">{center.address}</td>
                             </tr>
                         ))}

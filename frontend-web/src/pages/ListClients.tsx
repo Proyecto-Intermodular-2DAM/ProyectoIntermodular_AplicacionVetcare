@@ -90,7 +90,7 @@ const ListClients: React.FC = () => {
                                 <td className="col-nombre">{c.first_name} {c.last_name}</td>
                                 <td className="col-email"><strong>{c.email}</strong></td>
                                 <td className="col-fecha"><strong>{new Date(c.created_at).toLocaleDateString()}</strong></td>
-                                <td className="col-tel"><strong>{c.phone}</strong></td>
+                                <td className="col-tel"><strong>{c.phone_number}</strong></td>
                             </tr>
                         ))}
                     </tbody>

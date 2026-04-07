@@ -100,8 +100,8 @@ const ListEmployee: React.FC = () => {
                             <tr key={emp.id}>
                                 <td className="col-no">{emp.id.substring(0, 8)}</td>
                                 <td className="col-dni">{emp.dni}</td>
-                                <td className="col-nombre">{emp.name} {emp.surname}</td>
-                                <td className="col-telefono">{emp.phone}</td>
+                                <td className="col-nombre">{emp.first_name} {emp.last_name}</td>
+                                <td className="col-telefono">{emp.phone_number}</td>
                                 <td className="col-sueldo">{emp.salary} €</td>
                                 <td className="col-id">
                                     <button 

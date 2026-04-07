@@ -1,25 +1,28 @@
 import apiClient from './apiClient';
 
 export const vetService = {
-    // Employees
+    // Employees (All users who are not CLIENT)
     async getEmployees() {
-        const response = await apiClient.get('/employees', {
-            params: { select: '*' }
+        const response = await apiClient.get('/users', {
+            params: { 
+                role: 'neq.CLIENT',
+                select: '*'
+            }
         });
         return response.data;
     },
     async createEmployee(data: any) {
-        const response = await apiClient.post('/employees', data);
+        const response = await apiClient.post('/users', data);
         return response.data;
     },
     async updateEmployee(id: string, data: any) {
-        const response = await apiClient.patch('/employees', data, {
+        const response = await apiClient.patch('/users', data, {
             params: { id: `eq.${id}` }
         });
         return response.data;
     },
     async deleteEmployee(id: string) {
-        await apiClient.delete('/employees', {
+        await apiClient.delete('/users', {
             params: { id: `eq.${id}` }
         });
     },
@@ -48,7 +51,7 @@ export const vetService = {
 
     // Centers
     async getCenters() {
-        const response = await apiClient.get('/center', {
+        const response = await apiClient.get('/centers', {
             params: { select: '*' }
         });
         return response.data;
@@ -56,11 +59,11 @@ export const vetService = {
 
     // Animals
     async getAnimals() {
-        const { data } = await apiClient.get('/animals?select=*,client:users(*)');
+        const { data } = await apiClient.get('/animal?select=*,client:client_id(first_name,last_name)');
         return data;
     },
     async createAnimal(data: any) {
-        return await apiClient.post('/animals', data);
+        return await apiClient.post('/animal', data);
     },
 
     // Rooms
@@ -92,7 +95,7 @@ export const vetService = {
 
     // Clients
     async getClients() {
-        const { data } = await apiClient.get('/users?role=eq.Cliente');
+        const { data } = await apiClient.get('/users?role=eq.CLIENT');
         return data;
     },
     async createClient(data: any) {

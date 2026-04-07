@@ -84,10 +84,10 @@ const ListAnimal: React.FC = () => {
                     </thead>
                     <tbody>
                         {animals.map((animal) => (
-                            <tr key={animal.animal_code}>
-                                <td className="col-no">{animal.animal_code}</td>
+                            <tr key={animal.id}>
+                                <td className="col-no">{animal.id.substring(0, 8)}</td>
                                 <td className="col-dni">{animal.client?.first_name} {animal.client?.last_name}</td>
-                                <td className="col-centro">{animal.center_code || 'Global'}</td>
+                                <td className="col-centro">{animal.center_id || 'Global'}</td>
                                 <td className="col-nombre"><strong>{animal.name}</strong></td>
                                 <td className="col-especie">{animal.species}</td>
                                 <td className="col-foto">{animal.status}</td>
