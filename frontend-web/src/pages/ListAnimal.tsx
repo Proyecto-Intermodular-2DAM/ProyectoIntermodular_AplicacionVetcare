@@ -69,7 +69,7 @@ const ListAnimal: React.FC = () => {
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
                             <input 
                                 type="text" 
-                                placeholder="Buscar animal (Nombre, especie...)" 
+                                placeholder="Buscar animal (Nombre, Especie, Cod, Centro, Estado...)" 
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -90,11 +90,17 @@ const ListAnimal: React.FC = () => {
                     </thead>
                     <tbody>
                         {animals
-                            .filter(animal => 
-                                animal.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                animal.species?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                `${animal.client?.first_name} ${animal.client?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
+                            .filter(animal => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    animal.name?.toLowerCase().includes(s) ||
+                                    animal.species?.toLowerCase().includes(s) ||
+                                    `${animal.client?.first_name} ${animal.client?.last_name}`.toLowerCase().includes(s) ||
+                                    animal.id?.toLowerCase().includes(s) ||
+                                    (animal.center_id || 'global').toLowerCase().includes(s) ||
+                                    animal.status?.toLowerCase().includes(s)
+                                );
+                            })
                             .map((animal) => (
                                 <tr key={animal.id}>
                                     <td className="col-no">{animal.id.substring(0, 8)}</td>
