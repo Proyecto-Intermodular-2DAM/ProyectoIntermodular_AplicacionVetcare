@@ -9,6 +9,7 @@ import '../theme/css/ListEmployee.css';
 const ListDate: React.FC = () => {
     const navigate = useNavigate();
     const [appointments, setAppointments] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -66,7 +67,12 @@ const ListDate: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar cita (Animal, cliente...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -83,20 +89,26 @@ const ListDate: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {appointments.map((apt) => (
-                            <tr key={apt.id}>
-                                <td className="col-id">{apt.id.substring(0, 8)}</td>
-                                <td className="col-animal">{apt.animal?.name || 'N/A'}</td>
-                                <td className="col-fecha">{new Date(apt.appointment_date).toLocaleDateString()}</td>
-                                <td className="col-hora">{apt.appointment_time}</td>
-                                <td className="col-veterinario">{apt.client ? `${apt.client.first_name} ${apt.client.last_name}` : 'N/A'}</td>
-                                <td className="col-estado">
-                                    <span className={`status-badge ${apt.status?.toLowerCase()}`}>
-                                        {apt.status}
-                                    </span>
-                                </td>
-                            </tr>
-                        ))}
+                        {appointments
+                            .filter(apt => 
+                                apt.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                `${apt.client?.first_name} ${apt.client?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                apt.status?.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((apt) => (
+                                <tr key={apt.id}>
+                                    <td className="col-id">{apt.id.substring(0, 8)}</td>
+                                    <td className="col-animal">{apt.animal?.name || 'N/A'}</td>
+                                    <td className="col-fecha">{new Date(apt.appointment_date).toLocaleDateString()}</td>
+                                    <td className="col-hora">{apt.appointment_time}</td>
+                                    <td className="col-veterinario">{apt.client ? `${apt.client.first_name} ${apt.client.last_name}` : 'N/A'}</td>
+                                    <td className="col-estado">
+                                        <span className={`status-badge ${apt.status?.toLowerCase()}`}>
+                                            {apt.status}
+                                        </span>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>

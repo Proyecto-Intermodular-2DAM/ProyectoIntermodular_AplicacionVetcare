@@ -1,42 +1,41 @@
 import React from 'react';
 import { IonIcon } from '@ionic/react';
 import { person, logOutOutline } from 'ionicons/icons';
+import { authService, UserProfile } from '../services/authService';
+import { useNavigate } from 'react-router-dom';
 import '../theme/css/UserMenu.css';
 
 interface UserMenuProps {
+    profile: UserProfile | null;
     onClose: () => void;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ onClose }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ profile, onClose }) => {
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await authService.signOut();
+            onClose();
+            navigate('/login');
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+    };
     return (
         <div className="user-menu-container">
             <div className="user-menu-header">
                 <div className="menu-user-avatar">
-                    P
+                    {profile ? profile.first_name.charAt(0).toUpperCase() : 'U'}
                 </div>
-                <span className="menu-user-name">Raul</span>
+                <span className="menu-user-name">{profile ? `${profile.first_name} ${profile.last_name}` : 'Cargando...'}</span>
             </div>
 
             <div className="user-menu-list">
-                <div className="user-menu-item" onClick={() => console.log('Editar perfil')}>
-                    <IonIcon icon={person} />
-                    <span>Editar Perfil</span>
-                </div>
+                {/* Editar Perfil removed as requested by user */}
 
-                <div className="user-menu-item" onClick={() => console.log('Cerrar sesión')}>
+                <div className="user-menu-item" onClick={handleLogout}>
                     <IonIcon icon={logOutOutline} style={{ transform: 'rotate(180deg)' }} />
-                    {/* Image uses an icon that looks like exit/enter, ionic log-out usually points right. 
-                        If image shows arrow POINTING OUT TO RIGHT, standard logOut is fine.
-                        Image shows Box with Arrow pointing RIGHT. Standard logOutOutline is Box with arrow pointing RIGHT.
-                        Wait, standard logOut often points RIGHT. 
-                        Let's check the image again. 
-                        Image icon: Box on left, arrow pointing RIGHT out of it. 
-                        This is standard logOutOutline or exitOutline. 
-                        Wait, standard logOut is usually box with arrow pointing LEFT (log in) or RIGHT (log out). 
-                        I'll stick with logOutOutline. layout matches image. 
-                        Image shows "person" icon is filled. person (filled) or personOutline. 
-                        Image shows filled head/shoulders. `person` is filled in Ionons 5+. 
-                    */}
                     <span>Cerrar Sesión</span>
                 </div>
             </div>

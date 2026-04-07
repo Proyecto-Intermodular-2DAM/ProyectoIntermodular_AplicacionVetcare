@@ -9,6 +9,7 @@ import '../theme/css/ListEmployee.css';
 const ListEmployee: React.FC = () => {
     const navigate = useNavigate();
     const [employees, setEmployees] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -79,7 +80,12 @@ const ListEmployee: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar empleado (Nombre, DNI...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -96,23 +102,28 @@ const ListEmployee: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {employees.map((emp) => (
-                            <tr key={emp.id}>
-                                <td className="col-no">{emp.id.substring(0, 8)}</td>
-                                <td className="col-dni">{emp.dni}</td>
-                                <td className="col-nombre">{emp.first_name} {emp.last_name}</td>
-                                <td className="col-telefono">{emp.phone_number}</td>
-                                <td className="col-sueldo">{emp.salary} €</td>
-                                <td className="col-id">
-                                    <button 
-                                        className="btn-eliminar-small"
-                                        onClick={() => handleDelete(emp.id)}
-                                    >
-                                        Eliminar
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
+                        {employees
+                            .filter(emp => 
+                                `${emp.first_name} ${emp.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                emp.dni?.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((emp) => (
+                                <tr key={emp.id}>
+                                    <td className="col-no">{emp.id.substring(0, 8)}</td>
+                                    <td className="col-dni">{emp.dni}</td>
+                                    <td className="col-nombre">{emp.first_name} {emp.last_name}</td>
+                                    <td className="col-telefono">{emp.phone_number}</td>
+                                    <td className="col-sueldo">{emp.salary} €</td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(emp.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>

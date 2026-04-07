@@ -9,6 +9,7 @@ import '../theme/css/ListEmployee.css';
 const ListClients: React.FC = () => {
     const navigate = useNavigate();
     const [clients, setClients] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -66,7 +67,12 @@ const ListClients: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar cliente (Nombre, DNI, email...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -83,16 +89,22 @@ const ListClients: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {clients.map((c) => (
-                            <tr key={c.id}>
-                                <td className="col-no">{c.id.substring(0, 8)}</td>
-                                <td className="col-dni">{c.dni}</td>
-                                <td className="col-nombre">{c.first_name} {c.last_name}</td>
-                                <td className="col-email"><strong>{c.email}</strong></td>
-                                <td className="col-fecha"><strong>{new Date(c.created_at).toLocaleDateString()}</strong></td>
-                                <td className="col-tel"><strong>{c.phone_number}</strong></td>
-                            </tr>
-                        ))}
+                        {clients
+                            .filter(client => 
+                                `${client.first_name} ${client.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                client.dni?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                client.email?.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((c) => (
+                                <tr key={c.id}>
+                                    <td className="col-no">{c.id.substring(0, 8)}</td>
+                                    <td className="col-dni">{c.dni}</td>
+                                    <td className="col-nombre">{c.first_name} {c.last_name}</td>
+                                    <td className="col-email"><strong>{c.email}</strong></td>
+                                    <td className="col-fecha"><strong>{new Date(c.created_at).toLocaleDateString()}</strong></td>
+                                    <td className="col-tel"><strong>{c.phone_number}</strong></td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>

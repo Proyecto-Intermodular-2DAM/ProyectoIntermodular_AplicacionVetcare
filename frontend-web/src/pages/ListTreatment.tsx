@@ -9,6 +9,7 @@ import '../theme/css/ListEmployee.css';
 const ListTreatment: React.FC = () => {
     const navigate = useNavigate();
     const [treatments, setTreatments] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -66,7 +67,12 @@ const ListTreatment: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar tratamiento (Animal, descripción...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -83,16 +89,22 @@ const ListTreatment: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {treatments.map((tr) => (
-                            <tr key={tr.id}>
-                                <td className="col-no">{tr.id}</td>
-                                <td className="col-dni">{tr.animal?.client_dni || 'N/A'}</td>
-                                <td className="col-nombre">{tr.animal?.name || 'N/A'}</td>
-                                <td className="col-desc"><strong>{tr.description}</strong></td>
-                                <td className="col-med"><strong>{tr.medication}</strong></td>
-                                <td className="col-psol">{tr.dosage}</td>
-                            </tr>
-                        ))}
+                        {treatments
+                            .filter(tr => 
+                                tr.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                tr.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                tr.medication?.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((tr) => (
+                                <tr key={tr.id}>
+                                    <td className="col-no">{tr.id.substring(0, 8)}</td>
+                                    <td className="col-dni">{tr.animal?.client_dni || 'N/A'}</td>
+                                    <td className="col-nombre">{tr.animal?.name || 'N/A'}</td>
+                                    <td className="col-desc"><strong>{tr.description}</strong></td>
+                                    <td className="col-med"><strong>{tr.medication}</strong></td>
+                                    <td className="col-psol">{tr.dosage}</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>

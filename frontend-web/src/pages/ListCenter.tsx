@@ -9,6 +9,7 @@ import '../theme/css/ListEmployee.css';
 const ListCenter: React.FC = () => {
     const navigate = useNavigate();
     const [centers, setCenters] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -66,7 +67,12 @@ const ListCenter: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar el centro (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar centro (Nombre, dirección...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -81,14 +87,20 @@ const ListCenter: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {centers.map((center) => (
-                            <tr key={center.id}>
-                                <td className="col-no">{center.id.substring(0, 8)}</td>
-                                <td className="col-dni">{center.name}</td>
-                                <td className="col-nombre">{center.postcode}</td>
-                                <td className="col-sueldo">{center.address}</td>
-                            </tr>
-                        ))}
+                        {centers
+                            .filter(center => 
+                                center.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                center.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                center.postcode?.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((center) => (
+                                <tr key={center.id}>
+                                    <td className="col-no">{center.id.substring(0, 8)}</td>
+                                    <td className="col-dni">{center.name}</td>
+                                    <td className="col-nombre">{center.postcode}</td>
+                                    <td className="col-sueldo">{center.address}</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>

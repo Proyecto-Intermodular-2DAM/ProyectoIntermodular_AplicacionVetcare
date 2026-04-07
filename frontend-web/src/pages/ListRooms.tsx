@@ -9,6 +9,7 @@ import '../theme/css/ListEmployee.css';
 const ListRooms: React.FC = () => {
     const navigate = useNavigate();
     const [rooms, setRooms] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -66,7 +67,12 @@ const ListRooms: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar sala (Nombre...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -80,13 +86,18 @@ const ListRooms: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {rooms.map((room, index) => (
-                            <tr key={index}>
-                                <td className="col-nombre">{room.name}</td>
-                                <td className="col-centro">{room.center_code}</td>
-                                <td className="col-dni">{room.size_m2} m²</td>
-                            </tr>
-                        ))}
+                        {rooms
+                            .filter(room => 
+                                room.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                room.center_code?.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((room, index) => (
+                                <tr key={index}>
+                                    <td className="col-nombre">{room.name}</td>
+                                    <td className="col-centro">{room.center_code}</td>
+                                    <td className="col-dni">{room.size_m2} m²</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>

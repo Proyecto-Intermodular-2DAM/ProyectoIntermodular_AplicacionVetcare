@@ -9,6 +9,7 @@ import '../theme/css/ListEmployee.css';
 const ListAdoption: React.FC = () => {
     const navigate = useNavigate();
     const [adoptions, setAdoptions] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -66,7 +67,12 @@ const ListAdoption: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar adopción (Animal, DNI...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -83,16 +89,22 @@ const ListAdoption: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {adoptions.map((ad) => (
-                            <tr key={ad.id}>
-                                <td className="col-no">{ad.id}</td>
-                                <td className="col-dni">{ad.client?.dni || 'N/A'}</td>
-                                <td className="col-nombre">{ad.animal?.name || 'N/A'}</td>
-                                <td className="col-id-animal"><strong>{ad.animal_id}</strong></td>
-                                <td className="col-fecha"><strong>{new Date(ad.adoption_date).toLocaleDateString()}</strong></td>
-                                <td className="col-comentario">{ad.comments}</td>
-                            </tr>
-                        ))}
+                        {adoptions
+                            .filter(ad => 
+                                ad.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                ad.client?.dni?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                ad.comments?.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((ad) => (
+                                <tr key={ad.id}>
+                                    <td className="col-no">{ad.id.substring(0, 8)}</td>
+                                    <td className="col-dni">{ad.client?.dni || 'N/A'}</td>
+                                    <td className="col-nombre">{ad.animal?.name || 'N/A'}</td>
+                                    <td className="col-id-animal"><strong>{ad.animal_id.substring(0, 8)}</strong></td>
+                                    <td className="col-fecha"><strong>{new Date(ad.adoption_date).toLocaleDateString()}</strong></td>
+                                    <td className="col-comentario">{ad.comments}</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>

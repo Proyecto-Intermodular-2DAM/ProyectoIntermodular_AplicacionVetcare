@@ -9,6 +9,7 @@ import '../theme/css/ListEmployee.css';
 const ListAnimal: React.FC = () => {
     const navigate = useNavigate();
     const [animals, setAnimals] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
@@ -66,7 +67,12 @@ const ListAnimal: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar animal (Nombre, especie...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
                     </div>
                 </div>
@@ -83,16 +89,22 @@ const ListAnimal: React.FC = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {animals.map((animal) => (
-                            <tr key={animal.id}>
-                                <td className="col-no">{animal.id.substring(0, 8)}</td>
-                                <td className="col-dni">{animal.client?.first_name} {animal.client?.last_name}</td>
-                                <td className="col-centro">{animal.center_id || 'Global'}</td>
-                                <td className="col-nombre"><strong>{animal.name}</strong></td>
-                                <td className="col-especie">{animal.species}</td>
-                                <td className="col-foto">{animal.status}</td>
-                            </tr>
-                        ))}
+                        {animals
+                            .filter(animal => 
+                                animal.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                animal.species?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                                `${animal.client?.first_name} ${animal.client?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
+                            )
+                            .map((animal) => (
+                                <tr key={animal.id}>
+                                    <td className="col-no">{animal.id.substring(0, 8)}</td>
+                                    <td className="col-dni">{animal.client?.first_name} {animal.client?.last_name}</td>
+                                    <td className="col-centro">{animal.center_id || 'Global'}</td>
+                                    <td className="col-nombre"><strong>{animal.name}</strong></td>
+                                    <td className="col-especie">{animal.species}</td>
+                                    <td className="col-foto">{animal.status}</td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
