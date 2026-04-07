@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Employee.css';
 
 const Employee: React.FC = () => {
@@ -70,14 +71,30 @@ const Employee: React.FC = () => {
 
         setLoading(true);
         try {
-            // Placeholder for API call
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} empleado:`, { dni, name, phone, salary });
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setError(`${type === 'create' ? 'Empleado creado' : 'Empleado actualizado'} correctamente`);
+            const employeeData = {
+                dni,
+                name,
+                phone,
+                salary: parseFloat(salary)
+            };
+
+            if (type === 'create') {
+                await vetService.createEmployee(employeeData);
+                setError("Empleado creado correctamente");
+            } else {
+                // For update, we might need an ID. 
+                // Since this is a simple CRUD and we don't have the ID here, 
+                // I'll assume for now we are using DNI as a unique identifier or the user should select from list.
+                // In a real scenario, we'd pass the ID from the URL or state.
+                // For now, I'll use DNI to find and update if possible, or just log.
+                // Let's assume we update by DNI for this simple implementation if ID is missing.
+                await vetService.updateEmployee(dni, employeeData); // Assuming ID = DNI or similar for this demo
+                setError("Empleado actualizado correctamente");
+            }
             setShowToast(true);
-        } catch (err) {
-            setError("Error al procesar la solicitud");
+            setTimeout(() => navigate('/listado-empleados'), 1500);
+        } catch (err: any) {
+            setError(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);

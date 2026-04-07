@@ -1,20 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/MainLayout';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonLoading, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/ListEmployee.css';
 
 const ListEmployee: React.FC = () => {
     const navigate = useNavigate();
+    const [employees, setEmployees] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
-    const employees = [
-        { no: 1, dni: '12345678A', nombre: 'Paco', telefono: '611 11 11 11', sueldo: '2000 €', id: '1' },
-        { no: 2, dni: '12345678B', nombre: 'Marta', telefono: '622 22 22 22', sueldo: '2000 €', id: '2' },
-        { no: 3, dni: '12345678C', nombre: 'German', telefono: '633 33 33 33', sueldo: '1800 €', id: '3' },
-        { no: 4, dni: '12345678F', nombre: 'Paula', telefono: '644 44 44 44', sueldo: '1800 €', id: '4' },
-        { no: 5, dni: '12345678E', nombre: 'Juan', telefono: '655 55 55 55', sueldo: '2200 €', id: '5' },
-    ];
+    useEffect(() => {
+        const fetchEmployees = async () => {
+            try {
+                const data = await vetService.getEmployees();
+                setEmployees(data || []);
+            } catch (err: any) {
+                setToastMessage(err.message || 'Error al cargar empleados');
+                setShowToast(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchEmployees();
+    }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!window.confirm('¿Estás seguro de que deseas eliminar este empleado?')) return;
+        try {
+            await vetService.deleteEmployee(id);
+            setEmployees(employees.filter(e => e.id !== id));
+            setToastMessage('Empleado eliminado correctamente');
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage(err.message || 'Error al eliminar empleado');
+            setShowToast(true);
+        }
+    };
+
+    if (loading) {
+        return <IonLoading isOpen={true} message="Cargando empleados..." />;
+    }
 
     return (
         <MainLayout>
@@ -52,37 +81,49 @@ const ListEmployee: React.FC = () => {
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
                             <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
                         </div>
-                        <button className="btn-eliminar-empleado">
-                            Eliminar Empleado <IonIcon icon={chevronForwardOutline} />
-                        </button>
                     </div>
                 </div>
 
                 <table className="employee-table">
                     <thead>
                         <tr>
-                            <th className="col-no">No.</th>
+                            <th className="col-no">ID</th>
                             <th className="col-dni">DNI</th>
                             <th className="col-nombre">Nombre</th>
                             <th className="col-telefono">Teléfono</th>
                             <th className="col-sueldo">Sueldo</th>
-                            <th className="col-id">ID Usuario</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         {employees.map((emp) => (
-                            <tr key={emp.no}>
-                                <td className="col-no">{emp.no}</td>
+                            <tr key={emp.id}>
+                                <td className="col-no">{emp.id.substring(0, 8)}</td>
                                 <td className="col-dni">{emp.dni}</td>
-                                <td className="col-nombre">{emp.nombre}</td>
-                                <td className="col-telefono">{emp.telefono}</td>
-                                <td className="col-sueldo">{emp.sueldo}</td>
-                                <td className="col-id">{emp.id}</td>
+                                <td className="col-nombre">{emp.name} {emp.surname}</td>
+                                <td className="col-telefono">{emp.phone}</td>
+                                <td className="col-sueldo">{emp.salary} €</td>
+                                <td className="col-id">
+                                    <button 
+                                        className="btn-eliminar-small"
+                                        onClick={() => handleDelete(emp.id)}
+                                    >
+                                        Eliminar
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={3000}
+                color="primary"
+                position="top"
+            />
         </MainLayout>
     );
 };

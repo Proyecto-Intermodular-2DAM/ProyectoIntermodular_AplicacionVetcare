@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Adoption.css';
 
 const Adoption: React.FC = () => {
@@ -58,16 +59,23 @@ const Adoption: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} adopción:`, {
-                dniCliente, nombreAnimal, descripcionLeft, descripcionRight, psologia
-            });
+            const adoptionData = {
+                client_dni: dniCliente,
+                animal_name: nombreAnimal,
+                comments: `${descripcionLeft} - ${descripcionRight}`,
+                adoption_date: new Date().toISOString()
+            };
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            setMessage(`Adopción ${type === 'create' ? 'creada' : 'actualizada'} correctamente`);
+            if (type === 'create') {
+                await vetService.createAdoption(adoptionData);
+                setMessage("Adopción creada correctamente");
+            } else {
+                setMessage("Actualización de adopción no implementada");
+            }
             setShowToast(true);
-        } catch (err) {
-            setMessage("Error al procesar la solicitud");
+            if (type === 'create') setTimeout(() => navigate('/listado-adopcion'), 1500);
+        } catch (err: any) {
+            setMessage(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);

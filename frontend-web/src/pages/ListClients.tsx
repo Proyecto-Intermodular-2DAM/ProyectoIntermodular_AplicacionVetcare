@@ -1,20 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/MainLayout';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonLoading, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
-import '../theme/css/ListEmployee.css'; // Reusing common list styles
+import { vetService } from '../services/vetService';
+import '../theme/css/ListEmployee.css';
 
 const ListClients: React.FC = () => {
     const navigate = useNavigate();
+    const [clients, setClients] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
-    const clients = [
-        { id: 1, dni: '12345678A', nombre: 'Juan Carlos', email: 'jc@gmial.com', fecha: '11/09/2025', tel: '966 66 66 66' },
-        { id: 2, dni: '12345678B', nombre: 'Ruben', email: 'ruben@gmail.com', fecha: '02/05/2024', tel: '966 69 69 69' },
-        { id: 3, dni: '12345678C', nombre: 'Martin', email: 'martin@gmail.com', fecha: '19/06/2015', tel: '966 66 66 62' },
-        { id: 4, dni: '12345678F', nombre: 'Raul', email: 'raul@gmail.com', fecha: '06/01/2016', tel: '966 66 66 63' },
-        { id: 5, dni: '12345678E', nombre: 'Alma', email: 'alma@gmail.com', fecha: '01/05/2020', tel: '966 66 66 64' },
-    ];
+    useEffect(() => {
+        const fetchClients = async () => {
+            try {
+                const data = await vetService.getClients();
+                setClients(data || []);
+            } catch (err: any) {
+                setToastMessage(err.message || 'Error al cargar clientes');
+                setShowToast(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchClients();
+    }, []);
+
+    if (loading) {
+        return <IonLoading isOpen={true} message="Cargando clientes..." />;
+    }
 
     return (
         <MainLayout>
@@ -52,9 +68,6 @@ const ListClients: React.FC = () => {
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
                             <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
                         </div>
-                        <button className="btn-eliminar-empleado">
-                            Eliminar Cliente <IonIcon icon={chevronForwardOutline} />
-                        </button>
                     </div>
                 </div>
 
@@ -72,17 +85,25 @@ const ListClients: React.FC = () => {
                     <tbody>
                         {clients.map((c) => (
                             <tr key={c.id}>
-                                <td className="col-no">{c.id}</td>
+                                <td className="col-no">{c.id.substring(0, 8)}</td>
                                 <td className="col-dni">{c.dni}</td>
-                                <td className="col-nombre">{c.nombre}</td>
+                                <td className="col-nombre">{c.first_name} {c.last_name}</td>
                                 <td className="col-email"><strong>{c.email}</strong></td>
-                                <td className="col-fecha"><strong>{c.fecha}</strong></td>
-                                <td className="col-tel"><strong>{c.tel}</strong></td>
+                                <td className="col-fecha"><strong>{new Date(c.created_at).toLocaleDateString()}</strong></td>
+                                <td className="col-tel"><strong>{c.phone}</strong></td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={3000}
+                color="danger"
+                position="top"
+            />
         </MainLayout>
     );
 };

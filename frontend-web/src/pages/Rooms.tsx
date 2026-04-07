@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Rooms.css';
 
 const Rooms: React.FC = () => {
@@ -51,16 +52,22 @@ const Rooms: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} sala:`, {
-                dniCliente, codigoCentro, nombre, extraField
-            });
+            const roomData = {
+                center_code: codigoCentro,
+                name: nombre,
+                size_m2: parseFloat(extraField) || 0
+            };
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            setMessage(`Sala ${type === 'create' ? 'creada' : 'actualizada'} correctamente`);
+            if (type === 'create') {
+                await vetService.createRoom(roomData);
+                setMessage("Sala creada correctamente");
+            } else {
+                setMessage("Actualización de sala no implementada por falta de ID");
+            }
             setShowToast(true);
-        } catch (err) {
-            setMessage("Error al procesar la solicitud");
+            if (type === 'create') setTimeout(() => navigate('/listado-salas'), 1500);
+        } catch (err: any) {
+            setMessage(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);

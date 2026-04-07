@@ -1,20 +1,36 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/MainLayout';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonLoading, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
-import '../theme/css/ListEmployee.css'; // Reusing common list styles
+import { vetService } from '../services/vetService';
+import '../theme/css/ListEmployee.css';
 
 const ListRooms: React.FC = () => {
     const navigate = useNavigate();
+    const [rooms, setRooms] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
-    const rooms = [
-        { nombre: '1', codCentro: '1', dniCli: '12334566 B' },
-        { nombre: '2', codCentro: '1', dniCli: '12334566 C' },
-        { nombre: '3', codCentro: '2', dniCli: '12334566 D' },
-        { nombre: '1', codCentro: '3', dniCli: '12334566 E' },
-        { nombre: '2', codCentro: '1', dniCli: '12334566 Q' },
-    ];
+    useEffect(() => {
+        const fetchRooms = async () => {
+            try {
+                const data = await vetService.getRooms();
+                setRooms(data || []);
+            } catch (err: any) {
+                setToastMessage(err.message || 'Error al cargar salas');
+                setShowToast(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchRooms();
+    }, []);
+
+    if (loading) {
+        return <IonLoading isOpen={true} message="Cargando salas..." />;
+    }
 
     return (
         <MainLayout>
@@ -52,9 +68,6 @@ const ListRooms: React.FC = () => {
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
                             <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
                         </div>
-                        <button className="btn-eliminar-empleado">
-                            Eliminar Salas <IonIcon icon={chevronForwardOutline} />
-                        </button>
                     </div>
                 </div>
 
@@ -63,20 +76,28 @@ const ListRooms: React.FC = () => {
                         <tr>
                             <th className="col-nombre">Nombre</th>
                             <th className="col-centro">Codigo Centro</th>
-                            <th className="col-dni">DNI Cliente</th>
+                            <th className="col-dni">Tamaño (m²)</th>
                         </tr>
                     </thead>
                     <tbody>
                         {rooms.map((room, index) => (
                             <tr key={index}>
-                                <td className="col-nombre">{room.nombre}</td>
-                                <td className="col-centro">{room.codCentro}</td>
-                                <td className="col-dni">{room.dniCli}</td>
+                                <td className="col-nombre">{room.name}</td>
+                                <td className="col-centro">{room.center_code}</td>
+                                <td className="col-dni">{room.size_m2} m²</td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={3000}
+                color="danger"
+                position="top"
+            />
         </MainLayout>
     );
 };

@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Treatment.css';
 
 const Treatment: React.FC = () => {
@@ -58,16 +59,24 @@ const Treatment: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} tratamiento:`, {
-                dniCliente, nombreAnimal, descripcion, medicamento, psologia
-            });
+            const treatmentData = {
+                animal_dni: dniCliente, // Simplified for demo
+                animal_name: nombreAnimal,
+                description: descripcion,
+                medication: medicamento,
+                dosage: psologia
+            };
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            setMessage(`Tratamiento ${type === 'create' ? 'creado' : 'actualizado'} correctamente`);
+            if (type === 'create') {
+                await vetService.createTreatment(treatmentData);
+                setMessage("Tratamiento creado correctamente");
+            } else {
+                setMessage("Actualización de tratamiento no implementada");
+            }
             setShowToast(true);
-        } catch (err) {
-            setMessage("Error al procesar la solicitud");
+            if (type === 'create') setTimeout(() => navigate('/listado-tratamientos'), 1500);
+        } catch (err: any) {
+            setMessage(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);

@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Clients.css';
 
 const Clients: React.FC = () => {
@@ -71,16 +72,24 @@ const Clients: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} cliente:`, {
-                dniCliente, nombreCliente, email, telefono
-            });
+            const clientData = {
+                dni: dniCliente,
+                first_name: nombreCliente,
+                email: email,
+                phone: telefono,
+                role: 'Cliente'
+            };
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            setMessage(`Cliente ${type === 'create' ? 'creado' : 'actualizado'} correctamente`);
+            if (type === 'create') {
+                await vetService.createClient(clientData);
+                setMessage("Cliente creado correctamente");
+            } else {
+                setMessage("Actualización de cliente no implementada");
+            }
             setShowToast(true);
-        } catch (err) {
-            setMessage("Error al procesar la solicitud");
+            if (type === 'create') setTimeout(() => navigate('/listado-clientes'), 1500);
+        } catch (err: any) {
+            setMessage(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);

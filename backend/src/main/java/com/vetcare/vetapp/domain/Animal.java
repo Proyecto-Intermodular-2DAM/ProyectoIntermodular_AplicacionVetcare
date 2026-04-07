@@ -1,10 +1,12 @@
-package com.vetcare.vetapp.model;
+package com.vetcare.vetapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,6 +30,16 @@ public class Animal {
 
     @Column(name = "animal_image")
     private String animalImage;
+
+    @Column(name = "is_active", nullable = false)
+    @ColumnDefault("true")
+    private boolean isActive;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private UUID deletedBy;
 
     @ManyToOne
     @JoinColumn(name = "client_id")
