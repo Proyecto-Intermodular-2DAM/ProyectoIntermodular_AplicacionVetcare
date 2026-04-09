@@ -104,12 +104,18 @@ const Employee: React.FC = () => {
 
         setLoading(true);
         try {
+            const nameParts = name.trim().split(/\s+/);
+            const firstName = nameParts[0];
+            const lastName = nameParts.slice(1).join(' ');
+
             const employeeData = {
                 dni,
-                name,
-                phone,
+                first_name: firstName,
+                last_name: lastName,
+                phone_number: phone,
                 salary: parseFloat(salary)
             };
+
 
             if (type === 'create') {
                 await vetService.createEmployee(employeeData);
