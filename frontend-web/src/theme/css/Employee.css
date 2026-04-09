@@ -64,7 +64,13 @@
 }
 
 .employee-form {
-    max-width: 800px;
+    max-width: 1000px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
 }
 
 .form-group {
@@ -84,7 +90,6 @@
     border-radius: 12px;
     padding: 16px 24px;
     width: 100%;
-    max-width: 500px;
     border: none;
     outline: none;
     font-size: 16px;

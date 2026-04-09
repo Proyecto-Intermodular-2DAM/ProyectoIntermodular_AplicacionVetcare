@@ -4,6 +4,7 @@ import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
 import { vetService } from '../services/vetService';
+import RoleSelect from '../components/RoleSelect';
 import '../theme/css/Employee.css';
 
 const Employee: React.FC = () => {
@@ -12,6 +13,8 @@ const Employee: React.FC = () => {
     const [name, setName] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
     const [salary, setSalary] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [role, setRole] = useState<string>("ADMIN");
 
     const [employees, setEmployees] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -39,6 +42,8 @@ const Employee: React.FC = () => {
         setName(`${emp.first_name} ${emp.last_name}`);
         setPhone(emp.phone_number || "");
         setSalary(emp.salary?.toString() || "");
+        setEmail(emp.email || "");
+        setRole(emp.role || "Administrador");
         setSelectedEmployeeId(emp.id);
         setSearchTerm("");
     };
@@ -64,6 +69,10 @@ const Employee: React.FC = () => {
         return lookup.charAt(number % 23) === letter;
     };
 
+    const validateEmail = (email: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
     const validatePhone = (phone: string) => {
         return /^[0-9]{9}$/.test(phone);
     };
@@ -75,10 +84,10 @@ const Employee: React.FC = () => {
 
     const handleAction = async (type: 'create' | 'update') => {
         setError("");
-        const allTouched = { dni: true, name: true, phone: true, salary: true };
+        const allTouched = { dni: true, name: true, phone: true, salary: true, email: true };
         setTouched(allTouched);
 
-        if (!dni || !name || !phone || !salary) {
+        if (!dni || !name || !phone || !salary || (type === 'create' && !email)) {
             setError("Por favor, completa todos los campos obligatorios");
             setShowToast(true);
             return;
@@ -102,19 +111,31 @@ const Employee: React.FC = () => {
             return;
         }
 
+        if (email && !validateEmail(email)) {
+            setError("Introduce un email válido");
+            setShowToast(true);
+            return;
+        }
+
         setLoading(true);
         try {
             const nameParts = name.trim().split(/\s+/);
             const firstName = nameParts[0];
             const lastName = nameParts.slice(1).join(' ');
 
-            const employeeData = {
+            const employeeData: any = {
                 dni,
                 first_name: firstName,
                 last_name: lastName,
                 phone_number: phone,
-                salary: parseFloat(salary)
+                salary: parseFloat(salary),
+                email,
+                role
             };
+
+            if (type === 'create') {
+                employeeData.user_name = email.split('@')[0];
+            }
 
 
             if (type === 'create') {
@@ -180,60 +201,84 @@ const Employee: React.FC = () => {
                 <div className="divider"></div>
 
                 <div className="employee-form">
-                    <div className="form-group">
-                        <label>DNI</label>
-                        {touched.dni && !validateDNI(dni) && (
-                            <div className="field-error-message">DNI no válido (8 números y letra)</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.dni && !validateDNI(dni) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar DNI"
-                            value={dni}
-                            onChange={(e) => setDni(e.target.value)}
-                            onBlur={() => markTouched('dni')}
-                        />
-                    </div>
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label>DNI</label>
+                            {touched.dni && !validateDNI(dni) && (
+                                <div className="field-error-message">DNI no válido (8 números y letra)</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.dni && !validateDNI(dni) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar DNI"
+                                value={dni}
+                                onChange={(e) => setDni(e.target.value)}
+                                onBlur={() => markTouched('dni')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>Nombre</label>
-                        {touched.name && !name && (
-                            <div className="field-error-message">El nombre es obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.name && !name ? 'input-invalid' : ''}`}
-                            placeholder="Insertar nombre"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            onBlur={() => markTouched('name')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Nombre</label>
+                            {touched.name && !name && (
+                                <div className="field-error-message">El nombre es obligatorio</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.name && !name ? 'input-invalid' : ''}`}
+                                placeholder="Insertar nombre"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                onBlur={() => markTouched('name')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>Telefono</label>
-                        {touched.phone && !validatePhone(phone) && (
-                            <div className="field-error-message">Teléfono no válido (9 dígitos)</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.phone && !validatePhone(phone) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Telefono"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            onBlur={() => markTouched('phone')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Telefono</label>
+                            {touched.phone && !validatePhone(phone) && (
+                                <div className="field-error-message">Teléfono no válido (9 dígitos)</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.phone && !validatePhone(phone) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar Telefono"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                onBlur={() => markTouched('phone')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>Sueldo</label>
-                        {touched.salary && !validateSalary(salary) && (
-                            <div className="field-error-message">Sueldo debe ser un número positivo</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.salary && !validateSalary(salary) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Sueldo"
-                            value={salary}
-                            onChange={(e) => setSalary(e.target.value)}
-                            onBlur={() => markTouched('salary')}
-                        />
+                        <div className="form-group">
+                            <label>Sueldo</label>
+                            {touched.salary && !validateSalary(salary) && (
+                                <div className="field-error-message">Sueldo debe ser un número positivo</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.salary && !validateSalary(salary) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar Sueldo"
+                                value={salary}
+                                onChange={(e) => setSalary(e.target.value)}
+                                onBlur={() => markTouched('salary')}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Email</label>
+                            {touched.email && !validateEmail(email) && (
+                                <div className="field-error-message">Introduce un email válido</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.email && !validateEmail(email) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                onBlur={() => markTouched('email')}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Rol</label>
+                            <RoleSelect
+                                value={role}
+                                onChange={(newRole) => setRole(newRole)}
+                            />
+                        </div>
                     </div>
 
                     <div className="form-actions">
