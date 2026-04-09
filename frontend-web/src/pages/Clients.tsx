@@ -15,10 +15,43 @@ const Clients: React.FC = () => {
     const [email, setEmail] = useState<string>("");
     const [telefono, setTelefono] = useState<string>("");
 
+    const [clients, setClients] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchClients = async () => {
+            try {
+                const data = await vetService.getClients();
+                setClients(data || []);
+            } catch (err: any) {
+                console.error("Error loading clients", err);
+            }
+        };
+        fetchClients();
+    }, []);
+
+    const handleSelectClient = (client: any) => {
+        setDniCliente(client.dni || "");
+        setNombreCliente(`${client.first_name || ""} ${client.last_name || ""}`.trim());
+        setEmail(client.email || "");
+        setTelefono(client.phone || "");
+        setSelectedClientId(client.id);
+        setSearchTerm("");
+    };
+
+    const filteredClients = searchTerm.length > 0
+        ? clients.filter(c => 
+            c.dni?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            `${c.first_name} ${c.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.email?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -84,7 +117,14 @@ const Clients: React.FC = () => {
                 await vetService.createClient(clientData);
                 setMessage("Cliente creado correctamente");
             } else {
-                setMessage("Actualización de cliente no implementada");
+                if (!selectedClientId) {
+                    setMessage("Por favor, busca y selecciona un cliente para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateClient(selectedClientId, clientData);
+                setMessage("Cliente actualizado correctamente");
             }
             setShowToast(true);
             if (type === 'create') setTimeout(() => navigate('/listado-clientes'), 1500);
@@ -111,7 +151,26 @@ const Clients: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar cliente por DNI, nombre o email..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredClients.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredClients.map(client => (
+                                <div 
+                                    key={client.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectClient(client)}
+                                >
+                                    <span className="employee-name">{client.first_name} {client.last_name}</span>
+                                    <span className="employee-detail">DNI: {client.dni} | Email: {client.email}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>

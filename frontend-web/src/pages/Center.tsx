@@ -3,6 +3,8 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
+import apiClient from '../services/apiClient';
 import '../theme/css/Employee.css';
 
 const Center: React.FC = () => {
@@ -12,10 +14,42 @@ const Center: React.FC = () => {
     const [codigoPostal, setCodigoPostal] = useState<string>("");
     const [direccion, setDireccion] = useState<string>("");
 
+    const [centers, setCenters] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedCenterId, setSelectedCenterId] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchCenters = async () => {
+            try {
+                const data = await vetService.getCenters();
+                setCenters(data || []);
+            } catch (err: any) {
+                console.error("Error loading centers", err);
+            }
+        };
+        fetchCenters();
+    }, []);
+
+    const handleSelectCenter = (center: any) => {
+        setNombre(center.name || "");
+        setCodigoPostal(center.postcode || "");
+        setDireccion(center.address || "");
+        setSelectedCenterId(center.id);
+        setSearchTerm("");
+    };
+
+    const filteredCenters = searchTerm.length > 0
+        ? centers.filter(center => 
+            center.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            center.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            center.postcode?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -50,19 +84,27 @@ const Center: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(
-                `${type === 'create' ? 'Creando' : 'Actualizando'} registro`,
-                { nombre, codigoPostal, direccion }
-            );
+            const centerData = {
+                name: nombre,
+                postcode: codigoPostal,
+                address: direccion
+            };
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            setMessage(
-                type === 'create'
-                    ? "Registro creado correctamente"
-                    : "Registro actualizado correctamente"
-            );
+            if (type === 'create') {
+                await vetService.createCenter(centerData); 
+                setMessage("Registro creado correctamente");
+            } else {
+                if (!selectedCenterId) {
+                    setMessage("Por favor, busca y selecciona un centro para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateCenter(selectedCenterId, centerData);
+                setMessage("Registro actualizado correctamente");
+            }
             setShowToast(true);
+            setTimeout(() => navigate('/listado-centros'), 1500);
         } catch {
             setMessage("Error al procesar la solicitud");
             setShowToast(true);
@@ -86,7 +128,26 @@ const Center: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar centro por nombre, dirección o CP..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredCenters.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredCenters.map(center => (
+                                <div 
+                                    key={center.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectCenter(center)}
+                                >
+                                    <span className="employee-name">{center.name}</span>
+                                    <span className="employee-detail">{center.address} | CP: {center.postcode}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>

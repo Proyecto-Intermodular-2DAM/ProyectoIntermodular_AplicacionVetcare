@@ -16,10 +16,44 @@ const Treatment: React.FC = () => {
     const [medicamento, setMedicamento] = useState<string>("");
     const [psologia, setPsologia] = useState<string>("");
 
+    const [treatments, setTreatments] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedTreatmentId, setSelectedTreatmentId] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchTreatments = async () => {
+            try {
+                const data = await vetService.getTreatments();
+                setTreatments(data || []);
+            } catch (err: any) {
+                console.error("Error loading treatments", err);
+            }
+        };
+        fetchTreatments();
+    }, []);
+
+    const handleSelectTreatment = (treatment: any) => {
+        setDniCliente(treatment.appointment?.client?.dni || "");
+        setNombreAnimal(treatment.appointment?.animal?.name || "");
+        setDescripcion(treatment.description || "");
+        setMedicamento(treatment.medication || "");
+        setPsologia(treatment.dosage || "");
+        setSelectedTreatmentId(treatment.id);
+        setSearchTerm("");
+    };
+
+    const filteredTreatments = searchTerm.length > 0
+        ? treatments.filter(t => 
+            t.medication?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            t.appointment?.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            t.id?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -60,8 +94,6 @@ const Treatment: React.FC = () => {
         setLoading(true);
         try {
             const treatmentData = {
-                animal_dni: dniCliente, // Simplified for demo
-                animal_name: nombreAnimal,
                 description: descripcion,
                 medication: medicamento,
                 dosage: psologia
@@ -71,7 +103,14 @@ const Treatment: React.FC = () => {
                 await vetService.createTreatment(treatmentData);
                 setMessage("Tratamiento creado correctamente");
             } else {
-                setMessage("Actualización de tratamiento no implementada");
+                if (!selectedTreatmentId) {
+                    setMessage("Por favor, busca y selecciona un tratamiento para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateTreatment(selectedTreatmentId, treatmentData);
+                setMessage("Tratamiento actualizado correctamente");
             }
             setShowToast(true);
             if (type === 'create') setTimeout(() => navigate('/listado-tratamientos'), 1500);
@@ -98,7 +137,26 @@ const Treatment: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar tratamiento por medicamento, animal o ID..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredTreatments.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredTreatments.map(t => (
+                                <div 
+                                    key={t.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectTreatment(t)}
+                                >
+                                    <span className="employee-name">{t.medication}</span>
+                                    <span className="employee-detail">Animal: {t.appointment?.animal?.name || 'N/A'} | ID: {t.id.substring(0, 8)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>

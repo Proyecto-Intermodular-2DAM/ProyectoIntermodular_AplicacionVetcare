@@ -48,12 +48,20 @@ export const vetService = {
         });
         return response.data;
     },
+    async createAppointment(data: any) {
+        const response = await apiClient.post('/appointments', data);
+        return response.data;
+    },
 
     // Centers
     async getCenters() {
         const response = await apiClient.get('/centers', {
             params: { select: '*' }
         });
+        return response.data;
+    },
+    async createCenter(data: any) {
+        const response = await apiClient.post('/centers', data);
         return response.data;
     },
 
@@ -65,6 +73,11 @@ export const vetService = {
     async createAnimal(data: any) {
         return await apiClient.post('/animal', data);
     },
+    async updateAnimal(id: string, data: any) {
+        return await apiClient.patch('/animal', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Rooms
     async getRooms() {
@@ -73,6 +86,11 @@ export const vetService = {
     },
     async createRoom(data: any) {
         return await apiClient.post('/rooms', data);
+    },
+    async updateRoom(id: string, data: any) {
+        return await apiClient.patch('/rooms', data, {
+            params: { id: `eq.${id}` }
+        });
     },
 
     // Treatments
@@ -83,6 +101,11 @@ export const vetService = {
     async createTreatment(data: any) {
         return await apiClient.post('/treatments', data);
     },
+    async updateTreatment(id: string, data: any) {
+        return await apiClient.patch('/treatments', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Adoption History
     async getAdoptionHistory() {
@@ -92,6 +115,11 @@ export const vetService = {
     async createAdoption(data: any) {
         return await apiClient.post('/adoption_history', data);
     },
+    async updateAdoption(id: string, data: any) {
+        return await apiClient.patch('/adoption_history', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Clients
     async getClients() {
@@ -100,5 +128,25 @@ export const vetService = {
     },
     async createClient(data: any) {
         return await apiClient.post('/users', data);
+    },
+    async updateClient(id: string, data: any) {
+        return await apiClient.patch('/users', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
+
+    // Appointments (Update was missing)
+    async updateAppointment(id: string, data: any) {
+        return await apiClient.patch('/appointments', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
+
+    // Centers (Update was missing)
+    async updateCenter(id: string, data: any) {
+        return await apiClient.patch('/centers', data, {
+            params: { id: `eq.${id}` }
+        });
     }
 };
+

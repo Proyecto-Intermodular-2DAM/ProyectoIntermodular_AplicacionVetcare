@@ -13,12 +13,43 @@ const Rooms: React.FC = () => {
     const [dniCliente, setDniCliente] = useState<string>("");
     const [codigoCentro, setCodigoCentro] = useState<string>("");
     const [nombre, setNombre] = useState<string>("");
-    const [extraField, setExtraField] = useState<string>(""); // Extra input shown at bottom of image
+    const [extraField, setExtraField] = useState<string>(""); // Extra input (size_m2)
+
+    const [rooms, setRooms] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchRooms = async () => {
+            try {
+                const data = await vetService.getRooms();
+                setRooms(data || []);
+            } catch (err: any) {
+                console.error("Error loading rooms", err);
+            }
+        };
+        fetchRooms();
+    }, []);
+
+    const handleSelectRoom = (room: any) => {
+        setNombre(room.name || "");
+        setCodigoCentro(room.center_code || "");
+        setExtraField(room.size_m2?.toString() || "");
+        setSelectedRoomId(room.id);
+        setSearchTerm("");
+    };
+
+    const filteredRooms = searchTerm.length > 0
+        ? rooms.filter(room => 
+            room.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            room.center_code?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -62,7 +93,14 @@ const Rooms: React.FC = () => {
                 await vetService.createRoom(roomData);
                 setMessage("Sala creada correctamente");
             } else {
-                setMessage("Actualización de sala no implementada por falta de ID");
+                if (!selectedRoomId) {
+                    setMessage("Por favor, busca y selecciona una sala para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateRoom(selectedRoomId, roomData);
+                setMessage("Sala actualizada correctamente");
             }
             setShowToast(true);
             if (type === 'create') setTimeout(() => navigate('/listado-salas'), 1500);
@@ -89,7 +127,26 @@ const Rooms: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar sala por nombre o centro..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredRooms.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredRooms.map(room => (
+                                <div 
+                                    key={room.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectRoom(room)}
+                                >
+                                    <span className="employee-name">{room.name}</span>
+                                    <span className="employee-detail">Centro: {room.center_code} | Tamaño: {room.size_m2}m²</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>

@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Employee.css';
 
 const Appointment: React.FC = () => {
@@ -15,10 +16,45 @@ const Appointment: React.FC = () => {
     const [sala, setSala] = useState<string>("");
     const [motivo, setMotivo] = useState<string>("");
 
+    const [appointments, setAppointments] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchAppointments = async () => {
+            try {
+                const data = await vetService.getAppointments();
+                setAppointments(data || []);
+            } catch (err: any) {
+                console.error("Error loading appointments", err);
+            }
+        };
+        fetchAppointments();
+    }, []);
+
+    const handleSelectAppointment = (apt: any) => {
+        setIdCita(apt.id || "");
+        setIdAnimal(apt.animal_id || "");
+        setDniCli(apt.client?.dni || "");
+        setFechaHora(apt.appointment_date || "");
+        setSala(apt.room_id || "");
+        setMotivo(apt.reason || "");
+        setSelectedAppointmentId(apt.id);
+        setSearchTerm("");
+    };
+
+    const filteredAppointments = searchTerm.length > 0
+        ? appointments.filter(apt => 
+            apt.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            apt.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            `${apt.client?.first_name} ${apt.client?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -60,19 +96,28 @@ const Appointment: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(
-                `${type === 'create' ? 'Creando' : 'Actualizando'} cita`,
-                { idCita, idAnimal, dniCli, fechaHora, sala, motivo }
-            );
+            const appointmentData = {
+                reason: motivo,
+                animal_id: idAnimal,
+                appointment_date: fechaHora,
+                room_id: sala
+            };
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
-
-            setMessage(
-                type === 'create'
-                    ? "Cita creada correctamente"
-                    : "Cita actualizada correctamente"
-            );
+            if (type === 'create') {
+                await vetService.createAppointment(appointmentData);
+                setMessage("Cita creada correctamente");
+            } else {
+                if (!selectedAppointmentId) {
+                    setMessage("Por favor, busca y selecciona una cita para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateAppointment(selectedAppointmentId, appointmentData);
+                setMessage("Cita actualizada correctamente");
+            }
             setShowToast(true);
+            setTimeout(() => navigate('/listado-citas'), 1500);
         } catch {
             setMessage("Error al procesar la solicitud");
             setShowToast(true);
@@ -96,7 +141,26 @@ const Appointment: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar cita" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar cita por ID, animal o cliente..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredAppointments.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredAppointments.map(apt => (
+                                <div 
+                                    key={apt.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectAppointment(apt)}
+                                >
+                                    <span className="employee-name">Animal: {apt.animal?.name || 'N/A'}</span>
+                                    <span className="employee-detail">Cliente: {apt.client ? `${apt.client.first_name} ${apt.client.last_name}` : 'N/A'} | ID: {apt.id.substring(0, 8)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>

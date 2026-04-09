@@ -16,10 +16,46 @@ const Adoption: React.FC = () => {
     const [descripcionRight, setDescripcionRight] = useState<string>("");
     const [psologia, setPsologia] = useState<string>("");
 
+    const [adoptions, setAdoptions] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedAdoptionId, setSelectedAdoptionId] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchAdoptions = async () => {
+            try {
+                const data = await vetService.getAdoptionHistory();
+                setAdoptions(data || []);
+            } catch (err: any) {
+                console.error("Error loading adoptions", err);
+            }
+        };
+        fetchAdoptions();
+    }, []);
+
+    const handleSelectAdoption = (adoption: any) => {
+        setDniCliente(adoption.client?.dni || "");
+        setNombreAnimal(adoption.animal?.name || "");
+        setPsologia(""); // Mapping logic depending on DB schema
+        const comments = adoption.comments || "";
+        const parts = comments.split(" - ");
+        setDescripcionLeft(parts[0] || "");
+        setDescripcionRight(parts[1] || "");
+        setSelectedAdoptionId(adoption.id);
+        setSearchTerm("");
+    };
+
+    const filteredAdoptions = searchTerm.length > 0
+        ? adoptions.filter(a => 
+            a.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            a.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            a.client?.dni?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -70,7 +106,14 @@ const Adoption: React.FC = () => {
                 await vetService.createAdoption(adoptionData);
                 setMessage("Adopción creada correctamente");
             } else {
-                setMessage("Actualización de adopción no implementada");
+                if (!selectedAdoptionId) {
+                    setMessage("Por favor, busca y selecciona una adopción para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateAdoption(selectedAdoptionId, adoptionData);
+                setMessage("Adopción actualizada correctamente");
             }
             setShowToast(true);
             if (type === 'create') setTimeout(() => navigate('/listado-adopcion'), 1500);
@@ -97,7 +140,26 @@ const Adoption: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar adopción por ID, animal o DNI..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredAdoptions.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredAdoptions.map(a => (
+                                <div 
+                                    key={a.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectAdoption(a)}
+                                >
+                                    <span className="employee-name">Animal: {a.animal?.name || 'N/A'}</span>
+                                    <span className="employee-detail">DNI: {a.client?.dni || 'N/A'} | ID: {a.id.substring(0, 8)}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>

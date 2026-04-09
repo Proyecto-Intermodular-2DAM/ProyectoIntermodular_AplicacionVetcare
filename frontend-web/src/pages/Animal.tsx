@@ -19,10 +19,47 @@ const Animal: React.FC = () => {
     const [descripcion, setDescripcion] = useState<string>("");
     const [foto, setFoto] = useState<string>("");
 
+    const [animals, setAnimals] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedAnimalId, setSelectedAnimalId] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false); 
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchAnimals = async () => {
+            try {
+                const data = await vetService.getAnimals();
+                setAnimals(data || []);
+            } catch (err: any) {
+                console.error("Error loading animals", err);
+            }
+        };
+        fetchAnimals();
+    }, []);
+
+    const handleSelectAnimal = (animal: any) => {
+        setDniCliente(animal.client?.dni || "");
+        setNombre(animal.name || "");
+        setEspecie(animal.species || "");
+        setEstado(animal.status || "");
+        setCodigoEdad(animal.age_code || "");
+        setSexo(animal.sex || "");
+        setDescripcion(animal.description || "");
+        setFoto(animal.photo_url || "");
+        setSelectedAnimalId(animal.id);
+        setSearchTerm("");
+    };
+
+    const filteredAnimals = searchTerm.length > 0
+        ? animals.filter(animal => 
+            animal.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            animal.species?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            animal.id?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -80,10 +117,14 @@ const Animal: React.FC = () => {
                 await vetService.createAnimal(animalData);
                 setMessage("Animal creado correctamente");
             } else {
-                // In a real app, we'd have the animal_code from URL
-                // For this demo, we'll assume we can update if we had the code
-                // await vetService.updateAnimal(codigo, animalData);
-                setMessage("Actualización de animal no implementada por falta de ID en esta vista");
+                if (!selectedAnimalId) {
+                    setMessage("Por favor, busca y selecciona un animal para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateAnimal(selectedAnimalId, animalData);
+                setMessage("Animal actualizado correctamente");
             }
             setShowToast(true);
             if (type === 'create') setTimeout(() => navigate('/listado-animales'), 1500);
@@ -110,7 +151,26 @@ const Animal: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar animal por nombre, especie o ID..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredAnimals.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredAnimals.map(animal => (
+                                <div 
+                                    key={animal.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectAnimal(animal)}
+                                >
+                                    <span className="employee-name">{animal.name}</span>
+                                    <span className="employee-detail">{animal.species} | DNI: {animal.client?.dni || 'Global'}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>
