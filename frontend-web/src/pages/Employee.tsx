@@ -13,10 +13,43 @@ const Employee: React.FC = () => {
     const [phone, setPhone] = useState<string>("");
     const [salary, setSalary] = useState<string>("");
 
+    const [employees, setEmployees] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
+
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchEmployees = async () => {
+            try {
+                const data = await vetService.getEmployees();
+                setEmployees(data || []);
+            } catch (err: any) {
+                console.error("Error loading employees", err);
+            }
+        };
+        fetchEmployees();
+    }, []);
+
+    const handleSelectEmployee = (emp: any) => {
+        setDni(emp.dni || "");
+        setName(`${emp.first_name} ${emp.last_name}`);
+        setPhone(emp.phone_number || "");
+        setSalary(emp.salary?.toString() || "");
+        setSelectedEmployeeId(emp.id);
+        setSearchTerm("");
+    };
+
+    const filteredEmployees = searchTerm.length > 0
+        ? employees.filter(emp => 
+            `${emp.first_name} ${emp.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            emp.dni?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
+
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -82,13 +115,13 @@ const Employee: React.FC = () => {
                 await vetService.createEmployee(employeeData);
                 setError("Empleado creado correctamente");
             } else {
-                // For update, we might need an ID. 
-                // Since this is a simple CRUD and we don't have the ID here, 
-                // I'll assume for now we are using DNI as a unique identifier or the user should select from list.
-                // In a real scenario, we'd pass the ID from the URL or state.
-                // For now, I'll use DNI to find and update if possible, or just log.
-                // Let's assume we update by DNI for this simple implementation if ID is missing.
-                await vetService.updateEmployee(dni, employeeData); // Assuming ID = DNI or similar for this demo
+                if (!selectedEmployeeId) {
+                    setError("Por favor, busca y selecciona un empleado para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateEmployee(selectedEmployeeId, employeeData);
                 setError("Empleado actualizado correctamente");
             }
             setShowToast(true);
@@ -116,7 +149,26 @@ const Employee: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar empleado por Nombre o DNI..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredEmployees.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredEmployees.map(emp => (
+                                <div 
+                                    key={emp.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectEmployee(emp)}
+                                >
+                                    <span className="employee-name">{emp.first_name} {emp.last_name}</span>
+                                    <span className="employee-detail">DNI: {emp.dni} | Tel: {emp.phone_number}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>

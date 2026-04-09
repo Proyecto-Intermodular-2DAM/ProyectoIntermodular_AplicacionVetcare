@@ -103,10 +103,19 @@ const ListEmployee: React.FC = () => {
                     </thead>
                     <tbody>
                         {employees
-                            .filter(emp => 
-                                `${emp.first_name} ${emp.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                emp.dni?.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
+                            .filter(emp => {
+                                const s = searchTerm.toLowerCase();
+                                const fullName = `${emp.first_name} ${emp.last_name}`.toLowerCase();
+                                return (
+                                    emp.id?.toLowerCase().includes(s) ||
+                                    emp.dni?.toLowerCase().includes(s) ||
+                                    fullName.includes(s) ||
+                                    emp.phone_number?.toLowerCase().includes(s) ||
+                                    emp.salary?.toString().includes(s) ||
+                                    'eliminar'.includes(s)
+                                );
+                            })
+
                             .map((emp) => (
                                 <tr key={emp.id}>
                                     <td className="col-no">{emp.id.substring(0, 8)}</td>
