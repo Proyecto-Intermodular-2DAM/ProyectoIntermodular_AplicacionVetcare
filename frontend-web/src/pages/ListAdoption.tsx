@@ -90,11 +90,17 @@ const ListAdoption: React.FC = () => {
                     </thead>
                     <tbody>
                         {adoptions
-                            .filter(ad => 
-                                ad.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                ad.client?.dni?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                ad.comments?.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
+                            .filter(ad => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    ad.id?.toLowerCase().includes(s) ||
+                                    ad.animal?.name?.toLowerCase().includes(s) ||
+                                    ad.client?.dni?.toLowerCase().includes(s) ||
+                                    ad.animal_id?.toLowerCase().includes(s) ||
+                                    new Date(ad.adoption_date).toLocaleDateString().toLowerCase().includes(s) ||
+                                    ad.comments?.toLowerCase().includes(s)
+                                );
+                            })
                             .map((ad) => (
                                 <tr key={ad.id}>
                                     <td className="col-no">{ad.id.substring(0, 8)}</td>

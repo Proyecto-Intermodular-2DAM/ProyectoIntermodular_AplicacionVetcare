@@ -90,11 +90,17 @@ const ListDate: React.FC = () => {
                     </thead>
                     <tbody>
                         {appointments
-                            .filter(apt => 
-                                apt.animal?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                `${apt.client?.first_name} ${apt.client?.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                apt.status?.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
+                            .filter(apt => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    apt.id?.toLowerCase().includes(s) ||
+                                    apt.animal?.name?.toLowerCase().includes(s) ||
+                                    `${apt.client?.first_name} ${apt.client?.last_name}`.toLowerCase().includes(s) ||
+                                    apt.status?.toLowerCase().includes(s) ||
+                                    new Date(apt.appointment_date).toLocaleDateString().toLowerCase().includes(s) ||
+                                    apt.appointment_time?.toLowerCase().includes(s)
+                                );
+                            })
                             .map((apt) => (
                                 <tr key={apt.id}>
                                     <td className="col-id">{apt.id.substring(0, 8)}</td>

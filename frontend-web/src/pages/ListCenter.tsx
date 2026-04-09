@@ -88,11 +88,15 @@ const ListCenter: React.FC = () => {
                     </thead>
                     <tbody>
                         {centers
-                            .filter(center => 
-                                center.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                center.address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                center.postcode?.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
+                            .filter(center => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    center.id?.toLowerCase().includes(s) ||
+                                    center.name?.toLowerCase().includes(s) ||
+                                    center.address?.toLowerCase().includes(s) ||
+                                    center.postcode?.toLowerCase().includes(s)
+                                );
+                            })
                             .map((center) => (
                                 <tr key={center.id}>
                                     <td className="col-no">{center.id.substring(0, 8)}</td>

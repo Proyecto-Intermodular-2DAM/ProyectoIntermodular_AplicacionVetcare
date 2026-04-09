@@ -87,10 +87,14 @@ const ListRooms: React.FC = () => {
                     </thead>
                     <tbody>
                         {rooms
-                            .filter(room => 
-                                room.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                room.center_code?.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
+                            .filter(room => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    room.name?.toLowerCase().includes(s) ||
+                                    room.center_code?.toLowerCase().includes(s) ||
+                                    room.size_m2?.toString().toLowerCase().includes(s)
+                                );
+                            })
                             .map((room, index) => (
                                 <tr key={index}>
                                     <td className="col-nombre">{room.name}</td>

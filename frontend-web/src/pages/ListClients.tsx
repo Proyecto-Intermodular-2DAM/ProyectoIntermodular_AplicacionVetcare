@@ -90,11 +90,17 @@ const ListClients: React.FC = () => {
                     </thead>
                     <tbody>
                         {clients
-                            .filter(client => 
-                                `${client.first_name} ${client.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                client.dni?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                                client.email?.toLowerCase().includes(searchTerm.toLowerCase())
-                            )
+                            .filter(client => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    client.id?.toLowerCase().includes(s) ||
+                                    `${client.first_name} ${client.last_name}`.toLowerCase().includes(s) ||
+                                    client.dni?.toLowerCase().includes(s) ||
+                                    client.email?.toLowerCase().includes(s) ||
+                                    new Date(client.created_at).toLocaleDateString().toLowerCase().includes(s) ||
+                                    client.phone_number?.toLowerCase().includes(s)
+                                );
+                            })
                             .map((c) => (
                                 <tr key={c.id}>
                                     <td className="col-no">{c.id.substring(0, 8)}</td>
