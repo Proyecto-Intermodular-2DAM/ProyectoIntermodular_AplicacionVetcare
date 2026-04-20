@@ -10,20 +10,22 @@ import {
     IonCard,
     IonCardContent,
     IonAvatar,
+    IonSpinner,
 } from "@ionic/react";
 import { arrowBack } from "ionicons/icons";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { vetService, Animal } from "../services/vetService";
-import { authService } from "../services/authService";
-import { useEffect, useState } from "react";
+import { useAnimals } from "../hooks/useVet";
+import { useProfile } from "../hooks/useProfile";
 import "../theme/css/UserProfile.css";
 
 const UserProfile: React.FC = () => {
     const navigate = useNavigate();
     const { user } = useAuth();
-    const [pets, setPets] = useState<Animal[]>([]);
-    const [publicProfile, setPublicProfile] = useState<any>(null);
+    const { animals: pets, loading: loadingPets } = useAnimals();
+    const { profile: publicProfile, loading: loadingProfile, error } = useProfile();
+
+    const loading = loadingPets || loadingProfile;
 
     // Derived info with fallback
     const userInfo = {
@@ -35,28 +37,6 @@ const UserProfile: React.FC = () => {
         dni: publicProfile?.dni || user?.user_metadata?.dni || "",
         profileImage: publicProfile?.user_image || user?.user_metadata?.avatar_url || "https://ionicframework.com/docs/img/demos/avatar.svg"
     };
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // Fetch Public Profile and Pets in parallel
-                const [profile, petsData] = await Promise.all([
-                    authService.getPublicUserProfile(),
-                    vetService.getMyAnimals()
-                ]);
-
-                setPublicProfile(profile);
-                setPets(petsData);
-
-            } catch (error) {
-                console.error("Error fetching UserProfile data:", error);
-            }
-        };
-
-        if (user) {
-            fetchData();
-        }
-    }, [user]);
 
     const handleGoBack = () => {
         navigate(-1);
@@ -86,30 +66,42 @@ const UserProfile: React.FC = () => {
             <IonContent fullscreen className="user-profile-content">
                 <div className="user-profile-container">
                     {/* User Info Section */}
-                    <div className="user-profile-info-section">
-                        <div className="user-profile-picture">
-                            <img src={userInfo.profileImage} alt={userInfo.name} />
+                    {loading ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', padding: '40px' }}>
+                            <IonSpinner name="crescent" />
                         </div>
-                        <h1 className="user-profile-name">{userInfo.name}</h1>
-                        <p className="user-profile-email">{userInfo.email}</p>
-                        {userInfo.phone && <p className="user-profile-detail">📞 {userInfo.phone}</p>}
-                        {userInfo.dni && <p className="user-profile-detail">🆔 {userInfo.dni}</p>}
+                    ) : (
+                        <div className="user-profile-info-section">
+                            <div className="user-profile-picture">
+                                <img src={userInfo.profileImage} alt={userInfo.name} />
+                            </div>
+                            <h1 className="user-profile-name">{userInfo.name}</h1>
+                            <p className="user-profile-email">{userInfo.email}</p>
+                            {userInfo.phone && <p className="user-profile-detail">📞 {userInfo.phone}</p>}
+                            {userInfo.dni && <p className="user-profile-detail">🆔 {userInfo.dni}</p>}
 
-                        <IonButton
-                            onClick={handleEditProfile}
-                            className="user-profile-edit-button"
-                            aria-label="Editar Perfil"
-                        >
-                            Editar Perfil
-                        </IonButton>
-                    </div>
+                            <IonButton
+                                onClick={handleEditProfile}
+                                className="user-profile-edit-button"
+                                aria-label="Editar Perfil"
+                            >
+                                Editar Perfil
+                            </IonButton>
+                        </div>
+                    )}
 
                     {/* Pets Section */}
                     <div className="user-profile-pets-section">
                         <h2 className="user-profile-pets-title">Mis Mascotas</h2>
 
+                        {error && !publicProfile && (
+                            <div style={{ textAlign: 'center', padding: '20px', color: 'var(--ion-color-danger)' }}>
+                                <p>{error}</p>
+                            </div>
+                        )}
+
                         <div className="user-profile-pets-list">
-                            {pets.map((pet) => (
+                            {pets?.map((pet) => (
                                 <IonCard
                                     key={pet.id}
                                     className="user-profile-pet-card"
@@ -127,6 +119,9 @@ const UserProfile: React.FC = () => {
                                     </IonCardContent>
                                 </IonCard>
                             ))}
+                            {!loading && pets?.length === 0 && (
+                                <p style={{ textAlign: 'center', color: 'var(--ion-color-medium)' }}>No tienes mascotas registradas.</p>
+                            )}
                         </div>
                     </div>
                 </div>

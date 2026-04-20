@@ -12,52 +12,34 @@ import {
 } from '@ionic/react';
 import { arrowForward, medkit } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import TopBar from '../components/TopBar';
 import SideMenu from '../components/SideMenu';
-import { vetService, Animal as ServiceAnimal } from '../services/vetService';
+import { useAnimals, useTreatments } from '../hooks/useVet';
 import '../theme/css/Treatment.css';
-
-interface AnimalWithTreatments extends ServiceAnimal {
-    activeTreatments: number;
-}
 
 const Treatment: React.FC = () => {
     const navigate = useNavigate();
-    const [animals, setAnimals] = useState<AnimalWithTreatments[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { animals: myAnimals, loading: loadingAnimals, error: errorAnimals } = useAnimals();
+    const { treatments: myTreatments, loading: loadingTreatments, error: errorTreatments } = useTreatments();
 
-    useEffect(() => {
-        const fetchAnimalsAndTreatments = async () => {
-            try {
-                const myAnimals = await vetService.getMyAnimals();
-                const myTreatments = await vetService.getMyTreatments();
+    const loading = loadingAnimals || loadingTreatments;
+    const error = errorAnimals || errorTreatments;
 
-                console.log("[Diagnostic] My Animals:", myAnimals);
-                console.log("[Diagnostic] My Treatments:", myTreatments);
+    const animalsWithCount = useMemo(() => {
+        if (!myAnimals || !myTreatments) return [];
 
-                const animalsWithCount = myAnimals.map(animal => {
-                    const animalTreatments = myTreatments.filter(t => t.animal_id === animal.id);
-                    console.log(`[Diagnostic] Animal ${animal.name} (${animal.id}) has treatments:`, animalTreatments);
-                    return {
-                        ...animal,
-                        activeTreatments: animalTreatments.length
-                    };
-                });
+        return myAnimals.map(animal => {
+            const animalTreatments = myTreatments.filter(t => t.animal_id === animal.id);
+            return {
+                ...animal,
+                activeTreatments: animalTreatments.length
+            };
+        });
+    }, [myAnimals, myTreatments]);
 
-                setAnimals(animalsWithCount);
-            } catch (error) {
-                console.error("Error fetching treatments data:", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAnimalsAndTreatments();
-    }, []);
-
-    const totalAnimals = animals.length;
-    const animalsInTreatment = animals.filter(animal => animal.activeTreatments > 0).length;
+    const totalAnimals = animalsWithCount.length;
+    const animalsInTreatment = animalsWithCount.filter(animal => animal.activeTreatments > 0).length;
 
     const handleAnimalClick = (animalId: string) => {
         navigate(`/animal-treatment/${animalId}`);
@@ -99,8 +81,12 @@ const Treatment: React.FC = () => {
                                 <div style={{ display: 'flex', justifyContent: 'center', padding: '20px' }}>
                                     <IonSpinner name="crescent" />
                                 </div>
-                            ) : animals.length > 0 ? (
-                                animals.map((animal) => (
+                            ) : error ? (
+                                <div style={{ textAlign: 'center', padding: '40px', color: 'var(--ion-color-danger)' }}>
+                                    <p>{error}</p>
+                                </div>
+                            ) : animalsWithCount.length > 0 ? (
+                                animalsWithCount.map((animal) => (
                                     <IonCard
                                         key={animal.id}
                                         className="treatment-card"

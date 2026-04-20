@@ -1,10 +1,10 @@
-import { supabase } from '../lib/supabase';
 import { authService } from './authService';
+import apiClient from './apiClient';
 
 export interface Animal {
-    id: string; // Changed to string (UUID in SQL)
+    id: string;
     name: string;
-    species: string; // Changed from type
+    species: string;
     breed?: string;
     avatar?: string;
     owner_id: string;
@@ -13,9 +13,9 @@ export interface Animal {
     weight?: number;
     height?: number;
     sex?: string;
-    status?: string; 
-    animal_image?: string; // Correct column name
-    information?: string; // Added field for adoption details
+    status?: string;
+    animal_image?: string;
+    information?: string;
 }
 
 export interface Appointment {
@@ -26,9 +26,9 @@ export interface Appointment {
     status: string;
     client_id: string;
     animal_id: string;
-    date: string; // Alias for UI
-    time: string; // Alias for UI
-    title?: string; // Add title for UI compatibility
+    date: string;
+    time: string;
+    title: string;
     animal?: {
         name: string;
         animal_image?: string;
@@ -37,7 +37,7 @@ export interface Appointment {
 }
 
 export interface Treatment {
-    id: string; // UUID
+    id: string;
     description: string;
     medication?: string;
     dosage?: string;
@@ -56,6 +56,61 @@ export interface Treatment {
     };
 }
 
+const mapAnimalFromAPI = (data: any): Animal => ({
+    id: data.id,
+    name: data.name,
+    species: data.species,
+    breed: data.breed,
+    avatar: data.avatar,
+    owner_id: data.client_id, // Note: client_id in DB, owner_id in interface
+    description: data.description,
+    birth_date: data.birth_date,
+    weight: data.weight,
+    height: data.height,
+    sex: data.sex,
+    status: data.status,
+    animal_image: data.animal_image,
+    information: data.information,
+});
+
+const mapAppointmentFromAPI = (data: any): Appointment => ({
+    id: data.id,
+    appointment_date: data.appointment_date,
+    appointment_time: data.appointment_time,
+    reason: data.reason,
+    status: data.status,
+    client_id: data.client_id,
+    animal_id: data.animal_id,
+    date: data.appointment_date,
+    time: data.appointment_time,
+    title: data.reason || 'Sin motivo',
+    animal: data.animal ? {
+        name: data.animal.name,
+        animal_image: data.animal.animal_image,
+        species: data.animal.species,
+    } : undefined
+});
+
+const mapTreatmentFromAPI = (data: any): Treatment => ({
+    id: data.id,
+    description: data.description,
+    medication: data.medication,
+    dosage: data.dosage,
+    appointment_id: data.appointment_id,
+    employee_id: data.employee_id,
+    animal_id: data.appointment?.animal?.id,
+    animal_name: data.appointment?.animal?.name,
+    date: data.appointment?.appointment_date || data.created_at,
+    created_at: data.created_at,
+    frequency_hours: data.frequency_hours,
+    frequency_days: data.frequency_days,
+    frequency_months: data.frequency_months,
+    frequency_years: data.frequency_years,
+    animal: data.appointment?.animal ? {
+        name: data.appointment.animal.name
+    } : undefined
+});
+
 class VetService {
     private animalsCache: Animal[] | null = null;
     private appointmentsCache: Appointment[] | null = null;
@@ -65,7 +120,7 @@ class VetService {
     /**
      * Fetch all animals belonging to the current user
      */
-    async getMyAnimals() {
+    async getMyAnimals(): Promise<Animal[]> {
         if (this.animalsCache) return this.animalsCache;
         if (this.animalsPromise) return this.animalsPromise;
 
@@ -74,17 +129,20 @@ class VetService {
                 const userId = await authService.getPublicUserId();
                 if (!userId) return [];
 
-                const { data, error } = await supabase
-                    .from('animal')
-                    .select('*')
-                    .eq('client_id', userId);
+                const response = await apiClient.get(`/animal`, {
+                    params: {
+                        select: '*',
+                        client_id: `eq.${userId}`
+                    }
+                });
 
-                if (error) throw error;
-                this.animalsCache = data as Animal[];
-                return this.animalsCache;
-            } catch (error) {
+                const data = response.data.data ?? response.data;
+                const mapped = Array.isArray(data) ? data.map(mapAnimalFromAPI) : [];
+                this.animalsCache = mapped;
+                return mapped;
+            } catch (error: any) {
                 console.error('Error fetching animals:', error);
-                return [];
+                throw new Error(error.response?.data?.message || "No se pudo cargar la lista de animales.");
             } finally {
                 this.animalsPromise = null;
             }
@@ -96,44 +154,51 @@ class VetService {
     /**
      * Fetch all animals available for adoption
      */
-    async getAnimalsForAdoption() {
+    async getAnimalsForAdoption(): Promise<Animal[]> {
         try {
-            const { data, error } = await supabase
-                .from('animal')
-                .select('*')
-                .eq('status', 'READY_FOR_ADOPTION'); // Only show animals ready for adoption
-
-            if (error) throw error;
-            return data as Animal[];
-        } catch (error) {
+            const response = await apiClient.get(`/animal`, {
+                params: {
+                    select: '*',
+                    status: 'eq.READY_FOR_ADOPTION'
+                }
+            });
+            const data = response.data.data ?? response.data;
+            return Array.isArray(data) ? data.map(mapAnimalFromAPI) : [];
+        } catch (error: any) {
             console.error('Error fetching adoption animals:', error);
-            return [];
+            throw new Error(error.response?.data?.message || "No se pudo cargar la lista de adopción.");
         }
     }
 
     /**
      * Fetch a single animal by ID
      */
-    async getAnimalById(id: string) {
+    async getAnimalById(id: string): Promise<Animal | null> {
         try {
-            const { data, error } = await supabase
-                .from('animal')
-                .select('*')
-                .eq('id', id)
-                .single();
-
-            if (error) throw error;
-            return data as Animal;
-        } catch (error) {
-            console.error(`Error fetching animal ${id}:`, error);
+            const response = await apiClient.get(`/animal`, {
+                params: {
+                    select: '*',
+                    id: `eq.${id}`
+                },
+                headers: {
+                    'Accept': 'application/vnd.pgrst.object+json' // To get a single object instead of an array
+                }
+            });
+            const data = response.data.data ?? response.data;
+            if (data) {
+                return mapAnimalFromAPI(data);
+            }
             return null;
+        } catch (error: any) {
+            console.error(`Error fetching animal ${id}:`, error);
+            throw new Error(error.response?.data?.message || "No se pudo obtener el animal.");
         }
     }
 
     /**
      * Fetch all appointments for the current user's animals
      */
-    async getMyAppointments() {
+    async getMyAppointments(): Promise<Appointment[]> {
         if (this.appointmentsCache) return this.appointmentsCache;
         if (this.appointmentsPromise) return this.appointmentsPromise;
 
@@ -142,29 +207,21 @@ class VetService {
                 const userId = await authService.getPublicUserId();
                 if (!userId) return [];
 
-                const { data, error } = await supabase
-                    .from('appointments')
-                    .select(`
-                        *,
-                        animal:animal_id (name, animal_image, species)
-                    `)
-                    .eq('client_id', userId)
-                    .order('appointment_date', { ascending: true });
+                const response = await apiClient.get(`/appointments`, {
+                    params: {
+                        select: '*,animal:animal_id(name,animal_image,species)',
+                        client_id: `eq.${userId}`,
+                        order: 'appointment_date.asc'
+                    }
+                });
 
-                if (error) throw error;
-
-                const mapped = data.map((item: any) => ({
-                    ...item,
-                    date: item.appointment_date,
-                    time: item.appointment_time,
-                    title: item.reason || 'Sin motivo'
-                })) as Appointment[];
-
+                const data = response.data.data ?? response.data;
+                const mapped = Array.isArray(data) ? data.map(mapAppointmentFromAPI) : [];
                 this.appointmentsCache = mapped;
                 return mapped;
-            } catch (error) {
+            } catch (error: any) {
                 console.error('Error fetching appointments:', error);
-                return [];
+                throw new Error(error.response?.data?.message || "No se pudo cargar la lista de citas.");
             } finally {
                 this.appointmentsPromise = null;
             }
@@ -176,42 +233,29 @@ class VetService {
     /**
      * Fetch all treatments for the current user's animals
      */
-    async getMyTreatments() {
+    async getMyTreatments(): Promise<Treatment[]> {
         try {
             const userId = await authService.getPublicUserId();
             if (!userId) return [];
 
-            // 1. Get user's appointments first to get IDs
             const myApps = await this.getMyAppointments();
             const appIds = myApps.map(a => a.id);
-            
+
             if (appIds.length === 0) return [];
 
-            // 2. Fetch treatments linked to those appointments
-            const { data, error } = await supabase
-                .from('treatments')
-                .select(`
-                    *,
-                    appointment:appointment_id (
-                        appointment_date,
-                        animal:animal_id (id, name)
-                    )
-                `)
-                .in('appointment_id', appIds)
-                .order('created_at', { ascending: false });
+            const response = await apiClient.get(`/treatments`, {
+                params: {
+                    select: '*,appointment:appointment_id(appointment_date,animal:animal_id(id,name))',
+                    appointment_id: `in.(${appIds.join(',')})`,
+                    order: 'created_at.desc'
+                }
+            });
 
-            if (error) throw error;
-
-            return data.map((t: any) => ({
-                ...t,
-                animal_id: t.appointment?.animal?.id,
-                animal_name: t.appointment?.animal?.name,
-                animal: t.appointment?.animal,
-                date: t.appointment?.appointment_date || t.created_at
-            })) as Treatment[];
-        } catch (error) {
+            const data = response.data.data ?? response.data;
+            return Array.isArray(data) ? data.map(mapTreatmentFromAPI) : [];
+        } catch (error: any) {
             console.error('Error fetching treatments:', error);
-            return [];
+            throw new Error(error.response?.data?.message || "No se pudo cargar la lista de tratamientos.");
         }
     }
 
