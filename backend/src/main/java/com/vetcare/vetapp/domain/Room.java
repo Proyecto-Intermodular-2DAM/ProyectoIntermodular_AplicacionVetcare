@@ -1,5 +1,6 @@
-package com.vetcare.vetapp.model;
+package com.vetcare.vetapp.domain;
 
+import com.vetcare.vetapp.domain.Center;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;

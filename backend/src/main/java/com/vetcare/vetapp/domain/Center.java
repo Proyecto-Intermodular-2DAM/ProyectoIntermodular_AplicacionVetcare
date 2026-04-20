@@ -1,4 +1,4 @@
-package com.vetcare.vetapp.model;
+package com.vetcare.vetapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -32,13 +32,14 @@ public class Center {
 
     @Column(name = "center_type", nullable = false)
     @ColumnDefault( "'CLINIC'")
-    private CenterType type;
+    @Enumerated(EnumType.STRING)
+    private com.vetcare.vetapp.domain.CenterType type;
 
     @OneToMany(mappedBy = "center", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Room> rooms;
+    private List<com.vetcare.vetapp.domain.Room> rooms;
 
     @ManyToMany(mappedBy = "workingCenters")
     @JsonIgnore
-    private List<User> employees;
+    private List<com.vetcare.vetapp.domain.User> employees;
 }

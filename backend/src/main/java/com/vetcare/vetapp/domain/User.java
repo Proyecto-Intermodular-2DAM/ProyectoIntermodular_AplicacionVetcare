@@ -1,4 +1,4 @@
-package com.vetcare.vetapp.model;
+package com.vetcare.vetapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -35,7 +35,7 @@ public class User {
     @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     @ColumnDefault( "'CLIENT'")
-    private UserRole role;
+    private com.vetcare.vetapp.domain.UserRole role;
 
     @Column(name = "user_image")
     private String userImage;
@@ -58,23 +58,23 @@ public class User {
 
     @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Animal> animals;
+    private List<com.vetcare.vetapp.domain.Animal> animals;
 
     @OneToMany(mappedBy = "adopter", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<AdoptionHistory> adoptions;
+    private List<com.vetcare.vetapp.domain.AdoptionHistory> adoptions;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Appointment> clientAppointments;
+    private List<com.vetcare.vetapp.domain.Appointment> clientAppointments;
 
     @OneToMany(mappedBy = "receptionist", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Appointment> receptionistAppointments;
+    private List<com.vetcare.vetapp.domain.Appointment> receptionistAppointments;
 
     @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL)
     @JsonIgnore
-    private List<Treatment> treatments;
+    private List<com.vetcare.vetapp.domain.Treatment> treatments;
 
     @ManyToMany
     @JoinTable(
@@ -83,5 +83,5 @@ public class User {
         inverseJoinColumns = @JoinColumn(name = "center_id")
     )
     @JsonIgnore
-    private List<Center> workingCenters;
+    private List<com.vetcare.vetapp.domain.Center> workingCenters;
 }

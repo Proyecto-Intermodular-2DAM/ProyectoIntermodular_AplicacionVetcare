@@ -1,4 +1,4 @@
-package com.vetcare.vetapp.model;
+package com.vetcare.vetapp.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
