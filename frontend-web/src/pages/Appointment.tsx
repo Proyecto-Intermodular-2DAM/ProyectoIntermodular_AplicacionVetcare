@@ -9,12 +9,17 @@ import '../theme/css/Employee.css';
 const Appointment: React.FC = () => {
     const navigate = useNavigate();
 
-    const [idCita, setIdCita] = useState<string>(""); //TODO cambiar tipo a id
-    const [idAnimal, setIdAnimal] = useState<string>(""); //TODO cambiar tipo a id
+    const [idAnimal, setIdAnimal] = useState<string>(""); 
     const [dniCli, setDniCli] = useState<string>("");
-    const [fechaHora, setFechaHora] = useState<string>(""); //TODO cambiar tipo a fecha
-    const [sala, setSala] = useState<string>("");
+    const [fecha, setFecha] = useState<string>("");
+    const [hora, setHora] = useState<string>("");
+    const [idSala, setIdSala] = useState<string>("");
     const [motivo, setMotivo] = useState<string>("");
+    const [estado, setEstado] = useState<string>("PENDING");
+
+    const [clients, setClients] = useState<any[]>([]);
+    const [animalsList, setAnimalsList] = useState<any[]>([]);
+    const [rooms, setRooms] = useState<any[]>([]);
 
     const [appointments, setAppointments] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -26,24 +31,36 @@ const Appointment: React.FC = () => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
 
     React.useEffect(() => {
-        const fetchAppointments = async () => {
+        const fetchData = async () => {
             try {
-                const data = await vetService.getAppointments();
-                setAppointments(data || []);
+                const [aptData, cliData, aniData, roomData] = await Promise.all([
+                    vetService.getAppointments(),
+                    vetService.getClients(),
+                    vetService.getAnimals(),
+                    vetService.getRooms()
+                ]);
+                setAppointments(aptData || []);
+                setClients(cliData || []);
+                setAnimalsList(aniData || []);
+                setRooms(roomData || []);
+                if (roomData?.length > 0 && !idSala) {
+                    setIdSala(roomData[0].id);
+                }
             } catch (err: any) {
-                console.error("Error loading appointments", err);
+                console.error("Error loading data", err);
             }
         };
-        fetchAppointments();
+        fetchData();
     }, []);
 
     const handleSelectAppointment = (apt: any) => {
-        setIdCita(apt.id || "");
-        setIdAnimal(apt.animal_id || "");
+        setIdAnimal(apt.animal?.name || "");
         setDniCli(apt.client?.dni || "");
-        setFechaHora(apt.appointment_date || "");
-        setSala(apt.room_id || "");
+        setFecha(apt.appointment_date || "");
+        setHora(apt.appointment_time || "");
+        setIdSala(apt.room_id || "");
         setMotivo(apt.reason || "");
+        setEstado(apt.status || "PENDING");
         setSelectedAppointmentId(apt.id);
         setSearchTerm("");
     };
@@ -73,16 +90,16 @@ const Appointment: React.FC = () => {
         setMessage("");
 
         const allTouched = {
-            idCita: true,
             idAnimal: true,
             dniCli: true,
-            fechaHora: true,
-            sala: true,
+            fecha: true,
+            hora: true,
+            idSala: true,
             motivo: true
         };
         setTouched(allTouched);
 
-        if (!idCita || !idAnimal || !dniCli || !fechaHora || !sala || !motivo) {
+        if (!idAnimal || !dniCli || !fecha || !hora || !idSala || !motivo) {
             setMessage("Por favor, completa todos los campos obligatorios");
             setShowToast(true);
             return;
@@ -96,11 +113,36 @@ const Appointment: React.FC = () => {
 
         setLoading(true);
         try {
+            // Resolve Client
+            const client = clients.find(c => c.dni.toUpperCase() === dniCli.toUpperCase());
+            if (!client) {
+                setMessage("No se encontró el cliente con ese DNI");
+                setShowToast(true);
+                setLoading(false);
+                return;
+            }
+
+            // Resolve Animal (owned by this client)
+            const animal = animalsList.find(a => 
+                a.client_id === client.id && 
+                a.name.toLowerCase() === idAnimal.toLowerCase()
+            );
+            
+            if (!animal) {
+                setMessage("No se encontró el animal '" + idAnimal + "' para este cliente");
+                setShowToast(true);
+                setLoading(false);
+                return;
+            }
+
             const appointmentData = {
                 reason: motivo,
-                animal_id: idAnimal,
-                appointment_date: fechaHora,
-                room_id: sala
+                client_id: client.id,
+                animal_id: animal.id,
+                appointment_date: fecha,
+                appointment_time: hora,
+                room_id: idSala,
+                status: estado
             };
 
             if (type === 'create') {
@@ -166,76 +208,105 @@ const Appointment: React.FC = () => {
                 <div className="divider"></div>
 
                 <div className="employee-form">
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label>DNI Cliente</label>
+                            {touched.dniCli && !validateDNI(dniCli) && (
+                                <div className="field-error-message">DNI no válido</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.dniCli && !validateDNI(dniCli) ? 'input-invalid' : ''}`}
+                                placeholder="DNI del cliente"
+                                value={dniCli}
+                                onChange={(e) => setDniCli(e.target.value)}
+                                onBlur={() => markTouched('dniCli')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>ID Cita</label>
-                        <input
-                            className="custom-input"
-                            placeholder="Insertar ID de la cita"
-                            value={idCita}
-                            onChange={(e) => setIdCita(e.target.value)}
-                            onBlur={() => markTouched('idCita')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Nombre Animal</label>
+                            {touched.idAnimal && !idAnimal && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.idAnimal && !idAnimal ? 'input-invalid' : ''}`}
+                                placeholder="Nombre del animal"
+                                value={idAnimal}
+                                onChange={(e) => setIdAnimal(e.target.value)}
+                                onBlur={() => markTouched('idAnimal')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>ID Animal</label>
-                        <input
-                            className="custom-input"
-                            placeholder="Insertar ID del animal"
-                            value={idAnimal}
-                            onChange={(e) => setIdAnimal(e.target.value)}
-                            onBlur={() => markTouched('idAnimal')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Fecha</label>
+                            {touched.fecha && !fecha && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <input
+                                type="date"
+                                className={`custom-input ${touched.fecha && !fecha ? 'input-invalid' : ''}`}
+                                value={fecha}
+                                onChange={(e) => setFecha(e.target.value)}
+                                onBlur={() => markTouched('fecha')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>DNI Cliente</label>
-                        {touched.dniCli && !validateDNI(dniCli) && (
-                            <div className="field-error-message">DNI no válido</div>
-                        )}
-                        <input
-                            className={`custom-input ${
-                                touched.dniCli && !validateDNI(dniCli) ? 'input-invalid' : ''
-                            }`}
-                            placeholder="Insertar DNI del cliente"
-                            value={dniCli}
-                            onChange={(e) => setDniCli(e.target.value)}
-                            onBlur={() => markTouched('dniCli')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Hora</label>
+                            {touched.hora && !hora && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <input
+                                type="time"
+                                className={`custom-input ${touched.hora && !hora ? 'input-invalid' : ''}`}
+                                value={hora}
+                                onChange={(e) => setHora(e.target.value)}
+                                onBlur={() => markTouched('hora')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>Fecha y Hora</label>
-                        <input
-                            type="date"
-                            className="custom-input"
-                            value={fechaHora}
-                            onChange={(e) => setFechaHora(e.target.value)}
-                            onBlur={() => markTouched('fechaHora')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Sala</label>
+                            <select
+                                className="custom-input"
+                                value={idSala}
+                                onChange={(e) => setIdSala(e.target.value)}
+                            >
+                                {rooms.map(r => (
+                                    <option key={r.id} value={r.id}>
+                                        {r.name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                    <div className="form-group">
-                        <label>Sala</label>
-                        <input
-                            className="custom-input"
-                            placeholder="Insertar sala"
-                            value={sala}
-                            onChange={(e) => setSala(e.target.value)}
-                            onBlur={() => markTouched('sala')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Estado</label>
+                            <select
+                                className="custom-input"
+                                value={estado}
+                                onChange={(e) => setEstado(e.target.value)}
+                            >
+                                <option value="PENDING">Pendiente</option>
+                                <option value="CONFIRMED">Confirmada</option>
+                                <option value="COMPLETED">Completada</option>
+                                <option value="CANCELLED">Cancelada</option>
+                            </select>
+                        </div>
 
-                    <div className="form-group">
-                        <label>Motivo</label>
-                        <textarea
-                            className="custom-input"
-                            placeholder="Insertar motivo de la cita"
-                            value={motivo}
-                            onChange={(e) => setMotivo(e.target.value)}
-                            onBlur={() => markTouched('motivo')}
-                        />
+                        <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                            <label>Motivo</label>
+                            {touched.motivo && !motivo && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <textarea
+                                className={`custom-input ${touched.motivo && !motivo ? 'input-invalid' : ''}`}
+                                placeholder="Motivo de la cita"
+                                value={motivo}
+                                onChange={(e) => setMotivo(e.target.value)}
+                                onBlur={() => markTouched('motivo')}
+                            />
+                        </div>
                     </div>
 
                     <div className="form-actions">

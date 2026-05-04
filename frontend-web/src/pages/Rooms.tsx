@@ -10,10 +10,9 @@ const Rooms: React.FC = () => {
     const navigate = useNavigate();
 
     // State for form fields based on the image provided
-    const [dniCliente, setDniCliente] = useState<string>("");
-    const [codigoCentro, setCodigoCentro] = useState<string>("");
     const [nombre, setNombre] = useState<string>("");
-    const [extraField, setExtraField] = useState<string>(""); // Extra input (size_m2)
+    const [idCentro, setIdCentro] = useState<string>("");
+    const [centers, setCenters] = useState<any[]>([]);
 
     const [rooms, setRooms] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -25,21 +24,27 @@ const Rooms: React.FC = () => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
 
     React.useEffect(() => {
-        const fetchRooms = async () => {
+        const fetchData = async () => {
             try {
-                const data = await vetService.getRooms();
-                setRooms(data || []);
+                const [roomsData, centersData] = await Promise.all([
+                    vetService.getRooms(),
+                    vetService.getCenters()
+                ]);
+                setRooms(roomsData || []);
+                setCenters(centersData || []);
+                if (centersData?.length > 0 && !idCentro) {
+                    setIdCentro(centersData[0].id);
+                }
             } catch (err: any) {
-                console.error("Error loading rooms", err);
+                console.error("Error loading data", err);
             }
         };
-        fetchRooms();
+        fetchData();
     }, []);
 
     const handleSelectRoom = (room: any) => {
         setNombre(room.name || "");
-        setCodigoCentro(room.center_code || "");
-        setExtraField(room.size_m2?.toString() || "");
+        setIdCentro(room.center_id || "");
         setSelectedRoomId(room.id);
         setSearchTerm("");
     };
@@ -66,17 +71,11 @@ const Rooms: React.FC = () => {
 
     const handleAction = async (type: 'create' | 'update') => {
         setMessage("");
-        const allTouched = { dniCliente: true, codigoCentro: true, nombre: true };
+        const allTouched = { nombre: true, idCentro: true };
         setTouched(allTouched);
 
-        if (!dniCliente || !codigoCentro || !nombre) {
+        if (!nombre || !idCentro) {
             setMessage("Por favor, completa los campos principales");
-            setShowToast(true);
-            return;
-        }
-
-        if (!validateDNI(dniCliente)) {
-            setMessage("El DNI introducido no es válido");
             setShowToast(true);
             return;
         }
@@ -84,9 +83,8 @@ const Rooms: React.FC = () => {
         setLoading(true);
         try {
             const roomData = {
-                center_code: codigoCentro,
-                name: nombre,
-                size_m2: parseFloat(extraField) || 0
+                center_id: idCentro,
+                name: nombre
             };
 
             if (type === 'create') {
@@ -153,35 +151,7 @@ const Rooms: React.FC = () => {
 
                 <div className="rooms-form">
                     <div className="form-group">
-                        <label>DNi Cliente</label>
-                        {touched.dniCliente && !validateDNI(dniCliente) && (
-                            <div className="field-error-message">DNI no válido (8 números y letra)</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Codigo"
-                            value={dniCliente}
-                            onChange={(e) => setDniCliente(e.target.value)}
-                            onBlur={() => markTouched('dniCliente')}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Codigo Centro</label>
-                        {touched.codigoCentro && !codigoCentro && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.codigoCentro && !codigoCentro ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Centro"
-                            value={codigoCentro}
-                            onChange={(e) => setCodigoCentro(e.target.value)}
-                            onBlur={() => markTouched('codigoCentro')}
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label>Nombre</label>
+                        <label>Nombre de la Sala</label>
                         {touched.nombre && !nombre && (
                             <div className="field-error-message">Campo obligatorio</div>
                         )}
@@ -194,31 +164,37 @@ const Rooms: React.FC = () => {
                         />
                     </div>
 
-                    <div className="form-group" style={{ marginTop: '20px' }}>
-                        {/* Empty label input as seen in lower part of the image mockup */}
-                        <input
+                    <div className="form-group">
+                        <label>Centro</label>
+                        <select
                             className="custom-input"
-                            value={extraField}
-                            onChange={(e) => setExtraField(e.target.value)}
-                        />
+                            value={idCentro}
+                            onChange={(e) => setIdCentro(e.target.value)}
+                        >
+                            {centers.map(center => (
+                                <option key={center.id} value={center.id}>
+                                    {center.name}
+                                </option>
+                            ))}
+                        </select>
                     </div>
-                </div>
 
-                <div className="form-actions-container">
-                    <button
-                        className="btn-action"
-                        onClick={() => handleAction('create')}
-                        disabled={loading}
-                    >
-                        {loading ? "Procesando..." : "Crear Salas"}
-                    </button>
-                    <button
-                        className="btn-action"
-                        onClick={() => handleAction('update')}
-                        disabled={loading}
-                    >
-                        {loading ? "Procesando..." : "Actualizar Salas"}
-                    </button>
+                    <div className="form-actions-container">
+                        <button
+                            className="btn-action"
+                            onClick={() => handleAction('create')}
+                            disabled={loading}
+                        >
+                            {loading ? "Procesando..." : "Crear Sala"}
+                        </button>
+                        <button
+                            className="btn-action"
+                            onClick={() => handleAction('update')}
+                            disabled={loading}
+                        >
+                            {loading ? "Procesando..." : "Actualizar Sala"}
+                        </button>
+                    </div>
                 </div>
             </div>
 

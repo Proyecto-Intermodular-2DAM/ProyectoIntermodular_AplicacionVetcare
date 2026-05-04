@@ -10,11 +10,15 @@ const Adoption: React.FC = () => {
     const navigate = useNavigate();
 
     // State for form fields based on mockup
-    const [dniCliente, setDniCliente] = useState<string>("");
+    const [dniAdopter, setDniAdopter] = useState<string>("");
     const [nombreAnimal, setNombreAnimal] = useState<string>("");
-    const [descripcionLeft, setDescripcionLeft] = useState<string>("");
-    const [descripcionRight, setDescripcionRight] = useState<string>("");
-    const [psologia, setPsologia] = useState<string>("");
+    const [idProcessedBy, setIdProcessedBy] = useState<string>("");
+    const [comments, setComments] = useState<string>("");
+    const [adoptionDate, setAdoptionDate] = useState<string>(new Date().toISOString().split('T')[0]);
+
+    const [clients, setClients] = useState<any[]>([]);
+    const [animals, setAnimals] = useState<any[]>([]);
+    const [employees, setEmployees] = useState<any[]>([]);
 
     const [adoptions, setAdoptions] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -26,25 +30,34 @@ const Adoption: React.FC = () => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
 
     React.useEffect(() => {
-        const fetchAdoptions = async () => {
+        const fetchData = async () => {
             try {
-                const data = await vetService.getAdoptionHistory();
-                setAdoptions(data || []);
+                const [ahData, cliData, aniData, empData] = await Promise.all([
+                    vetService.getAdoptionHistory(),
+                    vetService.getClients(),
+                    vetService.getAnimals(),
+                    vetService.getEmployees()
+                ]);
+                setAdoptions(ahData || []);
+                setClients(cliData || []);
+                setAnimals(aniData || []);
+                setEmployees(empData || []);
+                if (empData?.length > 0 && !idProcessedBy) {
+                    setIdProcessedBy(empData[0].id);
+                }
             } catch (err: any) {
-                console.error("Error loading adoptions", err);
+                console.error("Error loading data", err);
             }
         };
-        fetchAdoptions();
+        fetchData();
     }, []);
 
     const handleSelectAdoption = (adoption: any) => {
-        setDniCliente(adoption.client?.dni || "");
+        setDniAdopter(adoption.new_owner?.dni || "");
         setNombreAnimal(adoption.animal?.name || "");
-        setPsologia(""); // Mapping logic depending on DB schema
-        const comments = adoption.comments || "";
-        const parts = comments.split(" - ");
-        setDescripcionLeft(parts[0] || "");
-        setDescripcionRight(parts[1] || "");
+        setIdProcessedBy(adoption.processed_by || "");
+        setComments(adoption.comments || "");
+        setAdoptionDate(adoption.adoption_date ? adoption.adoption_date.split('T')[0] : "");
         setSelectedAdoptionId(adoption.id);
         setSearchTerm("");
     };
@@ -73,15 +86,15 @@ const Adoption: React.FC = () => {
     const handleAction = async (type: 'create' | 'update') => {
         setMessage("");
         const allTouched = {
-            dniCliente: true,
+            dniAdopter: true,
             nombreAnimal: true,
-            descripcionLeft: true,
-            descripcionRight: true,
-            psologia: true
+            idProcessedBy: true,
+            comments: true,
+            adoptionDate: true
         };
         setTouched(allTouched);
 
-        if (!dniCliente || !nombreAnimal || !descripcionLeft || !descripcionRight || !psologia) {
+        if (!dniAdopter || !nombreAnimal || !idProcessedBy || !comments || !adoptionDate) {
             setMessage("Por favor, completa todos los campos obligatorios");
             setShowToast(true);
             return;
@@ -95,11 +108,30 @@ const Adoption: React.FC = () => {
 
         setLoading(true);
         try {
+            // Find Animal
+            const animal = animals.find(a => a.name.toLowerCase() === nombreAnimal.toLowerCase());
+            // Find New Owner (Client)
+            const newOwner = clients.find(c => c.dni.toUpperCase() === dniAdopter.toUpperCase());
+
+            if (!animal) {
+                setMessage("No se encontró el animal '" + nombreAnimal + "'");
+                setShowToast(true);
+                setLoading(false);
+                return;
+            }
+            if (!newOwner) {
+                setMessage("No se encontró el adoptante con DNI " + dniAdopter);
+                setShowToast(true);
+                setLoading(false);
+                return;
+            }
+
             const adoptionData = {
-                client_dni: dniCliente,
-                animal_name: nombreAnimal,
-                comments: `${descripcionLeft} - ${descripcionRight}`,
-                adoption_date: new Date().toISOString()
+                animal_id: animal.id,
+                new_owner_id: newOwner.id,
+                processed_by: idProcessedBy,
+                adoption_date: adoptionDate,
+                comments: comments
             };
 
             if (type === 'create') {
@@ -165,77 +197,74 @@ const Adoption: React.FC = () => {
                 <div className="divider"></div>
 
                 <div className="adoption-form">
-                    {/* Top Row */}
-                    <div className="form-group">
-                        <label>DNI Cliente</label>
-                        {touched.dniCliente && !validateDNI(dniCliente) && (
-                            <div className="field-error-message">DNI no válido (8 números y letra)</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar DNI Cliente"
-                            value={dniCliente}
-                            onChange={(e) => setDniCliente(e.target.value)}
-                            onBlur={() => markTouched('dniCliente')}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Descripción</label>
-                        {touched.descripcionRight && !descripcionRight && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.descripcionRight && !descripcionRight ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Descripción"
-                            value={descripcionRight}
-                            onChange={(e) => setDescripcionRight(e.target.value)}
-                            onBlur={() => markTouched('descripcionRight')}
-                        />
-                    </div>
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label>DNI Adoptante</label>
+                            {touched.dniAdopter && !validateDNI(dniAdopter) && (
+                                <div className="field-error-message">DNI no válido</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.dniAdopter && !validateDNI(dniAdopter) ? 'input-invalid' : ''}`}
+                                placeholder="DNI del nuevo dueño"
+                                value={dniAdopter}
+                                onChange={(e) => setDniAdopter(e.target.value)}
+                                onBlur={() => markTouched('dniAdopter')}
+                            />
+                        </div>
 
-                    {/* Mid Row */}
-                    <div className="form-group">
-                        <label>Nombre Animal</label>
-                        {touched.nombreAnimal && !nombreAnimal && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.nombreAnimal && !nombreAnimal ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Nombre Animal"
-                            value={nombreAnimal}
-                            onChange={(e) => setNombreAnimal(e.target.value)}
-                            onBlur={() => markTouched('nombreAnimal')}
-                        />
-                    </div>
-                    <div className="form-group">
-                        <label>Psología</label>
-                        {touched.psologia && !psologia && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.psologia && !psologia ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Psologia"
-                            value={psologia}
-                            onChange={(e) => setPsologia(e.target.value)}
-                            onBlur={() => markTouched('psologia')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Nombre Animal</label>
+                            {touched.nombreAnimal && !nombreAnimal && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.nombreAnimal && !nombreAnimal ? 'input-invalid' : ''}`}
+                                placeholder="Nombre del animal"
+                                value={nombreAnimal}
+                                onChange={(e) => setNombreAnimal(e.target.value)}
+                                onBlur={() => markTouched('nombreAnimal')}
+                            />
+                        </div>
 
-                    {/* Bottom Row */}
-                    <div className="form-group">
-                        <label>Descripcion</label>
-                        {touched.descripcionLeft && !descripcionLeft && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.descripcionLeft && !descripcionLeft ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Descripcion"
-                            value={descripcionLeft}
-                            onChange={(e) => setDescripcionLeft(e.target.value)}
-                            onBlur={() => markTouched('descripcionLeft')}
-                        />
+                        <div className="form-group">
+                            <label>Procesado por</label>
+                            <select
+                                className="custom-input"
+                                value={idProcessedBy}
+                                onChange={(e) => setIdProcessedBy(e.target.value)}
+                            >
+                                {employees.map(emp => (
+                                    <option key={emp.id} value={emp.id}>
+                                        {emp.first_name} {emp.last_name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Fecha de Adopción</label>
+                            <input
+                                type="date"
+                                className="custom-input"
+                                value={adoptionDate}
+                                onChange={(e) => setAdoptionDate(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                            <label>Comentarios</label>
+                            {touched.comments && !comments && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <textarea
+                                className={`custom-input ${touched.comments && !comments ? 'input-invalid' : ''}`}
+                                placeholder="Detalles de la adopción..."
+                                value={comments}
+                                onChange={(e) => setComments(e.target.value)}
+                                onBlur={() => markTouched('comments')}
+                            />
+                        </div>
                     </div>
-                    <div></div> {/* Empty for alignment */}
 
                     <div className="form-actions">
                         <button

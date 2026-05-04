@@ -68,8 +68,10 @@
 }
 
 .rooms-form {
-    max-width: 500px;
-    /* Rooms form has fields stacked in one column on the left in the image */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 40px;
+    max-width: 1000px;
 }
 
 .form-group {
@@ -100,13 +102,12 @@
 }
 
 .form-actions-container {
+    grid-column: span 2;
     display: flex;
     justify-content: flex-end;
     gap: 16px;
     margin-top: 40px;
     margin-bottom: 40px;
-    max-width: 800px;
-    /* Align with general content layout */
 }
 
 .btn-action {

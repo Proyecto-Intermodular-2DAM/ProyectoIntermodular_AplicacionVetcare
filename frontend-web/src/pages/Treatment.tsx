@@ -14,7 +14,11 @@ const Treatment: React.FC = () => {
     const [nombreAnimal, setNombreAnimal] = useState<string>("");
     const [descripcion, setDescripcion] = useState<string>("");
     const [medicamento, setMedicamento] = useState<string>("");
-    const [psologia, setPsologia] = useState<string>("");
+    const [posologia, setPosologia] = useState<string>("");
+    const [idEmpleado, setIdEmpleado] = useState<string>("");
+
+    const [appointmentsList, setAppointmentsList] = useState<any[]>([]);
+    const [employees, setEmployees] = useState<any[]>([]);
 
     const [treatments, setTreatments] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -26,15 +30,24 @@ const Treatment: React.FC = () => {
     const [touched, setTouched] = useState<Record<string, boolean>>({});
 
     React.useEffect(() => {
-        const fetchTreatments = async () => {
+        const fetchData = async () => {
             try {
-                const data = await vetService.getTreatments();
-                setTreatments(data || []);
+                const [trData, aptData, empData] = await Promise.all([
+                    vetService.getTreatments(),
+                    vetService.getAppointments(),
+                    vetService.getEmployees()
+                ]);
+                setTreatments(trData || []);
+                setAppointmentsList(aptData || []);
+                setEmployees(empData || []);
+                if (empData?.length > 0 && !idEmpleado) {
+                    setIdEmpleado(empData[0].id);
+                }
             } catch (err: any) {
-                console.error("Error loading treatments", err);
+                console.error("Error loading data", err);
             }
         };
-        fetchTreatments();
+        fetchData();
     }, []);
 
     const handleSelectTreatment = (treatment: any) => {
@@ -42,7 +55,8 @@ const Treatment: React.FC = () => {
         setNombreAnimal(treatment.appointment?.animal?.name || "");
         setDescripcion(treatment.description || "");
         setMedicamento(treatment.medication || "");
-        setPsologia(treatment.dosage || "");
+        setPosologia(treatment.dosage || "");
+        setIdEmpleado(treatment.employee_id || "");
         setSelectedTreatmentId(treatment.id);
         setSearchTerm("");
     };
@@ -68,18 +82,17 @@ const Treatment: React.FC = () => {
         return lookup.charAt(number % 23) === letter;
     };
 
-    const handleAction = async (type: 'create' | 'update') => {
-        setMessage("");
         const allTouched = {
             dniCliente: true,
             nombreAnimal: true,
             medicamento: true,
-            psologia: true,
-            descripcion: true
+            posologia: true,
+            descripcion: true,
+            idEmpleado: true
         };
         setTouched(allTouched);
 
-        if (!dniCliente || !nombreAnimal || !medicamento || !psologia || !descripcion) {
+        if (!dniCliente || !nombreAnimal || !medicamento || !posologia || !descripcion || !idEmpleado) {
             setMessage("Por favor, completa todos los campos obligatorios");
             setShowToast(true);
             return;
@@ -93,10 +106,25 @@ const Treatment: React.FC = () => {
 
         setLoading(true);
         try {
+            // Find Appointment
+            const appointment = appointmentsList.find(a => 
+                a.client?.dni.toUpperCase() === dniCliente.toUpperCase() &&
+                a.animal?.name.toLowerCase() === nombreAnimal.toLowerCase()
+            );
+
+            if (!appointment) {
+                setMessage("No se encontró una cita para este cliente y animal");
+                setShowToast(true);
+                setLoading(false);
+                return;
+            }
+
             const treatmentData = {
+                appointment_id: appointment.id,
+                employee_id: idEmpleado,
                 description: descripcion,
                 medication: medicamento,
-                dosage: psologia
+                dosage: posologia
             };
 
             if (type === 'create') {
@@ -162,83 +190,92 @@ const Treatment: React.FC = () => {
                 <div className="divider"></div>
 
                 <div className="treatment-form">
-                    {/* Left Column */}
-                    <div className="form-group">
-                        <label>DNi Cliente</label>
-                        {touched.dniCliente && !validateDNI(dniCliente) && (
-                            <div className="field-error-message">DNI no válido (8 números y letra)</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar DNI Cliente"
-                            value={dniCliente}
-                            onChange={(e) => setDniCliente(e.target.value)}
-                            onBlur={() => markTouched('dniCliente')}
-                        />
-                    </div>
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label>DNI Cliente</label>
+                            {touched.dniCliente && !validateDNI(dniCliente) && (
+                                <div className="field-error-message">DNI no válido (8 números y letra)</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar DNI Cliente"
+                                value={dniCliente}
+                                onChange={(e) => setDniCliente(e.target.value)}
+                                onBlur={() => markTouched('dniCliente')}
+                            />
+                        </div>
 
-                    {/* Right Column */}
-                    <div className="form-group">
-                        <label>Medicamento</label>
-                        {touched.medicamento && !medicamento && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.medicamento && !medicamento ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Medicamento"
-                            value={medicamento}
-                            onChange={(e) => setMedicamento(e.target.value)}
-                            onBlur={() => markTouched('medicamento')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Nombre Animal</label>
+                            {touched.nombreAnimal && !nombreAnimal && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.nombreAnimal && !nombreAnimal ? 'input-invalid' : ''}`}
+                                placeholder="Nombre del animal"
+                                value={nombreAnimal}
+                                onChange={(e) => setNombreAnimal(e.target.value)}
+                                onBlur={() => markTouched('nombreAnimal')}
+                            />
+                        </div>
 
-                    {/* Left Column */}
-                    <div className="form-group">
-                        <label>Nombre Animal</label>
-                        {touched.nombreAnimal && !nombreAnimal && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.nombreAnimal && !nombreAnimal ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Nombre Animal"
-                            value={nombreAnimal}
-                            onChange={(e) => setNombreAnimal(e.target.value)}
-                            onBlur={() => markTouched('nombreAnimal')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Veterinario</label>
+                            <select
+                                className="custom-input"
+                                value={idEmpleado}
+                                onChange={(e) => setIdEmpleado(e.target.value)}
+                            >
+                                {employees.map(emp => (
+                                    <option key={emp.id} value={emp.id}>
+                                        {emp.first_name} {emp.last_name}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
 
-                    {/* Right Column */}
-                    <div className="form-group">
-                        <label>Psologia</label>
-                        {touched.psologia && !psologia && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.psologia && !psologia ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Psologia"
-                            value={psologia}
-                            onChange={(e) => setPsologia(e.target.value)}
-                            onBlur={() => markTouched('psologia')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Medicamento</label>
+                            {touched.medicamento && !medicamento && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.medicamento && !medicamento ? 'input-invalid' : ''}`}
+                                placeholder="Nombre del medicamento"
+                                value={medicamento}
+                                onChange={(e) => setMedicamento(e.target.value)}
+                                onBlur={() => markTouched('medicamento')}
+                            />
+                        </div>
 
-                    {/* Left Column */}
-                    <div className="form-group">
-                        <label>Descripcion</label>
-                        {touched.descripcion && !descripcion && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.descripcion && !descripcion ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Descripcion"
-                            value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
-                            onBlur={() => markTouched('descripcion')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Posología</label>
+                            {touched.posologia && !posologia && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.posologia && !posologia ? 'input-invalid' : ''}`}
+                                placeholder="Ej: 1 pastilla cada 8h"
+                                value={posologia}
+                                onChange={(e) => setPosologia(e.target.value)}
+                                onBlur={() => markTouched('posologia')}
+                            />
+                        </div>
 
-                    {/* Right Column - Placeholder to keep grid structure parity with image */}
-                    <div></div>
+                        <div className="form-group" style={{ gridColumn: 'span 2' }}>
+                            <label>Descripción del Tratamiento</label>
+                            {touched.descripcion && !descripcion && (
+                                <div className="field-error-message">Campo obligatorio</div>
+                            )}
+                            <textarea
+                                className={`custom-input ${touched.descripcion && !descripcion ? 'input-invalid' : ''}`}
+                                placeholder="Detalles del tratamiento..."
+                                value={descripcion}
+                                onChange={(e) => setDescripcion(e.target.value)}
+                                onBlur={() => markTouched('descripcion')}
+                            />
+                        </div>
+                    </div>
 
 
                     <div className="form-actions">
