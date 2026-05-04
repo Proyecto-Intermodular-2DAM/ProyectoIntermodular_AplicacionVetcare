@@ -82,6 +82,7 @@ const Treatment: React.FC = () => {
         return lookup.charAt(number % 23) === letter;
     };
 
+    const handleAction = async (type: string) => {
         const allTouched = {
             dniCliente: true,
             nombreAnimal: true,
