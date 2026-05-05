@@ -93,6 +93,14 @@ const Rooms: React.FC = () => {
             return;
         }
 
+        // Check if center exists
+        const selectedCenter = centers.find(c => c.id === idCentro);
+        if (!selectedCenter) {
+            setMessage("El centro seleccionado no existe");
+            setShowToast(true);
+            return;
+        }
+
         setLoading(true);
         try {
             const roomData = {

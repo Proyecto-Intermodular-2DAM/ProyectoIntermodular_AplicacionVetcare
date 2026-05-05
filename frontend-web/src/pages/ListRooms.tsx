@@ -95,7 +95,7 @@ const ListRooms: React.FC = () => {
                     <thead>
                         <tr>
                             <th className="col-nombre">Nombre</th>
-                            <th className="col-centro">Codigo Centro</th>
+                            <th className="col-centro">Nombre Centro</th>
                             <th className="col-dni">Tamaño (m²)</th>
                             <th className="col-id">Acciones</th>
                         </tr>
@@ -113,7 +113,7 @@ const ListRooms: React.FC = () => {
                             .map((room, index) => (
                                 <tr key={index}>
                                     <td className="col-nombre">{room.name}</td>
-                                    <td className="col-centro">{room.center?.postcode || 'N/A'}</td>
+                                    <td className="col-centro">{room.center?.name || 'N/A'}</td>
                                     <td className="col-dni">{room.size_m2} m²</td>
                                     <td className="col-id">
                                         <button
