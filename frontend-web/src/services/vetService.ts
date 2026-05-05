@@ -141,6 +141,11 @@ export const vetService = {
             params: { id: `eq.${id}` }
         });
     },
+    async deleteAppointment(id: string) {
+        await apiClient.delete('/appointments', {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Centers (Update was missing)
     async updateCenter(id: string, data: any) {

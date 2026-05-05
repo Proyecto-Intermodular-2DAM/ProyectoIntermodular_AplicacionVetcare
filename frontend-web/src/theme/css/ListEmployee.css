@@ -158,3 +158,18 @@
 .col-id {
     width: 90px;
 }
+
+.btn-eliminar-small {
+    background-color: #eb445a;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-eliminar-small:hover {
+    background-color: #cf3c4f;
+}
