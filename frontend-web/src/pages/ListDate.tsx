@@ -1,20 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/MainLayout';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonLoading, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
-import '../theme/css/ListEmployee.css'; // Reusing common list styles
+import { vetService } from '../services/vetService';
+import '../theme/css/ListEmployee.css';
 
 const ListDate: React.FC = () => {
     const navigate = useNavigate();
+    const [appointments, setAppointments] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
-    const appointments = [
-        { no: 1, motivo: 'Vacunación mascota', dniRec: '74252515B', dniCli: '72585958B', idAnimal: '125', fecha: '15.01.2025', hora: '10:16 AM' },
-        { no: 2, motivo: 'Operación programada', dniRec: '74252515B', dniCli: '8085457B', idAnimal: '15', fecha: '01.06.2025', hora: '23:32 AM' },
-        { no: 3, motivo: 'Revision general', dniRec: '74252515B', dniCli: '74253156B', idAnimal: '215', fecha: '15.07.2025', hora: '10:05 AM' },
-        { no: 4, motivo: 'Desparasitación', dniRec: '78888888B', dniCli: '74245218B', idAnimal: '255', fecha: '25.05.2025', hora: '10:25 AM' },
-        { no: 5, motivo: 'Operación programada', dniRec: '78888888B', dniCli: '74879457B', idAnimal: '305', fecha: '25.25.2025', hora: '16:15 AM' },
-    ];
+    const fetchAppointments = async () => {
+        try {
+            const data = await vetService.getAppointments();
+            setAppointments(data || []);
+        } catch (err: any) {
+            setToastMessage(err.message || 'Error al cargar citas');
+            setShowToast(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchAppointments();
+    }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!window.confirm('¿Estás seguro de que deseas eliminar esta cita?')) return;
+        try {
+            await vetService.deleteAppointment(id);
+            setAppointments(appointments.filter(apt => apt.id !== id));
+            setToastMessage('Cita eliminada correctamente');
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage(err.message || 'Error al eliminar cita');
+            setShowToast(true);
+        }
+    };
+
+    if (loading) {
+        return <IonLoading isOpen={true} message="Cargando citas..." />;
+    }
 
     return (
         <MainLayout>
@@ -23,9 +54,9 @@ const ListDate: React.FC = () => {
                     <h1>Listado Citas</h1>
                     <button
                         className="btn-gestion-empleado"
-                        onClick={() => navigate('/citas')}
+                        onClick={() => navigate('/date')}
                     >
-                        Gestión Citas <IonIcon icon={chevronForwardOutline} />
+                        Nueva Cita <IonIcon icon={chevronForwardOutline} />
                     </button>
                 </div>
 
@@ -50,44 +81,74 @@ const ListDate: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar cita (Animal, cliente...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
-                        <button className="btn-eliminar-empleado">
-                            Eliminar Cita <IonIcon icon={chevronForwardOutline} />
-                        </button>
                     </div>
                 </div>
 
                 <table className="employee-table">
                     <thead>
                         <tr>
-                            <th className="col-check" style={{ width: '40px' }}><input type="checkbox" /></th>
-                            <th className="col-no">No.</th>
-                            <th className="col-motivo">Motivo</th>
-                            <th className="col-dni-rec">DNI Recepcionista <span style={{ color: 'red' }}>*</span></th>
-                            <th className="col-dni-cli">DNI Cliente</th>
-                            <th className="col-animal">ID Animal</th>
-                            <th className="col-fecha">Fecha / Hora</th>
+                            <th className="col-id">ID</th>
+                            <th className="col-animal">Animal</th>
+                            <th className="col-fecha">Fecha</th>
+                            <th className="col-hora">Hora</th>
+                            <th className="col-veterinario">Cliente</th>
+                            <th className="col-estado">Estado</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {appointments.map((apt) => (
-                            <tr key={apt.no}>
-                                <td className="col-check"><input type="checkbox" /></td>
-                                <td className="col-no">{apt.no}</td>
-                                <td className="col-motivo">{apt.motivo}</td>
-                                <td className="col-dni-rec"><strong>{apt.dniRec}</strong></td>
-                                <td className="col-dni-cli"><strong>{apt.dniCli}</strong></td>
-                                <td className="col-animal">{apt.idAnimal}</td>
-                                <td className="col-fecha">
-                                    <div>{apt.fecha}</div>
-                                    <div style={{ fontSize: '12px', color: '#888' }}>{apt.hora}</div>
-                                </td>
-                            </tr>
-                        ))}
+                        {appointments
+                            .filter(apt => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    apt.id?.toLowerCase().includes(s) ||
+                                    apt.animal?.name?.toLowerCase().includes(s) ||
+                                    `${apt.client?.first_name} ${apt.client?.last_name}`.toLowerCase().includes(s) ||
+                                    apt.status?.toLowerCase().includes(s) ||
+                                    new Date(apt.appointment_date).toLocaleDateString().toLowerCase().includes(s) ||
+                                    apt.appointment_time?.toLowerCase().includes(s)
+                                );
+                            })
+                            .map((apt) => (
+                                <tr key={apt.id}>
+                                    <td className="col-id">{apt.id.substring(0, 8)}</td>
+                                    <td className="col-animal">{apt.animal?.name || 'N/A'}</td>
+                                    <td className="col-fecha">{new Date(apt.appointment_date).toLocaleDateString()}</td>
+                                    <td className="col-hora">{apt.appointment_time}</td>
+                                    <td className="col-veterinario">{apt.client ? `${apt.client.first_name} ${apt.client.last_name}` : 'N/A'}</td>
+                                    <td className="col-estado">
+                                        <span className={`status-badge ${apt.status?.toLowerCase()}`}>
+                                            {apt.status}
+                                        </span>
+                                    </td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(apt.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={3000}
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
+                position="top"
+            />
         </MainLayout>
     );
 };

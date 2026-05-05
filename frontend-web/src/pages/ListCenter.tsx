@@ -1,20 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/MainLayout';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonLoading, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/ListEmployee.css';
 
 const ListCenter: React.FC = () => {
     const navigate = useNavigate();
+    const [centers, setCenters] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
-    const appointments = [
-        { cod: 1, nombre: 'Centro Altabix', codPost: '03203', direccion: 'Plaza España 1'},
-        { cod: 2, nombre: 'Centro GranVia', codPost: '03201', direccion: 'Calle Mayor 5'},
-        { cod: 3, nombre: 'Centro Ballecas', codPost: '01234', direccion: 'Avenida Libertad 10'},
-        { cod: 4, nombre: 'Centro Hospitalet', codPost: '04352', direccion: 'Calle Salud 7'},
-        { cod: 5, nombre: 'Centro PlazaMar', codPost: '02481', direccion: 'Calle Comercio 3'},
-    ];
+    useEffect(() => {
+        const fetchCenters = async () => {
+            try {
+                const data = await vetService.getCenters();
+                setCenters(data || []);
+            } catch (err: any) {
+                setToastMessage(err.message || 'Error al cargar centros');
+                setShowToast(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchCenters();
+    }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar este centro?")) return;
+
+        try {
+            await vetService.deleteCenter(id);
+            setCenters(centers.filter(c => c.id !== id));
+            setToastMessage("Centro eliminado correctamente");
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage("Error al eliminar el centro");
+            setShowToast(true);
+        }
+    };
+
+    if (loading) {
+        return <IonLoading isOpen={true} message="Cargando centros..." />;
+    }
 
     return (
         <MainLayout>
@@ -50,11 +81,13 @@ const ListCenter: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar el centro (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar centro (Nombre, dirección...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
-                        <button className="btn-eliminar-empleado">
-                            Eliminar Centro <IonIcon icon={chevronForwardOutline} />
-                        </button>
                     </div>
                 </div>
 
@@ -65,20 +98,47 @@ const ListCenter: React.FC = () => {
                             <th className="col-dni">Nombre</th>
                             <th className="col-nombre">Código Postal</th>
                             <th className="col-sueldo">Dirección</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {appointments.map((emp) => (
-                            <tr key={emp.cod}>
-                                <td className="col-no">{emp.cod}</td>
-                                <td className="col-dni">{emp.nombre}</td>
-                                <td className="col-nombre">{emp.codPost}</td>
-                                <td className="col-sueldo">{emp.direccion}</td>
-                            </tr>
-                        ))}
+                        {centers
+                            .filter(center => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    center.id?.toLowerCase().includes(s) ||
+                                    center.name?.toLowerCase().includes(s) ||
+                                    center.address?.toLowerCase().includes(s) ||
+                                    center.postcode?.toLowerCase().includes(s)
+                                );
+                            })
+                            .map((center) => (
+                                <tr key={center.id}>
+                                    <td className="col-no">{center.id.substring(0, 8)}</td>
+                                    <td className="col-dni">{center.name}</td>
+                                    <td className="col-nombre">{center.postcode}</td>
+                                    <td className="col-sueldo">{center.address}</td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(center.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={3000}
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
+                position="top"
+            />
         </MainLayout>
     );
 };

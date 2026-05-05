@@ -1,20 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import MainLayout from '../components/MainLayout';
-import { IonIcon } from '@ionic/react';
+import { IonIcon, IonLoading, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline, calendarOutline, filterOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
-import '../theme/css/ListEmployee.css'; // Reusing common list styles
+import { vetService } from '../services/vetService';
+import '../theme/css/ListEmployee.css';
 
 const ListTreatment: React.FC = () => {
     const navigate = useNavigate();
+    const [treatments, setTreatments] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
-    const treatments = [
-        { id: 1, dniCli: '12345678A', animal: 'Anakin', desc: 'Tratamiento antibiótico por infección', med: 'Amoxicilina 250 mg', psol: '1 comprimido cada 12 horas durante 7 días' },
-        { id: 2, dniCli: '12345678B', animal: 'Pelusa', desc: 'Desparasitación interna por parásitos', med: 'Milbemax', psol: '1 comprimido cada 3 meses' },
-        { id: 3, dniCli: '12345678C', animal: 'Mustio', desc: 'Control de dermatitis alérgica con picazón', med: 'Apoquel 5.4 mg', psol: '1 comprimido diario durante 14 días' },
-        { id: 4, dniCli: '12345678F', animal: 'Bola', desc: 'Tratamiento para otitis externa con secreción.', med: 'Otomax gotas', psol: '4 gotas por oído, 2 veces al día durante' },
-        { id: 5, dniCli: '12345678E', animal: 'camilo', desc: 'Prevención de pulgas y garrapatas.', med: 'NexGard 28 mg', psol: 'NexGard 28 mg' },
-    ];
+    useEffect(() => {
+        const fetchTreatments = async () => {
+            try {
+                const data = await vetService.getTreatments();
+                setTreatments(data || []);
+            } catch (err: any) {
+                setToastMessage(err.message || 'Error al cargar tratamientos');
+                setShowToast(true);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTreatments();
+    }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar este tratamiento?")) return;
+
+        try {
+            await vetService.deleteTreatment(id);
+            setTreatments(treatments.filter(t => t.id !== id));
+            setToastMessage("Tratamiento eliminado correctamente");
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage("Error al eliminar el tratamiento");
+            setShowToast(true);
+        }
+    };
+
+    if (loading) {
+        return <IonLoading isOpen={true} message="Cargando tratamientos..." />;
+    }
 
     return (
         <MainLayout>
@@ -50,11 +81,13 @@ const ListTreatment: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input type="text" placeholder="Buscar la cita (Ctrl + G)" />
+                            <input 
+                                type="text" 
+                                placeholder="Buscar tratamiento (Animal, descripción...)" 
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
-                        <button className="btn-eliminar-empleado">
-                            Eliminar Tratamiento <IonIcon icon={chevronForwardOutline} />
-                        </button>
                     </div>
                 </div>
 
@@ -66,23 +99,52 @@ const ListTreatment: React.FC = () => {
                             <th className="col-nombre">Nombre Animal</th>
                             <th className="col-desc">Descripción</th>
                             <th className="col-med">Medicamento</th>
-                            <th className="col-psol">Psologia</th>
+                            <th className="col-psol">Posología</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {treatments.map((tr) => (
-                            <tr key={tr.id}>
-                                <td className="col-no">{tr.id}</td>
-                                <td className="col-dni">{tr.dniCli}</td>
-                                <td className="col-nombre">{tr.animal}</td>
-                                <td className="col-desc"><strong>{tr.desc}</strong></td>
-                                <td className="col-med"><strong>{tr.med}</strong></td>
-                                <td className="col-psol">{tr.psol}</td>
-                            </tr>
-                        ))}
+                        {treatments
+                            .filter(tr => {
+                                const s = searchTerm.toLowerCase();
+                                return (
+                                    tr.id?.toLowerCase().includes(s) ||
+                                    tr.appointment?.animal?.name?.toLowerCase().includes(s) ||
+                                    tr.appointment?.client?.dni?.toLowerCase().includes(s) ||
+                                    tr.description?.toLowerCase().includes(s) ||
+                                    tr.medication?.toLowerCase().includes(s) ||
+                                    tr.dosage?.toLowerCase().includes(s)
+                                );
+                            })
+                            .map((tr) => (
+                                <tr key={tr.id}>
+                                    <td className="col-no">{tr.id.substring(0, 8)}</td>
+                                    <td className="col-dni">{tr.appointment?.client?.dni || 'N/A'}</td>
+                                    <td className="col-nombre">{tr.appointment?.animal?.name || 'N/A'}</td>
+                                    <td className="col-desc"><strong>{tr.description}</strong></td>
+                                    <td className="col-med"><strong>{tr.medication}</strong></td>
+                                    <td className="col-psol">{tr.dosage}</td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(tr.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
                     </tbody>
                 </table>
             </div>
+            <IonToast
+                isOpen={showToast}
+                onDidDismiss={() => setShowToast(false)}
+                message={toastMessage}
+                duration={3000}
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
+                position="top"
+            />
         </MainLayout>
     );
 };

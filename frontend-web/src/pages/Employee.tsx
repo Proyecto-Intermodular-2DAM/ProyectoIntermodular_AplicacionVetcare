@@ -3,6 +3,8 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
+import RoleSelect from '../components/RoleSelect';
 import '../theme/css/Employee.css';
 
 const Employee: React.FC = () => {
@@ -11,11 +13,48 @@ const Employee: React.FC = () => {
     const [name, setName] = useState<string>("");
     const [phone, setPhone] = useState<string>("");
     const [salary, setSalary] = useState<string>("");
+    const [email, setEmail] = useState<string>("");
+    const [role, setRole] = useState<string>("ADMIN");
+
+    const [employees, setEmployees] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState<string | null>(null);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchEmployees = async () => {
+            try {
+                const data = await vetService.getEmployees();
+                setEmployees(data || []);
+            } catch (err: any) {
+                console.error("Error loading employees", err);
+            }
+        };
+        fetchEmployees();
+    }, []);
+
+    const handleSelectEmployee = (emp: any) => {
+        setDni(emp.dni || "");
+        setName(`${emp.first_name} ${emp.last_name}`);
+        setPhone(emp.phone_number || "");
+        setSalary(emp.salary?.toString() || "");
+        setEmail(emp.email || "");
+        setRole(emp.role || "Administrador");
+        setSelectedEmployeeId(emp.id);
+        setSearchTerm("");
+    };
+
+    const filteredEmployees = searchTerm.length > 0
+        ? employees.filter(emp => 
+            `${emp.first_name} ${emp.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            emp.dni?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
+
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -30,6 +69,10 @@ const Employee: React.FC = () => {
         return lookup.charAt(number % 23) === letter;
     };
 
+    const validateEmail = (email: string) => {
+        return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    };
+
     const validatePhone = (phone: string) => {
         return /^[0-9]{9}$/.test(phone);
     };
@@ -41,10 +84,10 @@ const Employee: React.FC = () => {
 
     const handleAction = async (type: 'create' | 'update') => {
         setError("");
-        const allTouched = { dni: true, name: true, phone: true, salary: true };
+        const allTouched = { dni: true, name: true, phone: true, salary: true, email: true };
         setTouched(allTouched);
 
-        if (!dni || !name || !phone || !salary) {
+        if (!dni || !name || !phone || !salary || (type === 'create' && !email)) {
             setError("Por favor, completa todos los campos obligatorios");
             setShowToast(true);
             return;
@@ -68,16 +111,50 @@ const Employee: React.FC = () => {
             return;
         }
 
+        if (email && !validateEmail(email)) {
+            setError("Introduce un email válido");
+            setShowToast(true);
+            return;
+        }
+
         setLoading(true);
         try {
-            // Placeholder for API call
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} empleado:`, { dni, name, phone, salary });
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            setError(`${type === 'create' ? 'Empleado creado' : 'Empleado actualizado'} correctamente`);
+            const nameParts = name.trim().split(/\s+/);
+            const firstName = nameParts[0];
+            const lastName = nameParts.slice(1).join(' ');
+
+            const employeeData: any = {
+                dni,
+                first_name: firstName,
+                last_name: lastName,
+                phone_number: phone,
+                salary: parseFloat(salary),
+                email,
+                role
+            };
+
+            if (type === 'create') {
+                employeeData.user_name = email.split('@')[0];
+            }
+
+
+            if (type === 'create') {
+                await vetService.createEmployee(employeeData);
+                setError("Empleado creado correctamente");
+            } else {
+                if (!selectedEmployeeId) {
+                    setError("Por favor, busca y selecciona un empleado para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateEmployee(selectedEmployeeId, employeeData);
+                setError("Empleado actualizado correctamente");
+            }
             setShowToast(true);
-        } catch (err) {
-            setError("Error al procesar la solicitud");
+            setTimeout(() => navigate('/listado-empleados'), 1500);
+        } catch (err: any) {
+            setError(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);
@@ -99,66 +176,109 @@ const Employee: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar empleado por Nombre o DNI..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredEmployees.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredEmployees.map(emp => (
+                                <div 
+                                    key={emp.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectEmployee(emp)}
+                                >
+                                    <span className="employee-name">{emp.first_name} {emp.last_name}</span>
+                                    <span className="employee-detail">DNI: {emp.dni} | Tel: {emp.phone_number}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>
 
                 <div className="employee-form">
-                    <div className="form-group">
-                        <label>DNI</label>
-                        {touched.dni && !validateDNI(dni) && (
-                            <div className="field-error-message">DNI no válido (8 números y letra)</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.dni && !validateDNI(dni) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar DNI"
-                            value={dni}
-                            onChange={(e) => setDni(e.target.value)}
-                            onBlur={() => markTouched('dni')}
-                        />
-                    </div>
+                    <div className="form-grid">
+                        <div className="form-group">
+                            <label>DNI</label>
+                            {touched.dni && !validateDNI(dni) && (
+                                <div className="field-error-message">DNI no válido (8 números y letra)</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.dni && !validateDNI(dni) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar DNI"
+                                value={dni}
+                                onChange={(e) => setDni(e.target.value)}
+                                onBlur={() => markTouched('dni')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>Nombre</label>
-                        {touched.name && !name && (
-                            <div className="field-error-message">El nombre es obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.name && !name ? 'input-invalid' : ''}`}
-                            placeholder="Insertar nombre"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            onBlur={() => markTouched('name')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Nombre</label>
+                            {touched.name && !name && (
+                                <div className="field-error-message">El nombre es obligatorio</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.name && !name ? 'input-invalid' : ''}`}
+                                placeholder="Insertar nombre"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                onBlur={() => markTouched('name')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>Telefono</label>
-                        {touched.phone && !validatePhone(phone) && (
-                            <div className="field-error-message">Teléfono no válido (9 dígitos)</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.phone && !validatePhone(phone) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Telefono"
-                            value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
-                            onBlur={() => markTouched('phone')}
-                        />
-                    </div>
+                        <div className="form-group">
+                            <label>Telefono</label>
+                            {touched.phone && !validatePhone(phone) && (
+                                <div className="field-error-message">Teléfono no válido (9 dígitos)</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.phone && !validatePhone(phone) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar Telefono"
+                                value={phone}
+                                onChange={(e) => setPhone(e.target.value)}
+                                onBlur={() => markTouched('phone')}
+                            />
+                        </div>
 
-                    <div className="form-group">
-                        <label>Sueldo</label>
-                        {touched.salary && !validateSalary(salary) && (
-                            <div className="field-error-message">Sueldo debe ser un número positivo</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.salary && !validateSalary(salary) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Sueldo"
-                            value={salary}
-                            onChange={(e) => setSalary(e.target.value)}
-                            onBlur={() => markTouched('salary')}
-                        />
+                        <div className="form-group">
+                            <label>Sueldo</label>
+                            {touched.salary && !validateSalary(salary) && (
+                                <div className="field-error-message">Sueldo debe ser un número positivo</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.salary && !validateSalary(salary) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar Sueldo"
+                                value={salary}
+                                onChange={(e) => setSalary(e.target.value)}
+                                onBlur={() => markTouched('salary')}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Email</label>
+                            {touched.email && !validateEmail(email) && (
+                                <div className="field-error-message">Introduce un email válido</div>
+                            )}
+                            <input
+                                className={`custom-input ${touched.email && !validateEmail(email) ? 'input-invalid' : ''}`}
+                                placeholder="Insertar Email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                onBlur={() => markTouched('email')}
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Rol</label>
+                            <RoleSelect
+                                value={role}
+                                onChange={(newRole) => setRole(newRole)}
+                            />
+                        </div>
                     </div>
 
                     <div className="form-actions">

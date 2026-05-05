@@ -3,10 +3,20 @@ import { IonIcon, IonSearchbar } from '@ionic/react';
 import { notificationsOutline } from 'ionicons/icons';
 import UserMenu from './UserMenu';
 import Breadcrumbs from './Breadcrumbs';
+import { authService, UserProfile } from '../services/authService';
 import '../theme/css/TopBar.css';
 
 const TopBar: React.FC = () => {
     const [showUserMenu, setShowUserMenu] = React.useState(false);
+    const [profile, setProfile] = React.useState<UserProfile | null>(null);
+
+    React.useEffect(() => {
+        const fetchProfile = async () => {
+            const up = await authService.getUserProfile();
+            setProfile(up);
+        };
+        fetchProfile();
+    }, []);
 
     return (
         <div className="top-bar-container">
@@ -19,10 +29,7 @@ const TopBar: React.FC = () => {
             </div>
 
             <div className="top-bar-right">
-                <IonSearchbar
-                    placeholder="Search or type a command (Ctrl + G)"
-                    className="custom-search-bar"
-                />
+                {/* Search bar removed as requested */}
 
                 <div className="notification-button">
                     <IonIcon icon={notificationsOutline} className="notification-icon" />
@@ -34,13 +41,13 @@ const TopBar: React.FC = () => {
                     onClick={() => setShowUserMenu(!showUserMenu)}
                 >
                     <div className="user-avatar">
-                        P
+                        {profile ? profile.first_name.charAt(0).toUpperCase() : 'U'}
                     </div>
-                    <span className="user-name">Raul</span>
+                    <span className="user-name">{profile ? profile.first_name : 'Cargando...'}</span>
                 </div>
 
                 {showUserMenu && (
-                    <UserMenu onClose={() => setShowUserMenu(false)} />
+                    <UserMenu profile={profile} onClose={() => setShowUserMenu(false)} />
                 )}
             </div>
         </div>

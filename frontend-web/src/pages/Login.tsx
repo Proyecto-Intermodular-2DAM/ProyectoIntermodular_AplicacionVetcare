@@ -78,18 +78,20 @@ const Login: React.FC = () => {
         setLoading(true);
 
         try {
-            const { error: authError } = await authService.signIn(email, pass);
+            await authService.signIn(email, pass);
+            const profile = await authService.getUserProfile();
 
-            if (authError) {
-                setError("Credenciales inválidas. Por favor, revisa tu email y contraseña.");
+            if (profile && profile.role === 'Cliente') {
+                await authService.signOut();
+                setError("Acceso denegado. Los clientes deben usar la aplicación móvil.");
                 setShowToast(true);
                 setLoading(false);
                 return;
             }
 
             navigate("/home");
-        } catch (err) {
-            setError("Error inesperado al iniciar sesión");
+        } catch (err: any) {
+            setError(err.message || "Error inesperado al iniciar sesión");
             setShowToast(true);
         } finally {
             setLoading(false);

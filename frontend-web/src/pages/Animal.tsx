@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Animal.css';
 
 const Animal: React.FC = () => {
@@ -12,16 +13,61 @@ const Animal: React.FC = () => {
     const [dniCliente, setDniCliente] = useState<string>("");
     const [nombre, setNombre] = useState<string>("");
     const [especie, setEspecie] = useState<string>("");
-    const [estado, setEstado] = useState<string>("");
-    const [codigoEdad, setCodigoEdad] = useState<string>("");
-    const [sexo, setSexo] = useState<string>("");
-    const [descripcion, setDescripcion] = useState<string>("");
+    const [estado, setEstado] = useState<string>("INTAKE");
     const [foto, setFoto] = useState<string>("");
+    const [idCentro, setIdCentro] = useState<string>("");
+    
+    const [centers, setCenters] = useState<any[]>([]);
+    const [clients, setClients] = useState<any[]>([]);
+
+    const [animals, setAnimals] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedAnimalId, setSelectedAnimalId] = useState<string | null>(null);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
-    const [showToast, setShowToast] = useState<boolean>(false);
+    const [showToast, setShowToast] = useState<boolean>(false); 
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [animalsData, centersData, clientsData] = await Promise.all([
+                    vetService.getAnimals(),
+                    vetService.getCenters(),
+                    vetService.getClients()
+                ]);
+                setAnimals(animalsData || []);
+                setCenters(centersData || []);
+                setClients(clientsData || []);
+                if (centersData?.length > 0 && !idCentro) {
+                    setIdCentro(centersData[0].id);
+                }
+            } catch (err: any) {
+                console.error("Error loading data", err);
+            }
+        };
+        fetchData();
+    }, []);
+
+    const handleSelectAnimal = (animal: any) => {
+        setDniCliente(animal.client?.dni || "");
+        setNombre(animal.name || "");
+        setEspecie(animal.species || "");
+        setEstado(animal.status || "INTAKE");
+        setFoto(animal.animal_image || "");
+        setIdCentro(animal.center_id || "");
+        setSelectedAnimalId(animal.id);
+        setSearchTerm("");
+    };
+
+    const filteredAnimals = searchTerm.length > 0
+        ? animals.filter(animal => 
+            animal.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            animal.species?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            animal.id?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -43,15 +89,13 @@ const Animal: React.FC = () => {
             nombre: true,
             especie: true,
             estado: true,
-            codigoEdad: true,
-            sexo: true,
-            descripcion: true,
-            foto: true
+            foto: true,
+            idCentro: true
         };
         setTouched(allTouched);
 
-        if (!dniCliente || !nombre || !especie || !estado || !codigoEdad || !sexo || !descripcion || !foto) {
-            setMessage("Por favor, completa todos los campos obligatorios");
+        if (!dniCliente || !nombre || !especie || !estado || !idCentro) {
+            setMessage("Por favor, completa los campos principales");
             setShowToast(true);
             return;
         }
@@ -64,17 +108,41 @@ const Animal: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} animal:`, {
-                dniCliente, nombre, especie, estado, codigoEdad, sexo, descripcion, foto
-            });
+            // Find client ID from DNI
+            const client = clients.find(c => c.dni.toUpperCase() === dniCliente.toUpperCase());
+            if (!client) {
+                setMessage("No se encontró ningún cliente con ese DNI");
+                setShowToast(true);
+                setLoading(false);
+                return;
+            }
 
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            const animalData = {
+                client_id: client.id,
+                center_id: idCentro,
+                name: nombre,
+                species: especie,
+                status: estado,
+                animal_image: foto
+            };
 
-            setMessage(`Animal ${type === 'create' ? 'creado' : 'actualizado'} correctamente`);
+            if (type === 'create') {
+                await vetService.createAnimal(animalData);
+                setMessage("Animal creado correctamente");
+            } else {
+                if (!selectedAnimalId) {
+                    setMessage("Por favor, busca y selecciona un animal para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateAnimal(selectedAnimalId, animalData);
+                setMessage("Animal actualizado correctamente");
+            }
             setShowToast(true);
-        } catch (err) {
-            setMessage("Error al procesar la solicitud");
+            if (type === 'create') setTimeout(() => navigate('/listado-animales'), 1500);
+        } catch (err: any) {
+            setMessage(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);
@@ -96,13 +164,31 @@ const Animal: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar animal por nombre, especie o ID..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredAnimals.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredAnimals.map(animal => (
+                                <div 
+                                    key={animal.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectAnimal(animal)}
+                                >
+                                    <span className="employee-name">{animal.name}</span>
+                                    <span className="employee-detail">{animal.species} | DNI: {animal.client?.dni || 'Global'}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>
 
                 <div className="animal-form">
-                    {/* Left Column */}
                     <div className="form-group">
                         <label>DNI Cliente</label>
                         {touched.dniCliente && !validateDNI(dniCliente) && (
@@ -110,31 +196,15 @@ const Animal: React.FC = () => {
                         )}
                         <input
                             className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Codigo"
+                            placeholder="Insertar DNI del Dueño"
                             value={dniCliente}
                             onChange={(e) => setDniCliente(e.target.value)}
                             onBlur={() => markTouched('dniCliente')}
                         />
                     </div>
 
-                    {/* Right Column */}
                     <div className="form-group">
-                        <label>Codigo Edad</label>
-                        {touched.codigoEdad && !codigoEdad && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.codigoEdad && !codigoEdad ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Edad"
-                            value={codigoEdad}
-                            onChange={(e) => setCodigoEdad(e.target.value)}
-                            onBlur={() => markTouched('codigoEdad')}
-                        />
-                    </div>
-
-                    {/* Left Column */}
-                    <div className="form-group">
-                        <label>Nombre</label>
+                        <label>Nombre del Animal</label>
                         {touched.nombre && !nombre && (
                             <div className="field-error-message">Campo obligatorio</div>
                         )}
@@ -147,22 +217,6 @@ const Animal: React.FC = () => {
                         />
                     </div>
 
-                    {/* Right Column */}
-                    <div className="form-group">
-                        <label>Sexo</label>
-                        {touched.sexo && !sexo && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.sexo && !sexo ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Sexo"
-                            value={sexo}
-                            onChange={(e) => setSexo(e.target.value)}
-                            onBlur={() => markTouched('sexo')}
-                        />
-                    </div>
-
-                    {/* Left Column */}
                     <div className="form-group">
                         <label>Especie</label>
                         {touched.especie && !especie && (
@@ -170,55 +224,50 @@ const Animal: React.FC = () => {
                         )}
                         <input
                             className={`custom-input ${touched.especie && !especie ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Especie"
+                            placeholder="Ej: Perro, Gato..."
                             value={especie}
                             onChange={(e) => setEspecie(e.target.value)}
                             onBlur={() => markTouched('especie')}
                         />
                     </div>
 
-                    {/* Right Column */}
-                    <div className="form-group">
-                        <label>Descripcion</label>
-                        {touched.descripcion && !descripcion && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.descripcion && !descripcion ? 'input-invalid' : ''}`}
-                            placeholder="Insertar descripcion"
-                            value={descripcion}
-                            onChange={(e) => setDescripcion(e.target.value)}
-                            onBlur={() => markTouched('descripcion')}
-                        />
-                    </div>
-
-                    {/* Left Column */}
                     <div className="form-group">
                         <label>Estado</label>
-                        {touched.estado && !estado && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
-                        <input
-                            className={`custom-input ${touched.estado && !estado ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Estado"
+                        <select
+                            className="custom-input"
                             value={estado}
                             onChange={(e) => setEstado(e.target.value)}
-                            onBlur={() => markTouched('estado')}
-                        />
+                        >
+                            <option value="INTAKE">Ingreso</option>
+                            <option value="IN_TREATMENT">En Tratamiento</option>
+                            <option value="READY_FOR_ADOPTION">Listo para Adopción</option>
+                            <option value="RESERVED">Reservado</option>
+                            <option value="ADOPTED">Adoptado</option>
+                        </select>
                     </div>
 
-                    {/* Right Column */}
                     <div className="form-group">
-                        <label>foto</label>
-                        {touched.foto && !foto && (
-                            <div className="field-error-message">Campo obligatorio</div>
-                        )}
+                        <label>Centro</label>
+                        <select
+                            className="custom-input"
+                            value={idCentro}
+                            onChange={(e) => setIdCentro(e.target.value)}
+                        >
+                            {centers.map(center => (
+                                <option key={center.id} value={center.id}>
+                                    {center.name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div className="form-group">
+                        <label>Foto (URL)</label>
                         <input
-                            className={`custom-input ${touched.foto && !foto ? 'input-invalid' : ''}`}
-                            placeholder="Insertar foto"
+                            className="custom-input"
+                            placeholder="Insertar URL de la foto"
                             value={foto}
                             onChange={(e) => setFoto(e.target.value)}
-                            onBlur={() => markTouched('foto')}
                         />
                     </div>
 

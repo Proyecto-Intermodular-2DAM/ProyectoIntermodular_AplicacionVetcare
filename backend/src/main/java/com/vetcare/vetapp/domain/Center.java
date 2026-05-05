@@ -1,4 +1,4 @@
-package com.vetcare.vetapp.model;
+package com.vetcare.vetapp.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -6,6 +6,7 @@ import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,8 +32,18 @@ public class Center {
     private String postcode;
 
     @Column(name = "center_type", nullable = false)
-    @ColumnDefault( "'CLINIC'")
+    @ColumnDefault("'CLINIC'")
     private CenterType type;
+
+    @Column(name = "is_active", nullable = false)
+    @ColumnDefault("true")
+    private boolean isActive;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private UUID deletedBy;
 
     @OneToMany(mappedBy = "center", cascade = CascadeType.ALL)
     @JsonIgnore

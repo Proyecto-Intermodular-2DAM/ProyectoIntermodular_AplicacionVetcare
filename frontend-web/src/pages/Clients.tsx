@@ -3,6 +3,7 @@ import MainLayout from '../components/MainLayout';
 import { IonIcon, IonToast } from '@ionic/react';
 import { searchOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
+import { vetService } from '../services/vetService';
 import '../theme/css/Clients.css';
 
 const Clients: React.FC = () => {
@@ -10,14 +11,49 @@ const Clients: React.FC = () => {
 
     // State for form fields as per image
     const [dniCliente, setDniCliente] = useState<string>("");
-    const [nombreCliente, setNombreCliente] = useState<string>("");
+    const [firstName, setFirstName] = useState<string>("");
+    const [lastName, setLastName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [telefono, setTelefono] = useState<string>("");
+
+    const [clients, setClients] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    const [selectedClientId, setSelectedClientId] = useState<string | null>(null);
 
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
     const [showToast, setShowToast] = useState<boolean>(false);
     const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+    React.useEffect(() => {
+        const fetchClients = async () => {
+            try {
+                const data = await vetService.getClients();
+                setClients(data || []);
+            } catch (err: any) {
+                console.error("Error loading clients", err);
+            }
+        };
+        fetchClients();
+    }, []);
+
+    const handleSelectClient = (client: any) => {
+        setDniCliente(client.dni || "");
+        setFirstName(client.first_name || "");
+        setLastName(client.last_name || "");
+        setEmail(client.email || "");
+        setTelefono(client.phone_number || "");
+        setSelectedClientId(client.id);
+        setSearchTerm("");
+    };
+
+    const filteredClients = searchTerm.length > 0
+        ? clients.filter(c => 
+            c.dni?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            `${c.first_name} ${c.last_name}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            c.email?.toLowerCase().includes(searchTerm.toLowerCase())
+          ).slice(0, 5)
+        : [];
 
     const markTouched = (field: string) => {
         setTouched(prev => ({ ...prev, [field]: true }));
@@ -42,10 +78,10 @@ const Clients: React.FC = () => {
 
     const handleAction = async (type: 'create' | 'update') => {
         setMessage("");
-        const allTouched = { dniCliente: true, nombreCliente: true, email: true, telefono: true };
+        const allTouched = { dniCliente: true, firstName: true, email: true, telefono: true };
         setTouched(allTouched);
 
-        if (!dniCliente || !nombreCliente || !email || !telefono) {
+        if (!dniCliente || !firstName || !email || !telefono) {
             setMessage("Por favor, completa todos los campos obligatorios");
             setShowToast(true);
             return;
@@ -71,16 +107,36 @@ const Clients: React.FC = () => {
 
         setLoading(true);
         try {
-            console.log(`${type === 'create' ? 'Creando' : 'Actualizando'} cliente:`, {
-                dniCliente, nombreCliente, email, telefono
-            });
+            const clientData: any = {
+                dni: dniCliente,
+                first_name: firstName,
+                last_name: lastName,
+                email: email,
+                phone_number: telefono,
+                role: 'CLIENT'
+            };
 
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (type === 'create') {
+                clientData.user_name = email.split('@')[0];
+            }
 
-            setMessage(`Cliente ${type === 'create' ? 'creado' : 'actualizado'} correctamente`);
+            if (type === 'create') {
+                await vetService.createClient(clientData);
+                setMessage("Cliente creado correctamente");
+            } else {
+                if (!selectedClientId) {
+                    setMessage("Por favor, busca y selecciona un cliente para actualizar");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                await vetService.updateClient(selectedClientId, clientData);
+                setMessage("Cliente actualizado correctamente");
+            }
             setShowToast(true);
-        } catch (err) {
-            setMessage("Error al procesar la solicitud");
+            if (type === 'create') setTimeout(() => navigate('/listado-clientes'), 1500);
+        } catch (err: any) {
+            setMessage(err.userMessage || "Error al procesar la solicitud");
             setShowToast(true);
         } finally {
             setLoading(false);
@@ -102,15 +158,33 @@ const Clients: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input type="text" placeholder="Buscar" />
+                    <input 
+                        type="text" 
+                        placeholder="Buscar cliente por DNI, nombre o email..." 
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                    {filteredClients.length > 0 && (
+                        <div className="search-results-dropdown">
+                            {filteredClients.map(client => (
+                                <div 
+                                    key={client.id} 
+                                    className="search-result-item"
+                                    onClick={() => handleSelectClient(client)}
+                                >
+                                    <span className="employee-name">{client.first_name} {client.last_name}</span>
+                                    <span className="employee-detail">DNI: {client.dni} | Email: {client.email}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="divider"></div>
 
                 <div className="clients-form">
-                    {/* Row 1 */}
                     <div className="form-group">
-                        <label>DNi Cliente</label>
+                        <label>DNI Cliente</label>
                         {touched.dniCliente && !validateDNI(dniCliente) && (
                             <div className="field-error-message">DNI no válido (8 números y letra)</div>
                         )}
@@ -122,6 +196,7 @@ const Clients: React.FC = () => {
                             onBlur={() => markTouched('dniCliente')}
                         />
                     </div>
+
                     <div className="form-group">
                         <label>Telefono</label>
                         {touched.telefono && !validatePhone(telefono) && (
@@ -136,26 +211,30 @@ const Clients: React.FC = () => {
                         />
                     </div>
 
-                    {/* Row 2 */}
                     <div className="form-group">
-                        <label>Nombre Cliente</label>
-                        {touched.nombreCliente && !nombreCliente && (
+                        <label>Nombre</label>
+                        {touched.firstName && !firstName && (
                             <div className="field-error-message">El nombre es obligatorio</div>
                         )}
                         <input
-                            className={`custom-input ${touched.nombreCliente && !nombreCliente ? 'input-invalid' : ''}`}
-                            placeholder="Insertar Nombre Cliente"
-                            value={nombreCliente}
-                            onChange={(e) => setNombreCliente(e.target.value)}
-                            onBlur={() => markTouched('nombreCliente')}
+                            className={`custom-input ${touched.firstName && !firstName ? 'input-invalid' : ''}`}
+                            placeholder="Insertar Nombre"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            onBlur={() => markTouched('firstName')}
                         />
                     </div>
-                    {/* Empty placeholder field on the right as per image */}
+
                     <div className="form-group">
-                        <div className="custom-input" style={{ visibility: 'hidden' }}></div>
+                        <label>Apellidos</label>
+                        <input
+                            className="custom-input"
+                            placeholder="Insertar Apellidos"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                        />
                     </div>
 
-                    {/* Row 3 */}
                     <div className="form-group">
                         <label>Email</label>
                         {touched.email && !validateEmail(email) && (
@@ -169,12 +248,6 @@ const Clients: React.FC = () => {
                             onBlur={() => markTouched('email')}
                         />
                     </div>
-                    <div></div>
-
-                    {/* Submit row as bottom spacer/extra field as seen in mockup */}
-                    <div className="form-group" style={{ gridColumn: 'span 1', marginTop: '20px' }}>
-                        <div className="custom-input" style={{ visibility: 'hidden' }}></div>
-                    </div>
 
                     <div className="form-actions">
                         <button
@@ -182,14 +255,14 @@ const Clients: React.FC = () => {
                             onClick={() => handleAction('create')}
                             disabled={loading}
                         >
-                            {loading ? "Procesando..." : "Crear Clientes"}
+                            {loading ? "Procesando..." : "Crear Cliente"}
                         </button>
                         <button
                             className="btn-action"
                             onClick={() => handleAction('update')}
                             disabled={loading}
                         >
-                            {loading ? "Procesando..." : "Actualizar Clientes"}
+                            {loading ? "Procesando..." : "Actualizar Cliente"}
                         </button>
                     </div>
                 </div>

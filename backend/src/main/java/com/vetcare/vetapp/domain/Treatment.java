@@ -1,10 +1,12 @@
-package com.vetcare.vetapp.model;
+package com.vetcare.vetapp.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -25,6 +27,16 @@ public class Treatment {
 
     @Column(name = "dosage")
     private String dosage;
+
+    @Column(name = "is_active", nullable = false)
+    @ColumnDefault("true")
+    private boolean isActive;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "deleted_by")
+    private UUID deletedBy;
 
     @ManyToOne
     @JoinColumn(name = "appointment_id", nullable = false)
