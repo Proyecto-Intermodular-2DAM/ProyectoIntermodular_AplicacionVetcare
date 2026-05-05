@@ -81,9 +81,9 @@ const ListRooms: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input 
-                                type="text" 
-                                placeholder="Buscar sala (Nombre...)" 
+                            <input
+                                type="text"
+                                placeholder="Buscar sala (Nombre...)"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -106,17 +106,17 @@ const ListRooms: React.FC = () => {
                                 const s = searchTerm.toLowerCase();
                                 return (
                                     room.name?.toLowerCase().includes(s) ||
-                                    room.center_code?.toLowerCase().includes(s) ||
+                                    (room.center?.postcode || 'global').toLowerCase().includes(s) ||
                                     room.size_m2?.toString().toLowerCase().includes(s)
                                 );
                             })
                             .map((room, index) => (
                                 <tr key={index}>
                                     <td className="col-nombre">{room.name}</td>
-                                    <td className="col-centro">{room.center_code}</td>
+                                    <td className="col-centro">{room.center?.postcode || 'N/A'}</td>
                                     <td className="col-dni">{room.size_m2} m²</td>
                                     <td className="col-id">
-                                        <button 
+                                        <button
                                             className="btn-eliminar-small"
                                             onClick={() => handleDelete(room.id)}
                                         >

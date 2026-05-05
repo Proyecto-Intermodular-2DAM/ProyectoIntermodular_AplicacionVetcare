@@ -4,7 +4,7 @@ export const vetService = {
     // Employees (All users who are not CLIENT)
     async getEmployees() {
         const response = await apiClient.get('/users', {
-            params: { 
+            params: {
                 role: 'neq.CLIENT',
                 select: '*'
             }
@@ -72,7 +72,7 @@ export const vetService = {
 
     // Animals
     async getAnimals() {
-        const { data } = await apiClient.get('/animal?select=*,client:client_id(first_name,last_name,dni)');
+        const { data } = await apiClient.get('/animal?select=*,client:client_id(first_name,last_name,dni),center:center_id(name,postcode)');
         return data;
     },
     async createAnimal(data: any) {
@@ -91,7 +91,7 @@ export const vetService = {
 
     // Rooms
     async getRooms() {
-        const { data } = await apiClient.get('/rooms');
+        const { data } = await apiClient.get('/rooms?select=*,center:center_id(name,postcode)');
         return data;
     },
     async createRoom(data: any) {

@@ -112,7 +112,7 @@ const ListAnimal: React.FC = () => {
                                     animal.species?.toLowerCase().includes(s) ||
                                     `${animal.client?.first_name} ${animal.client?.last_name}`.toLowerCase().includes(s) ||
                                     animal.id?.toLowerCase().includes(s) ||
-                                    (animal.center_id || 'global').toLowerCase().includes(s) ||
+                                    (animal.center?.postcode || 'global').toLowerCase().includes(s) ||
                                     animal.status?.toLowerCase().includes(s)
                                 );
                             })
@@ -120,7 +120,7 @@ const ListAnimal: React.FC = () => {
                                 <tr key={animal.id}>
                                     <td className="col-no">{animal.id.substring(0, 8)}</td>
                                     <td className="col-dni">{animal.client?.first_name} {animal.client?.last_name}</td>
-                                    <td className="col-centro">{animal.center_id || 'Global'}</td>
+                                    <td className="col-centro">{animal.center?.postcode || 'Global'}</td>
                                     <td className="col-nombre"><strong>{animal.name}</strong></td>
                                     <td className="col-especie">{animal.species}</td>
                                     <td className="col-foto">{animal.status}</td>
