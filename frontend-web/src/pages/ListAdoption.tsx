@@ -29,6 +29,20 @@ const ListAdoption: React.FC = () => {
         fetchAdoptions();
     }, []);
 
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar este registro de adopción?")) return;
+
+        try {
+            await vetService.deleteAdoption(id);
+            setAdoptions(adoptions.filter(ad => ad.id !== id));
+            setToastMessage("Registro de adopción eliminado correctamente");
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage("Error al eliminar el registro");
+            setShowToast(true);
+        }
+    };
+
     if (loading) {
         return <IonLoading isOpen={true} message="Cargando historial..." />;
     }
@@ -86,6 +100,7 @@ const ListAdoption: React.FC = () => {
                             <th className="col-id-animal">Id Animal</th>
                             <th className="col-fecha">Fecha</th>
                             <th className="col-comentario">Comentario</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,6 +124,14 @@ const ListAdoption: React.FC = () => {
                                     <td className="col-id-animal"><strong>{ad.animal_id.substring(0, 8)}</strong></td>
                                     <td className="col-fecha"><strong>{new Date(ad.adoption_date).toLocaleDateString()}</strong></td>
                                     <td className="col-comentario">{ad.comments}</td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(ad.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                     </tbody>
@@ -119,7 +142,7 @@ const ListAdoption: React.FC = () => {
                 onDidDismiss={() => setShowToast(false)}
                 message={toastMessage}
                 duration={3000}
-                color="danger"
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
                 position="top"
             />
         </MainLayout>

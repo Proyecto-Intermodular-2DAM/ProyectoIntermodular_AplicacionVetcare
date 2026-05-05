@@ -29,6 +29,20 @@ const ListClients: React.FC = () => {
         fetchClients();
     }, []);
 
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar este cliente?")) return;
+
+        try {
+            await vetService.deleteEmployee(id); // Use deleteEmployee as it targets the /users table
+            setClients(clients.filter(c => c.id !== id));
+            setToastMessage("Cliente eliminado correctamente");
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage("Error al eliminar el cliente");
+            setShowToast(true);
+        }
+    };
+
     if (loading) {
         return <IonLoading isOpen={true} message="Cargando clientes..." />;
     }
@@ -86,6 +100,7 @@ const ListClients: React.FC = () => {
                             <th className="col-email">Email</th>
                             <th className="col-fecha">Fecha</th>
                             <th className="col-tel">Telefono</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,6 +124,14 @@ const ListClients: React.FC = () => {
                                     <td className="col-email"><strong>{c.email}</strong></td>
                                     <td className="col-fecha"><strong>{new Date(c.created_at).toLocaleDateString()}</strong></td>
                                     <td className="col-tel"><strong>{c.phone_number}</strong></td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(c.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                     </tbody>
@@ -119,7 +142,7 @@ const ListClients: React.FC = () => {
                 onDidDismiss={() => setShowToast(false)}
                 message={toastMessage}
                 duration={3000}
-                color="danger"
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
                 position="top"
             />
         </MainLayout>

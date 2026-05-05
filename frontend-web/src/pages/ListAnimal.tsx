@@ -29,6 +29,20 @@ const ListAnimal: React.FC = () => {
         fetchAnimals();
     }, []);
 
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar este animal?")) return;
+
+        try {
+            await vetService.deleteAnimal(id);
+            setAnimals(animals.filter(a => a.id !== id));
+            setToastMessage("Animal eliminado correctamente");
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage("Error al eliminar el animal");
+            setShowToast(true);
+        }
+    };
+
     if (loading) {
         return <IonLoading isOpen={true} message="Cargando animales..." />;
     }
@@ -86,6 +100,7 @@ const ListAnimal: React.FC = () => {
                             <th className="col-nombre">Nombre</th>
                             <th className="col-especie">Especie</th>
                             <th className="col-foto">Estado</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,6 +124,14 @@ const ListAnimal: React.FC = () => {
                                     <td className="col-nombre"><strong>{animal.name}</strong></td>
                                     <td className="col-especie">{animal.species}</td>
                                     <td className="col-foto">{animal.status}</td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(animal.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                     </tbody>
@@ -119,7 +142,7 @@ const ListAnimal: React.FC = () => {
                 onDidDismiss={() => setShowToast(false)}
                 message={toastMessage}
                 duration={3000}
-                color="danger"
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
                 position="top"
             />
         </MainLayout>

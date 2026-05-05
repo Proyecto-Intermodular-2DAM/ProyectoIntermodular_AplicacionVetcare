@@ -44,7 +44,7 @@ export const vetService = {
     // Appointments
     async getAppointments() {
         const response = await apiClient.get('/appointments', {
-            params: { select: '*,animal:animal_id(name),client:client_id(first_name,last_name)' }
+            params: { select: '*,animal:animal_id(name),client:client_id(first_name,last_name,dni)' }
         });
         return response.data;
     },
@@ -64,10 +64,15 @@ export const vetService = {
         const response = await apiClient.post('/centers', data);
         return response.data;
     },
+    async deleteCenter(id: string) {
+        await apiClient.delete('/centers', {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Animals
     async getAnimals() {
-        const { data } = await apiClient.get('/animal?select=*,client:client_id(first_name,last_name)');
+        const { data } = await apiClient.get('/animal?select=*,client:client_id(first_name,last_name,dni)');
         return data;
     },
     async createAnimal(data: any) {
@@ -75,6 +80,11 @@ export const vetService = {
     },
     async updateAnimal(id: string, data: any) {
         return await apiClient.patch('/animal', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
+    async deleteAnimal(id: string) {
+        await apiClient.delete('/animal', {
             params: { id: `eq.${id}` }
         });
     },
@@ -92,6 +102,11 @@ export const vetService = {
             params: { id: `eq.${id}` }
         });
     },
+    async deleteRoom(id: string) {
+        await apiClient.delete('/rooms', {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Treatments
     async getTreatments() {
@@ -106,6 +121,11 @@ export const vetService = {
             params: { id: `eq.${id}` }
         });
     },
+    async deleteTreatment(id: string) {
+        await apiClient.delete('/treatments', {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Adoption History
     async getAdoptionHistory() {
@@ -117,6 +137,11 @@ export const vetService = {
     },
     async updateAdoption(id: string, data: any) {
         return await apiClient.patch('/adoption_history', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
+    async deleteAdoption(id: string) {
+        await apiClient.delete('/adoption_history', {
             params: { id: `eq.${id}` }
         });
     },
