@@ -98,6 +98,7 @@ const ListAdoption: React.FC = () => {
                             <th className="col-dni">DNI Cliente</th>
                             <th className="col-nombre">Nombre Animal</th>
                             <th className="col-id-animal">Id Animal</th>
+                            <th className="col-fecha">Estado Animal</th>
                             <th className="col-fecha">Fecha</th>
                             <th className="col-comentario">Comentario</th>
                             <th className="col-id">Acciones</th>
@@ -122,7 +123,8 @@ const ListAdoption: React.FC = () => {
                                     <td className="col-dni">{ad.client?.dni || 'N/A'}</td>
                                     <td className="col-nombre">{ad.animal?.name || 'N/A'}</td>
                                     <td className="col-id-animal"><strong>{ad.animal_id.substring(0, 8)}</strong></td>
-                                    <td className="col-fecha"><strong>{new Date(ad.adoption_date).toLocaleDateString()}</strong></td>
+                                    <td className="col-fecha">{ad.animal?.status || 'N/A'}</td>
+                                    <td className="col-fecha"><strong>{new Date(ad.adoption_date || ad.date).toLocaleDateString()}</strong></td>
                                     <td className="col-comentario">{ad.comments}</td>
                                     <td className="col-id">
                                         <button 

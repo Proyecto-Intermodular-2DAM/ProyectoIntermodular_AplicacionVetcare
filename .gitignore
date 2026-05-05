@@ -7,20 +7,39 @@ build/
 .DS_Store
 *.log
 *.tmp
+.vite/
+.nx/
 
-# --- Spring Boot ---
+# --- Spring Boot (Backend) ---
 backend/target/
 backend/build/
 backend/.gradle/
 backend/out/
 backend/.idea/
+backend/bin/
+**/*.class
+**/target/
+**/build/
+**/.gradle/
 
 # --- Environment / config ---
 .env
-.env.local
-.env.production
-.env.development
+.env.*
+!.env.example
 
 # --- OS / Editor ---
+.idea/
+.vscode/
 Thumbs.db
 *.iml
+*.iws
+*.ipr
+.project
+.classpath
+.factorypath
+.settings/
+
+# --- Others ---
+temp/
+tmp/
+backup/

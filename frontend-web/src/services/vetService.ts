@@ -129,7 +129,7 @@ export const vetService = {
 
     // Adoption History
     async getAdoptionHistory() {
-        const { data } = await apiClient.get('/adoption_history?select=*,animal:animal_id(name),client:adopter_id(dni)');
+        const { data } = await apiClient.get('/adoption_history?select=*,animal:animal_id(name,status),client:adopter_id(dni)');
         return data;
     },
     async createAdoption(data: any) {
