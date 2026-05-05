@@ -100,7 +100,7 @@ const Adoption: React.FC = () => {
             return;
         }
 
-        if (!validateDNI(dniCliente)) {
+        if (!validateDNI(dniAdopter)) {
             setMessage("El DNI introducido no es válido");
             setShowToast(true);
             return;
