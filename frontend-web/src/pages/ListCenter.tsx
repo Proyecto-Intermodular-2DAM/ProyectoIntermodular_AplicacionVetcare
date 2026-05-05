@@ -29,6 +29,20 @@ const ListCenter: React.FC = () => {
         fetchCenters();
     }, []);
 
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar este centro?")) return;
+
+        try {
+            await vetService.deleteCenter(id);
+            setCenters(centers.filter(c => c.id !== id));
+            setToastMessage("Centro eliminado correctamente");
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage("Error al eliminar el centro");
+            setShowToast(true);
+        }
+    };
+
     if (loading) {
         return <IonLoading isOpen={true} message="Cargando centros..." />;
     }
@@ -84,6 +98,7 @@ const ListCenter: React.FC = () => {
                             <th className="col-dni">Nombre</th>
                             <th className="col-nombre">Código Postal</th>
                             <th className="col-sueldo">Dirección</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -103,6 +118,14 @@ const ListCenter: React.FC = () => {
                                     <td className="col-dni">{center.name}</td>
                                     <td className="col-nombre">{center.postcode}</td>
                                     <td className="col-sueldo">{center.address}</td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(center.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                     </tbody>
@@ -113,7 +136,7 @@ const ListCenter: React.FC = () => {
                 onDidDismiss={() => setShowToast(false)}
                 message={toastMessage}
                 duration={3000}
-                color="danger"
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
                 position="top"
             />
         </MainLayout>

@@ -4,7 +4,7 @@ export const vetService = {
     // Employees (All users who are not CLIENT)
     async getEmployees() {
         const response = await apiClient.get('/users', {
-            params: { 
+            params: {
                 role: 'neq.CLIENT',
                 select: '*'
             }
@@ -44,7 +44,7 @@ export const vetService = {
     // Appointments
     async getAppointments() {
         const response = await apiClient.get('/appointments', {
-            params: { select: '*,animal:animal_id(name),client:client_id(first_name,last_name)' }
+            params: { select: '*,animal:animal_id(name),client:client_id(first_name,last_name,dni)' }
         });
         return response.data;
     },
@@ -64,10 +64,15 @@ export const vetService = {
         const response = await apiClient.post('/centers', data);
         return response.data;
     },
+    async deleteCenter(id: string) {
+        await apiClient.delete('/centers', {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Animals
     async getAnimals() {
-        const { data } = await apiClient.get('/animal?select=*,client:client_id(first_name,last_name)');
+        const { data } = await apiClient.get('/animal?select=*,client:client_id(first_name,last_name,dni),center:center_id(name,postcode)');
         return data;
     },
     async createAnimal(data: any) {
@@ -78,10 +83,15 @@ export const vetService = {
             params: { id: `eq.${id}` }
         });
     },
+    async deleteAnimal(id: string) {
+        await apiClient.delete('/animal', {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Rooms
     async getRooms() {
-        const { data } = await apiClient.get('/rooms');
+        const { data } = await apiClient.get('/rooms?select=*,center:center_id(name,postcode)');
         return data;
     },
     async createRoom(data: any) {
@@ -89,6 +99,11 @@ export const vetService = {
     },
     async updateRoom(id: string, data: any) {
         return await apiClient.patch('/rooms', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
+    async deleteRoom(id: string) {
+        await apiClient.delete('/rooms', {
             params: { id: `eq.${id}` }
         });
     },
@@ -106,10 +121,15 @@ export const vetService = {
             params: { id: `eq.${id}` }
         });
     },
+    async deleteTreatment(id: string) {
+        await apiClient.delete('/treatments', {
+            params: { id: `eq.${id}` }
+        });
+    },
 
     // Adoption History
     async getAdoptionHistory() {
-        const { data } = await apiClient.get('/adoption_history?select=*,animal:animal_id(name),client:adopter_id(dni)');
+        const { data } = await apiClient.get('/adoption_history?select=*,animal:animal_id(name,status),client:adopter_id(dni)');
         return data;
     },
     async createAdoption(data: any) {
@@ -117,6 +137,11 @@ export const vetService = {
     },
     async updateAdoption(id: string, data: any) {
         return await apiClient.patch('/adoption_history', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
+    async deleteAdoption(id: string) {
+        await apiClient.delete('/adoption_history', {
             params: { id: `eq.${id}` }
         });
     },
@@ -138,6 +163,11 @@ export const vetService = {
     // Appointments (Update was missing)
     async updateAppointment(id: string, data: any) {
         return await apiClient.patch('/appointments', data, {
+            params: { id: `eq.${id}` }
+        });
+    },
+    async deleteAppointment(id: string) {
+        await apiClient.delete('/appointments', {
             params: { id: `eq.${id}` }
         });
     },

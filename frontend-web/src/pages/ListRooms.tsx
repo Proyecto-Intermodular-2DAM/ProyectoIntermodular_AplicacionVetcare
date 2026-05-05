@@ -29,6 +29,20 @@ const ListRooms: React.FC = () => {
         fetchRooms();
     }, []);
 
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar esta sala?")) return;
+
+        try {
+            await vetService.deleteRoom(id);
+            setRooms(rooms.filter(r => r.id !== id));
+            setToastMessage("Sala eliminada correctamente");
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage("Error al eliminar la sala");
+            setShowToast(true);
+        }
+    };
+
     if (loading) {
         return <IonLoading isOpen={true} message="Cargando salas..." />;
     }
@@ -67,9 +81,9 @@ const ListRooms: React.FC = () => {
                     <div className="controls-right">
                         <div className="table-search-bar">
                             <IonIcon icon={searchOutline} style={{ marginRight: '8px', color: '#888' }} />
-                            <input 
-                                type="text" 
-                                placeholder="Buscar sala (Nombre...)" 
+                            <input
+                                type="text"
+                                placeholder="Buscar sala (Nombre...)"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
@@ -83,6 +97,7 @@ const ListRooms: React.FC = () => {
                             <th className="col-nombre">Nombre</th>
                             <th className="col-centro">Codigo Centro</th>
                             <th className="col-dni">Tamaño (m²)</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -91,15 +106,23 @@ const ListRooms: React.FC = () => {
                                 const s = searchTerm.toLowerCase();
                                 return (
                                     room.name?.toLowerCase().includes(s) ||
-                                    room.center_code?.toLowerCase().includes(s) ||
+                                    (room.center?.postcode || 'global').toLowerCase().includes(s) ||
                                     room.size_m2?.toString().toLowerCase().includes(s)
                                 );
                             })
                             .map((room, index) => (
                                 <tr key={index}>
                                     <td className="col-nombre">{room.name}</td>
-                                    <td className="col-centro">{room.center_code}</td>
+                                    <td className="col-centro">{room.center?.postcode || 'N/A'}</td>
                                     <td className="col-dni">{room.size_m2} m²</td>
+                                    <td className="col-id">
+                                        <button
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(room.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                     </tbody>
@@ -110,7 +133,7 @@ const ListRooms: React.FC = () => {
                 onDidDismiss={() => setShowToast(false)}
                 message={toastMessage}
                 duration={3000}
-                color="danger"
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
                 position="top"
             />
         </MainLayout>

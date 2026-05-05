@@ -23,6 +23,9 @@ const Treatment: React.FC = () => {
     const [treatments, setTreatments] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
     const [selectedTreatmentId, setSelectedTreatmentId] = useState<string | null>(null);
+    const [allClients, setAllClients] = useState<any[]>([]);
+    const [allAnimals, setAllAnimals] = useState<any[]>([]);
+    const [idAnimal, setIdAnimal] = useState<string>("");
 
     const [loading, setLoading] = useState<boolean>(false);
     const [message, setMessage] = useState<string>("");
@@ -32,14 +35,18 @@ const Treatment: React.FC = () => {
     React.useEffect(() => {
         const fetchData = async () => {
             try {
-                const [trData, aptData, empData] = await Promise.all([
+                const [trData, aptData, empData, clientData, animalData] = await Promise.all([
                     vetService.getTreatments(),
                     vetService.getAppointments(),
-                    vetService.getEmployees()
+                    vetService.getEmployees(),
+                    vetService.getClients(),
+                    vetService.getAnimals()
                 ]);
                 setTreatments(trData || []);
                 setAppointmentsList(aptData || []);
                 setEmployees(empData || []);
+                setAllClients(clientData || []);
+                setAllAnimals(animalData || []);
                 if (empData?.length > 0 && !idEmpleado) {
                     setIdEmpleado(empData[0].id);
                 }
@@ -50,8 +57,44 @@ const Treatment: React.FC = () => {
         fetchData();
     }, []);
 
+    // Auto-fill and animal filter logic
+    React.useEffect(() => {
+        if (dniCliente.length >= 8) {
+            const client = allClients.find(c => c.dni?.toUpperCase() === dniCliente.toUpperCase());
+            if (client) {
+                // Filter animals for this client
+                const clientAnimals = allAnimals.filter(a => a.client_id === client.id);
+                
+                // If current idAnimal is not in this client's animals, reset or auto-select
+                const currentAnimalValid = clientAnimals.some(a => a.id === idAnimal);
+                if (!currentAnimalValid) {
+                    if (clientAnimals.length === 1) {
+                        setIdAnimal(clientAnimals[0].id);
+                        setNombreAnimal(clientAnimals[0].name);
+                    } else {
+                        setIdAnimal("");
+                        setNombreAnimal("");
+                    }
+                }
+            } else {
+                setIdAnimal("");
+                setNombreAnimal("");
+            }
+        } else {
+            setIdAnimal("");
+            setNombreAnimal("");
+        }
+    }, [dniCliente, allClients, allAnimals]);
+
+    const getFilteredAnimals = () => {
+        const client = allClients.find(c => c.dni?.toUpperCase() === dniCliente.toUpperCase());
+        if (!client) return [];
+        return allAnimals.filter(a => a.client_id === client.id);
+    };
+
     const handleSelectTreatment = (treatment: any) => {
         setDniCliente(treatment.appointment?.client?.dni || "");
+        setIdAnimal(treatment.appointment?.animal_id || "");
         setNombreAnimal(treatment.appointment?.animal?.name || "");
         setDescripcion(treatment.description || "");
         setMedicamento(treatment.medication || "");
@@ -85,7 +128,7 @@ const Treatment: React.FC = () => {
     const handleAction = async (type: string) => {
         const allTouched = {
             dniCliente: true,
-            nombreAnimal: true,
+            idAnimal: true,
             medicamento: true,
             posologia: true,
             descripcion: true,
@@ -93,7 +136,7 @@ const Treatment: React.FC = () => {
         };
         setTouched(allTouched);
 
-        if (!dniCliente || !nombreAnimal || !medicamento || !posologia || !descripcion || !idEmpleado) {
+        if (!dniCliente || !idAnimal || !medicamento || !posologia || !descripcion || !idEmpleado) {
             setMessage("Por favor, completa todos los campos obligatorios");
             setShowToast(true);
             return;
@@ -110,7 +153,7 @@ const Treatment: React.FC = () => {
             // Find Appointment
             const appointment = appointmentsList.find(a => 
                 a.client?.dni.toUpperCase() === dniCliente.toUpperCase() &&
-                a.animal?.name.toLowerCase() === nombreAnimal.toLowerCase()
+                a.animal_id === idAnimal
             );
 
             if (!appointment) {
@@ -207,17 +250,25 @@ const Treatment: React.FC = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Nombre Animal</label>
-                            {touched.nombreAnimal && !nombreAnimal && (
+                            <label>Animal</label>
+                            {touched.idAnimal && !idAnimal && (
                                 <div className="field-error-message">Campo obligatorio</div>
                             )}
-                            <input
-                                className={`custom-input ${touched.nombreAnimal && !nombreAnimal ? 'input-invalid' : ''}`}
-                                placeholder="Nombre del animal"
-                                value={nombreAnimal}
-                                onChange={(e) => setNombreAnimal(e.target.value)}
-                                onBlur={() => markTouched('nombreAnimal')}
-                            />
+                            <select
+                                className={`custom-input ${touched.idAnimal && !idAnimal ? 'input-invalid' : ''}`}
+                                value={idAnimal}
+                                onChange={(e) => {
+                                    setIdAnimal(e.target.value);
+                                    const selected = allAnimals.find(a => a.id === e.target.value);
+                                    if (selected) setNombreAnimal(selected.name);
+                                }}
+                                onBlur={() => markTouched('idAnimal')}
+                            >
+                                <option value="">Seleccionar Animal</option>
+                                {getFilteredAnimals().map(a => (
+                                    <option key={a.id} value={a.id}>{a.name}</option>
+                                ))}
+                            </select>
                         </div>
 
                         <div className="form-group">

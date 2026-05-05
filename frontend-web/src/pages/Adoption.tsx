@@ -11,10 +11,10 @@ const Adoption: React.FC = () => {
 
     // State for form fields based on mockup
     const [dniAdopter, setDniAdopter] = useState<string>("");
+    const [idAnimal, setIdAnimal] = useState<string>("");
     const [nombreAnimal, setNombreAnimal] = useState<string>("");
-    const [idProcessedBy, setIdProcessedBy] = useState<string>("");
-    const [comments, setComments] = useState<string>("");
     const [adoptionDate, setAdoptionDate] = useState<string>(new Date().toISOString().split('T')[0]);
+    const [statusAnimal, setStatusAnimal] = useState<string>("ADOPTED");
 
     const [clients, setClients] = useState<any[]>([]);
     const [animals, setAnimals] = useState<any[]>([]);
@@ -42,9 +42,7 @@ const Adoption: React.FC = () => {
                 setClients(cliData || []);
                 setAnimals(aniData || []);
                 setEmployees(empData || []);
-                if (empData?.length > 0 && !idProcessedBy) {
-                    setIdProcessedBy(empData[0].id);
-                }
+
             } catch (err: any) {
                 console.error("Error loading data", err);
             }
@@ -53,11 +51,13 @@ const Adoption: React.FC = () => {
     }, []);
 
     const handleSelectAdoption = (adoption: any) => {
-        setDniAdopter(adoption.new_owner?.dni || "");
+        setDniAdopter(adoption.client?.dni || "");
+        setIdAnimal(adoption.animal_id || "");
         setNombreAnimal(adoption.animal?.name || "");
-        setIdProcessedBy(adoption.processed_by || "");
-        setComments(adoption.comments || "");
-        setAdoptionDate(adoption.adoption_date ? adoption.adoption_date.split('T')[0] : "");
+        // Handle both possible field names for date
+        const rawDate = adoption.adoption_date || adoption.date;
+        setAdoptionDate(rawDate ? rawDate.split('T')[0] : "");
+        setStatusAnimal(adoption.animal?.status || "ADOPTED");
         setSelectedAdoptionId(adoption.id);
         setSearchTerm("");
     };
@@ -87,14 +87,13 @@ const Adoption: React.FC = () => {
         setMessage("");
         const allTouched = {
             dniAdopter: true,
-            nombreAnimal: true,
-            idProcessedBy: true,
-            comments: true,
-            adoptionDate: true
+            idAnimal: true,
+            adoptionDate: true,
+            statusAnimal: true
         };
         setTouched(allTouched);
 
-        if (!dniAdopter || !nombreAnimal || !idProcessedBy || !comments || !adoptionDate) {
+        if (!dniAdopter || !idAnimal || !adoptionDate || !statusAnimal) {
             setMessage("Por favor, completa todos los campos obligatorios");
             setShowToast(true);
             return;
@@ -109,7 +108,7 @@ const Adoption: React.FC = () => {
         setLoading(true);
         try {
             // Find Animal
-            const animal = animals.find(a => a.name.toLowerCase() === nombreAnimal.toLowerCase());
+            const animal = animals.find(a => a.id === idAnimal);
             // Find New Owner (Client)
             const newOwner = clients.find(c => c.dni.toUpperCase() === dniAdopter.toUpperCase());
 
@@ -128,15 +127,16 @@ const Adoption: React.FC = () => {
 
             const adoptionData = {
                 animal_id: animal.id,
-                new_owner_id: newOwner.id,
-                processed_by: idProcessedBy,
-                adoption_date: adoptionDate,
-                comments: comments
+                adopter_id: newOwner.id,
+                date: adoptionDate,
+                adoption_date: adoptionDate
             };
 
             if (type === 'create') {
                 await vetService.createAdoption(adoptionData);
-                setMessage("Adopción creada correctamente");
+                // Also update animal status
+                await vetService.updateAnimal(idAnimal, { status: statusAnimal });
+                setMessage("Adopción creada y estado de animal actualizado correctamente");
             } else {
                 if (!selectedAdoptionId) {
                     setMessage("Por favor, busca y selecciona una adopción para actualizar");
@@ -145,7 +145,9 @@ const Adoption: React.FC = () => {
                     return;
                 }
                 await vetService.updateAdoption(selectedAdoptionId, adoptionData);
-                setMessage("Adopción actualizada correctamente");
+                // Also update animal status
+                await vetService.updateAnimal(idAnimal, { status: statusAnimal });
+                setMessage("Adopción y estado de animal actualizados correctamente");
             }
             setShowToast(true);
             if (type === 'create') setTimeout(() => navigate('/listado-adopcion'), 1500);
@@ -213,31 +215,27 @@ const Adoption: React.FC = () => {
                         </div>
 
                         <div className="form-group">
-                            <label>Nombre Animal</label>
-                            {touched.nombreAnimal && !nombreAnimal && (
+                            <label>Animal (Listo para adoptar)</label>
+                            {touched.idAnimal && !idAnimal && (
                                 <div className="field-error-message">Campo obligatorio</div>
                             )}
-                            <input
-                                className={`custom-input ${touched.nombreAnimal && !nombreAnimal ? 'input-invalid' : ''}`}
-                                placeholder="Nombre del animal"
-                                value={nombreAnimal}
-                                onChange={(e) => setNombreAnimal(e.target.value)}
-                                onBlur={() => markTouched('nombreAnimal')}
-                            />
-                        </div>
-
-                        <div className="form-group">
-                            <label>Procesado por</label>
                             <select
-                                className="custom-input"
-                                value={idProcessedBy}
-                                onChange={(e) => setIdProcessedBy(e.target.value)}
+                                className={`custom-input ${touched.idAnimal && !idAnimal ? 'input-invalid' : ''}`}
+                                value={idAnimal}
+                                onChange={(e) => {
+                                    setIdAnimal(e.target.value);
+                                    const selected = animals.find(a => a.id === e.target.value);
+                                    if (selected) setNombreAnimal(selected.name);
+                                }}
+                                onBlur={() => markTouched('idAnimal')}
                             >
-                                {employees.map(emp => (
-                                    <option key={emp.id} value={emp.id}>
-                                        {emp.first_name} {emp.last_name}
-                                    </option>
-                                ))}
+                                <option value="">Seleccionar Animal</option>
+                                {animals
+                                    .filter(a => a.status === 'READY_FOR_ADOPTION' || a.id === idAnimal)
+                                    .map(a => (
+                                        <option key={a.id} value={a.id}>{a.name}</option>
+                                    ))
+                                }
                             </select>
                         </div>
 
@@ -251,19 +249,22 @@ const Adoption: React.FC = () => {
                             />
                         </div>
 
-                        <div className="form-group" style={{ gridColumn: 'span 2' }}>
-                            <label>Comentarios</label>
-                            {touched.comments && !comments && (
-                                <div className="field-error-message">Campo obligatorio</div>
-                            )}
-                            <textarea
-                                className={`custom-input ${touched.comments && !comments ? 'input-invalid' : ''}`}
-                                placeholder="Detalles de la adopción..."
-                                value={comments}
-                                onChange={(e) => setComments(e.target.value)}
-                                onBlur={() => markTouched('comments')}
-                            />
+                        <div className="form-group">
+                            <label>Nuevo Estado del Animal</label>
+                            <select
+                                className="custom-input"
+                                value={statusAnimal}
+                                onChange={(e) => setStatusAnimal(e.target.value)}
+                            >
+                                <option value="READY_FOR_ADOPTION">Listo para adoptar</option>
+                                <option value="RESERVED">Reservado</option>
+                                <option value="ADOPTED">Adoptado</option>
+                            </select>
                         </div>
+
+
+
+
                     </div>
 
                     <div className="form-actions">

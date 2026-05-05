@@ -29,6 +29,20 @@ const ListTreatment: React.FC = () => {
         fetchTreatments();
     }, []);
 
+    const handleDelete = async (id: string) => {
+        if (!window.confirm("¿Estás seguro de que deseas eliminar este tratamiento?")) return;
+
+        try {
+            await vetService.deleteTreatment(id);
+            setTreatments(treatments.filter(t => t.id !== id));
+            setToastMessage("Tratamiento eliminado correctamente");
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage("Error al eliminar el tratamiento");
+            setShowToast(true);
+        }
+    };
+
     if (loading) {
         return <IonLoading isOpen={true} message="Cargando tratamientos..." />;
     }
@@ -86,6 +100,7 @@ const ListTreatment: React.FC = () => {
                             <th className="col-desc">Descripción</th>
                             <th className="col-med">Medicamento</th>
                             <th className="col-psol">Posología</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,6 +124,14 @@ const ListTreatment: React.FC = () => {
                                     <td className="col-desc"><strong>{tr.description}</strong></td>
                                     <td className="col-med"><strong>{tr.medication}</strong></td>
                                     <td className="col-psol">{tr.dosage}</td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(tr.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                     </tbody>
@@ -119,7 +142,7 @@ const ListTreatment: React.FC = () => {
                 onDidDismiss={() => setShowToast(false)}
                 message={toastMessage}
                 duration={3000}
-                color="danger"
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
                 position="top"
             />
         </MainLayout>

@@ -50,10 +50,10 @@ const Rooms: React.FC = () => {
     };
 
     const filteredRooms = searchTerm.length > 0
-        ? rooms.filter(room => 
+        ? rooms.filter(room =>
             room.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
             room.center_code?.toLowerCase().includes(searchTerm.toLowerCase())
-          ).slice(0, 5)
+        ).slice(0, 5)
         : [];
 
     const markTouched = (field: string) => {
@@ -76,6 +76,19 @@ const Rooms: React.FC = () => {
 
         if (!nombre || !idCentro) {
             setMessage("Por favor, completa los campos principales");
+            setShowToast(true);
+            return;
+        }
+
+        // Check for duplicate name in the same center
+        const isDuplicate = rooms.some(r => 
+            r.center_id === idCentro && 
+            r.name.trim().toLowerCase() === nombre.trim().toLowerCase() &&
+            r.id !== selectedRoomId
+        );
+
+        if (isDuplicate) {
+            setMessage("Ya existe una sala con este nombre en el centro seleccionado");
             setShowToast(true);
             return;
         }
@@ -125,17 +138,17 @@ const Rooms: React.FC = () => {
 
                 <div className="secondary-search-container">
                     <IonIcon icon={searchOutline} className="secondary-search-icon" />
-                    <input 
-                        type="text" 
-                        placeholder="Buscar sala por nombre o centro..." 
+                    <input
+                        type="text"
+                        placeholder="Buscar sala por nombre o centro..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                     {filteredRooms.length > 0 && (
                         <div className="search-results-dropdown">
                             {filteredRooms.map(room => (
-                                <div 
-                                    key={room.id} 
+                                <div
+                                    key={room.id}
                                     className="search-result-item"
                                     onClick={() => handleSelectRoom(room)}
                                 >

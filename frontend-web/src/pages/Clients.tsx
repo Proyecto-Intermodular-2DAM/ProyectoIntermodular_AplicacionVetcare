@@ -42,7 +42,7 @@ const Clients: React.FC = () => {
         setFirstName(client.first_name || "");
         setLastName(client.last_name || "");
         setEmail(client.email || "");
-        setTelefono(client.phone || "");
+        setTelefono(client.phone_number || "");
         setSelectedClientId(client.id);
         setSearchTerm("");
     };
@@ -112,7 +112,7 @@ const Clients: React.FC = () => {
                 first_name: firstName,
                 last_name: lastName,
                 email: email,
-                phone: telefono,
+                phone_number: telefono,
                 role: 'CLIENT'
             };
 

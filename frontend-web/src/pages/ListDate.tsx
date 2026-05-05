@@ -14,20 +14,34 @@ const ListDate: React.FC = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState('');
 
+    const fetchAppointments = async () => {
+        try {
+            const data = await vetService.getAppointments();
+            setAppointments(data || []);
+        } catch (err: any) {
+            setToastMessage(err.message || 'Error al cargar citas');
+            setShowToast(true);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchAppointments = async () => {
-            try {
-                const data = await vetService.getAppointments();
-                setAppointments(data || []);
-            } catch (err: any) {
-                setToastMessage(err.message || 'Error al cargar citas');
-                setShowToast(true);
-            } finally {
-                setLoading(false);
-            }
-        };
         fetchAppointments();
     }, []);
+
+    const handleDelete = async (id: string) => {
+        if (!window.confirm('¿Estás seguro de que deseas eliminar esta cita?')) return;
+        try {
+            await vetService.deleteAppointment(id);
+            setAppointments(appointments.filter(apt => apt.id !== id));
+            setToastMessage('Cita eliminada correctamente');
+            setShowToast(true);
+        } catch (err: any) {
+            setToastMessage(err.message || 'Error al eliminar cita');
+            setShowToast(true);
+        }
+    };
 
     if (loading) {
         return <IonLoading isOpen={true} message="Cargando citas..." />;
@@ -86,6 +100,7 @@ const ListDate: React.FC = () => {
                             <th className="col-hora">Hora</th>
                             <th className="col-veterinario">Cliente</th>
                             <th className="col-estado">Estado</th>
+                            <th className="col-id">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -113,6 +128,14 @@ const ListDate: React.FC = () => {
                                             {apt.status}
                                         </span>
                                     </td>
+                                    <td className="col-id">
+                                        <button 
+                                            className="btn-eliminar-small"
+                                            onClick={() => handleDelete(apt.id)}
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </td>
                                 </tr>
                             ))}
                     </tbody>
@@ -123,7 +146,7 @@ const ListDate: React.FC = () => {
                 onDidDismiss={() => setShowToast(false)}
                 message={toastMessage}
                 duration={3000}
-                color="danger"
+                color={toastMessage.includes("correctamente") ? "success" : "danger"}
                 position="top"
             />
         </MainLayout>
