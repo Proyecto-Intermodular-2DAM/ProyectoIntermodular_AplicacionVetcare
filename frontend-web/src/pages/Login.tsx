@@ -81,7 +81,7 @@ const Login: React.FC = () => {
             await authService.signIn(email, pass);
             const profile = await authService.getUserProfile();
 
-            if (profile && profile.role === 'Cliente') {
+            if (profile && profile.role === 'CLIENT') {
                 await authService.signOut();
                 setError("Acceso denegado. Los clientes deben usar la aplicación móvil.");
                 setShowToast(true);

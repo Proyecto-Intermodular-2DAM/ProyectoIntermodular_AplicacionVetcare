@@ -15,7 +15,7 @@ const ProtectedRoute: React.FC = () => {
     }
 
     // Role check: Only non-Clients can access the admin panel
-    if (profile && profile.role === 'Cliente') {
+    if (profile && profile.role === 'CLIENT') {
         return <Navigate to="/login" replace />;
     }
 

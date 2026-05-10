@@ -16,16 +16,19 @@ import {
 } from 'ionicons/icons';
 import '../theme/css/SideMenu.css';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const SideMenu: React.FC = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const { profile } = useAuth();
+    const isAdmin = profile?.role === 'ADMIN';
+
     // Helper to determine if route is active
     const isActive = (path: string) => location.pathname === path;
 
     const mainMenuItems = [
-        { label: 'Empleados', icon: peopleOutline, path: '/empleados' },
         { label: 'Citas', icon: documentTextOutline, path: '/citas' },
         { label: 'Centros', icon: businessOutline, path: '/centros' },
         { label: 'Animales', icon: pawOutline, path: '/animales' },
@@ -35,10 +38,17 @@ const SideMenu: React.FC = () => {
         { label: 'Clientes', icon: personOutline, path: '/clientes' },
     ];
 
+    if (isAdmin) {
+        mainMenuItems.unshift({ label: 'Empleados', icon: peopleOutline, path: '/empleados' });
+    }
+
     const secondaryMenuItems = [
-        { label: 'Usuarios', icon: globeOutline, path: '/usuarios' }, // globeOutline as placeholder for Usuarios (which was displayed with a web/globe icon in thought process, or maybe circle)
         { label: 'Roles Y Permisos', icon: settingsOutline, path: '/ajustes' },
     ];
+
+    if (isAdmin) {
+        secondaryMenuItems.unshift({ label: 'Usuarios', icon: globeOutline, path: '/usuarios' });
+    }
 
     return (
         <div className="side-menu-container">
