@@ -12,7 +12,6 @@ import Animal from '../pages/Animal';
 import Rooms from '../pages/Rooms';
 import Treatment from '../pages/Treatment';
 import ListEmployee from '../pages/ListEmployee';
-import ListAppoinment from '../pages/ListAppoinment';
 import ListDate from '../pages/ListDate';
 import ListAnimal from '../pages/ListAnimal';
 import ListRooms from '../pages/ListRooms';
