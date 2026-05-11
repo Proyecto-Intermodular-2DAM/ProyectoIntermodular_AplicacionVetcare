@@ -13,3 +13,18 @@ window.matchMedia = window.matchMedia || function() {
       dispatchEvent: function() { return true; },
   };
 };
+
+// Polyfill adoptedStyleSheets for JSDOM (Stencil/Ionic requirement)
+if (typeof document !== 'undefined' && !document.adoptedStyleSheets) {
+  Object.defineProperty(document, 'adoptedStyleSheets', {
+    value: [],
+    writable: true,
+  });
+}
+
+if (typeof ShadowRoot !== 'undefined' && !ShadowRoot.prototype.hasOwnProperty('adoptedStyleSheets')) {
+  Object.defineProperty(ShadowRoot.prototype, 'adoptedStyleSheets', {
+    value: [],
+    writable: true,
+  });
+}

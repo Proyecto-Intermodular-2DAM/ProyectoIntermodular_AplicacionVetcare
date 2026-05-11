@@ -19,17 +19,14 @@ En este documento se detallan los casos de prueba (Test Cases) para validar las 
 | **CP-11** | **Persistencia de Sesión** | Recargar página manteniendo sesión activa | F5 en `/home` con sesión válida de Supabase | `AuthContext` re-hidrata `user` y `profile` desde `getCurrentUser()` y `getUserProfile()` sin pedir login. | Sesión persistida tras recarga, usuario permanece autenticado. | ✅ Pasado |
 
 
-## 2. Casos de prueba adicionales (Vitest)
+## 2. Casos de prueba de integración (Vitest)
 
-Los siguientes casos se validan mediante tests unitarios ejecutables con `pnpm test.unit`:
+Los siguientes casos se validan mediante tests de integración ejecutables con Vitest. Realizan llamadas HTTP reales al proyecto de Supabase configurado en `.env`:
 
 | ID | Módulo | Descripción | Comando |
 |---|---|---|---|
-| **VT-01** | `authService.test.ts` (web) | Mock de Supabase: signIn, signOut, getUserProfile, onAuthStateChange | `cd frontend-web && pnpm test.unit` |
-| **VT-02** | `AuthContext.test.tsx` (web) | Estado de auth: login carga perfil, logout limpia estado, loading gestionado | `cd frontend-web && pnpm test.unit` |
-| **VT-03** | `ProtectedRoute.test.tsx` (web) | Redirección según rol: CLIENT → /login, ADMIN → render, sin auth → /login | `cd frontend-web && pnpm test.unit` |
-| **VT-04** | `SideMenu.test.tsx` (web) | Render condicional: ADMIN ve "Empleados" y "Usuarios", empleado no-admin no los ve | `cd frontend-web && pnpm test.unit` |
-| **VT-05** | `authService.test.ts` (mobile) | Mock de Supabase: signUp, signIn, signOut, resetPassword, updateProfile | `cd frontend-mobile && pnpm test.unit` |
+| **IT-01** | `supabase.integration.test.ts` (web) | **Integración real con Supabase**: signUp real, signIn con credenciales inválidas, getSession sin sesión, onAuthStateChange | `cd frontend-web && npx vitest run src/services/supabase.integration.test.ts` |
+| **IT-02** | `supabase.integration.test.ts` (mobile) | **Integración real con Supabase**: signUp real, signIn con credenciales inválidas, getSession sin sesión, onAuthStateChange | `cd frontend-mobile && npx vitest run src/services/supabase.integration.test.ts` |
 
 
 ## 3. Corrección de errores detectados
@@ -56,39 +53,47 @@ Durante las fases de desarrollo y pruebas se identificaron ciertos comportamient
 - **Causa:** El frontend web fue desarrollado inicialmente con un sistema mock de autenticación que usaba nombres en español. El backend Java usaba convenciones estándar en inglés. No existía una capa de mapeo entre ambos.
 - **Solución:** Se unificó el frontend para usar los valores exactos del backend (`ADMIN`, `CLIENT`, `VETERINARIAN`, etc.) obtenidos directamente desde la columna `role` de la tabla `users` en PostgreSQL/Supabase. Las comparaciones en `ProtectedRoute`, `SideMenu` y `Login` ahora usan el valor canónico de la base de datos.
 
-## 4. Ejecución de tests unitarios (Vitest)
+## 4. Ejecución de tests de integración (Vitest)
 
-Los tests unitarios se ejecutan con **Vitest** configurado con `globals: true` y entorno `jsdom`.
+Los tests se ejecutan con **Vitest** configurado con `globals: true` y entorno `jsdom`. Realizan **llamadas HTTP reales** al proyecto de Supabase configurado en `.env` (`VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY`). Requieren conexión a Internet.
 
-### Frontend Web
+**Frontend Web**
 ```bash
 cd frontend-web
-pnpm test.unit
+npx vitest run src/services/supabase.integration.test.ts
 ```
 
-Tests disponibles:
-- `src/services/authService.test.ts` — Mock de Supabase Auth (signIn, signOut, getUserProfile, onAuthStateChange)
-- `src/contexts/AuthContext.test.tsx` — Estado de autenticación (login, logout, loading, perfil)
-- `src/components/ProtectedRoute.test.tsx` — Redirecciones según rol y estado de sesión
-- `src/components/SideMenu.test.tsx` — Render condicional de items de menú según rol
-
-### Frontend Mobile
+**Frontend Mobile**
 ```bash
 cd frontend-mobile
-pnpm test.unit
+npx vitest run src/services/supabase.integration.test.ts
 ```
 
-Tests disponibles:
-- `src/services/authService.test.ts` — Mock de Supabase Auth (signUp, signIn, signOut, resetPassword, updateProfile, getPublicUserProfile)
+**Lo que validan:**
+- `signInWithPassword` con credenciales inexistentes devuelve error real de Supabase.
+- `getSession` sin sesión activa devuelve `null`.
+- `signUp` crea un usuario real en el proyecto de Supabase (email aleatorio por ejecución).
+- `onAuthStateChange` devuelve una suscripción real.
+- Si se configuran `VITE_TEST_USER_EMAIL` y `VITE_TEST_USER_PASSWORD` en `.env`, valida signIn, getUser y signOut con un usuario persistente.
+
+**Configuración recomendada para tests completos:**
+1. Crear un usuario de test manualmente en el panel de Supabase (Auth > Users).
+2. Añadir al `.env` del proyecto:
+   ```
+   VITE_TEST_USER_EMAIL=tu-usuario@test.com
+   VITE_TEST_USER_PASSWORD=TuPassSegura123!
+   ```
+3. Volver a ejecutar los tests de integración; el caso de signIn con usuario persistente se activará automáticamente.
+
+> **Nota:** Los tests de `signUp` crean un usuario nuevo en Supabase cada vez que se ejecutan. Para limpieza automatizada se requiere la `Service Role Key` (solo backend), no disponible en el frontend.
 
 ### Notas técnicas
-- Se usa `vi.mock()` para interceptar `@supabase/supabase-js` y simular respuestas de auth.
-- Se usa `vi.mock()` para interceptar módulos locales (`apiClient`, `authService`) y evitar llamadas reales a la red.
-- `AuthContext` se prueba envolviendo componentes con `<AuthProvider>` o mockeando `useAuth()` directamente.
+- Se instancia `createClient` de `@supabase/supabase-js` con las credenciales reales del `.env`.
+- No se usa `vi.mock()`; las respuestas provienen directamente del servicio de Supabase.
 - Los componentes React se prueban con `@testing-library/react` (render, screen, fireEvent).
 
 ---
 
-*🛠️ Herramientas utilizadas para las pruebas: DevTools del navegador (Network & Console), Postman (API requests), Cypress (E2E testing) y Vitest (unit testing).*
+*🛠️ Herramientas utilizadas para las pruebas: DevTools del navegador (Network & Console), Postman (API requests), Cypress (E2E testing) y Vitest (integration testing).*
 
-*📅 Última actualización: 2026-05-10 | Rama: `develop`*
+*📅 Última actualización: 2026-05-11 | Rama: `develop`*
