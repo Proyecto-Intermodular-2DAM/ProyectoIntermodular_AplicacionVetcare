@@ -94,13 +94,13 @@ const Animal: React.FC = () => {
         };
         setTouched(allTouched);
 
-        if (!dniCliente || !nombre || !especie || !estado || !idCentro) {
-            setMessage("Por favor, completa los campos principales");
+        if (!nombre || !especie || !estado || !idCentro) {
+            setMessage("Por favor, completa los campos principales (Nombre, Especie, Estado y Centro)");
             setShowToast(true);
             return;
         }
 
-        if (!validateDNI(dniCliente)) {
+        if (dniCliente && !validateDNI(dniCliente)) {
             setMessage("El DNI introducido no es válido");
             setShowToast(true);
             return;
@@ -108,17 +108,20 @@ const Animal: React.FC = () => {
 
         setLoading(true);
         try {
-            // Find client ID from DNI
-            const client = clients.find(c => c.dni.toUpperCase() === dniCliente.toUpperCase());
-            if (!client) {
-                setMessage("No se encontró ningún cliente con ese DNI");
-                setShowToast(true);
-                setLoading(false);
-                return;
+            let clientId = null;
+            if (dniCliente) {
+                const client = clients.find(c => c.dni.toUpperCase() === dniCliente.toUpperCase());
+                if (!client) {
+                    setMessage("No se encontró ningún cliente con el DNI proporcionado");
+                    setShowToast(true);
+                    setLoading(false);
+                    return;
+                }
+                clientId = client.id;
             }
 
             const animalData = {
-                client_id: client.id,
+                client_id: clientId,
                 center_id: idCentro,
                 name: nombre,
                 species: especie,
@@ -190,12 +193,12 @@ const Animal: React.FC = () => {
 
                 <div className="animal-form">
                     <div className="form-group">
-                        <label>DNI Cliente</label>
-                        {touched.dniCliente && !validateDNI(dniCliente) && (
+                        <label>DNI Cliente (Opcional)</label>
+                        {dniCliente && touched.dniCliente && !validateDNI(dniCliente) && (
                             <div className="field-error-message">DNI no válido (8 números y letra)</div>
                         )}
                         <input
-                            className={`custom-input ${touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
+                            className={`custom-input ${dniCliente && touched.dniCliente && !validateDNI(dniCliente) ? 'input-invalid' : ''}`}
                             placeholder="Insertar DNI del Dueño"
                             value={dniCliente}
                             onChange={(e) => setDniCliente(e.target.value)}
