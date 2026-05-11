@@ -1,5 +1,6 @@
 package com.vetcare.vetapp.domain;
 
+import com.vetcare.vetapp.domain.User;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
@@ -20,7 +21,7 @@ public class AdoptionHistory {
 
     @ManyToOne
     @JoinColumn(name = "animal_id", nullable = false)
-    private Animal animal;
+    private com.vetcare.vetapp.domain.Animal animal;
 
     @ManyToOne
     @JoinColumn(name = "adopter_id", nullable = false)

@@ -1,11 +1,14 @@
 package com.vetcare.vetapp.domain;
 
+import com.vetcare.vetapp.domain.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
+
+import com.vetcare.vetapp.domain.User;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,10 +24,10 @@ public class Appointment {
     @UuidGenerator
     private UUID id;
 
-    @Column(name = "date", nullable = false)
+    @Column(name = "appointment_date", nullable = false)
     private LocalDate date;
 
-    @Column(name = "time", nullable = false)
+    @Column(name = "appointment_time", nullable = false)
     private LocalTime time;
 
     @Column(name = "reason", nullable = false)
@@ -34,7 +37,7 @@ public class Appointment {
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull
-    private AppointmentStatus status;
+    private com.vetcare.vetapp.domain.AppointmentStatus status;
 
     @Column(name = "is_active", nullable = false)
     @ColumnDefault("true")
@@ -56,9 +59,9 @@ public class Appointment {
 
     @ManyToOne
     @JoinColumn(name = "animal_id", nullable = false)
-    private Animal animal;
+    private com.vetcare.vetapp.domain.Animal animal;
 
     @ManyToOne
     @JoinColumn(name = "room_id")
-    private Room room;
+    private com.vetcare.vetapp.domain.Room room;
 }
