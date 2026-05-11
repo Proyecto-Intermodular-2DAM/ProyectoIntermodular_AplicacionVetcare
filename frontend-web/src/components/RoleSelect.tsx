@@ -31,7 +31,8 @@ const RoleSelect: React.FC<RoleSelectProps> = ({ value, onChange }) => {
         { label: 'Recepcionista', value: 'RECEPTIONIST' },
         { label: 'Veterinario', value: 'VETERINARIAN' },
         { label: 'Cuidador', value: 'CAREGIVER' },
-        { label: 'Cirujano', value: 'SURGEON' }
+        { label: 'Cirujano', value: 'SURGEON' },
+        { label: 'Cliente', value: 'CLIENT' }
     ];
 
     useEffect(() => {
