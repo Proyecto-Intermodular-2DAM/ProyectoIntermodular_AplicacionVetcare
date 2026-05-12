@@ -43,15 +43,15 @@ Durante las fases de desarrollo y pruebas se identificaron ciertos comportamient
 - **Causa:** `SideMenu.tsx` definía el array de items estáticamente sin consultar el rol del usuario. No existía lógica condicional para ocultar opciones de administración.
 - **Solución:** Se implementó `isAdmin = profile?.role === 'ADMIN'` mediante `useAuth()`. Las opciones de "Empleados" (main menu) y "Usuarios" (secondary menu) se inyectan condicionalmente con `unshift()` únicamente cuando `isAdmin` es `true`.
 
-### Error 3: Logout no funcional y datos de usuario hardcodeados
-- **Problema:** El botón "Cerrar Sesión" en `UserMenu.tsx` no cerraba la sesión realmente (solo hacía `console.log`). Además, el `TopBar.tsx` y `UserMenu.tsx` mostraban avatar "P" y nombre "Raul" fijos, sin importar quién estuviera autenticado.
-- **Causa:** El componente `UserMenu` no estaba conectado al `AuthContext`. No usaba `authService.signOut()` ni leía los datos dinámicos del perfil.
-- **Solución:** Se conectó `UserMenu.tsx` a `useAuth()`, implementando `handleLogout` que llama a `authService.signOut()`, limpia el estado del contexto y cierra el menú. Se actualizó `TopBar.tsx` para leer `profile.first_name` / `user.email` en lugar de valores hardcodeados.
+### Error 3: Logout no funcional
+- **Problema:** El botón "Cerrar Sesión" en `UserMenu.tsx` no cerraba la sesión realmente (solo hacía `console.log`). Además, el `TopBar.tsx` y `UserMenu.tsx` mostraba el nombre nombre "Raul" constantemente, sin importar quién estuviera logueado.
+- **Causa:** El componente `UserMenu` no estaba conectado al `AuthContext`. No usaba `authService.signOut()` ni leía los datos del perfil.
+- **Solución:** Se implementó en `UserMenu.tsx` el metodo `handleLogout` que llama a `authService.signOut()`. Se actualizó `TopBar.tsx` para leer `profile.first_name` / `user.email` en lugar de valores hardcodeados.
 
-### Error 4: Inconsistencia en nombres de roles (Frontend vs Backend)
-- **Problema:** El frontend web usaba strings en español (`'Administrador'`, `'Recepcionista'`, `'Veterinario'`, `'Cuidador'`, `'Cirujano'`, `'CLIENT'`) mientras que el backend Spring Boot usaba el enum en inglés (`ADMIN`, `CLIENT`, `VETERINARIAN`, `RECEPTIONIST`, `CAREGIVER`, `SURGEON`). Esto generaba confusión y potenciales bugs de comparación.
-- **Causa:** El frontend web fue desarrollado inicialmente con un sistema mock de autenticación que usaba nombres en español. El backend Java usaba convenciones estándar en inglés. No existía una capa de mapeo entre ambos.
-- **Solución:** Se unificó el frontend para usar los valores exactos del backend (`ADMIN`, `CLIENT`, `VETERINARIAN`, etc.) obtenidos directamente desde la columna `role` de la tabla `users` en PostgreSQL/Supabase. Las comparaciones en `ProtectedRoute`, `SideMenu` y `Login` ahora usan el valor canónico de la base de datos.
+### Error 4: Los roles no "hablaban" el mismo idioma (Frontend vs Backend)
+- **Problema:** El panel web usaba nombres en español (`'Administrador'`, `'Veterinario'`) para identificar a los usuarios, pero el servidor y la base de datos esperaban nombres en inglés (`ADMIN`, `VETERINARIAN`). Esto causaba que el sistema no reconociera correctamente los permisos de cada usuario.
+- **Causa:** El frontend se desarrolló inicialmente con datos de prueba en español, mientras que el backend (Java Spring Boot) usa estándares en inglés.
+- **Solución:** Se unificó todo para usar los valores de la base de datos (`ADMIN`, `CLIENT`, `VETERINARIAN`, etc.). Ahora el frontend trabaja internamente con estos códigos fijos y solo traduce a "Administrador" o "Veterinario" de cara al usuario mediante `src/components/RoleSelect.tsx`.
 
 ## 4. Ejecución de tests de integración (Vitest)
 
