@@ -14,12 +14,14 @@ const ROLE_MAP: Record<string, string> = {
     'VETERINARIAN': 'Veterinario',
     'CAREGIVER': 'Cuidador',
     'SURGEON': 'Cirujano',
+    'CLIENT': 'Cliente',
     // Reverse mapping for display if needed
     'Administrador': 'ADMIN',
     'Recepcionista': 'RECEPTIONIST',
     'Veterinario': 'VETERINARIAN',
     'Cuidador': 'CAREGIVER',
-    'Cirujano': 'SURGEON'
+    'Cirujano': 'SURGEON',
+    'Cliente': 'CLIENT'
 };
 
 const RoleSelect: React.FC<RoleSelectProps> = ({ value, onChange }) => {
