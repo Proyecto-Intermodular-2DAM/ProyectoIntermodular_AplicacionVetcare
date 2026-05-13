@@ -49,9 +49,9 @@ Durante las fases de desarrollo y pruebas se identificaron ciertos comportamient
 - **Solución:** Se implementó en `UserMenu.tsx` el metodo `handleLogout` que llama a `authService.signOut()`. Se actualizó `TopBar.tsx` para leer `profile.first_name` / `user.email` en lugar de valores hardcodeados.
 
 ### Error 4: Los roles no "hablaban" el mismo idioma (Frontend vs Backend)
-- **Problema:** El panel web usaba nombres en español (`'Administrador'`, `'Veterinario'`) para identificar a los usuarios, pero el servidor y la base de datos esperaban nombres en inglés (`ADMIN`, `VETERINARIAN`). Esto causaba que el sistema no reconociera correctamente los permisos de cada usuario.
-- **Causa:** El frontend se desarrolló inicialmente con datos de prueba en español, mientras que el backend (Java Spring Boot) usa estándares en inglés.
-- **Solución:** Se unificó todo para usar los valores de la base de datos (`ADMIN`, `CLIENT`, `VETERINARIAN`, etc.). Ahora el frontend trabaja internamente con estos códigos fijos y solo traduce a "Administrador" o "Veterinario" de cara al usuario mediante `src/components/RoleSelect.tsx`.
+- **Problema:**  El panel web usaba nombres en español ('Administrador', 'Veterinario') para indicar el rol de los usuarios, pero el servidor y la base de datos esperaban nombres en inglés (ADMIN, VETERINARIAN). Esto causaba que el sistema no reconociera correctamente los permisos de cada usuario.
+- **Causa:** El frontend se desarrolló inicialmente con datos de prueba en español, mientras que el backend (Java Spring Boot) y la base de datos Supabase utilizan nombres estándar en inglés.
+- **Solución:** Se unificó todo para usar los valores de la base de datos (`ADMIN`, `CLIENT`, `VETERINARIAN`, etc.). Ahora el frontend trabaja internamente con estos nombres en ingles y solo traduce a 'Administrador' o 'Veterinario' de cara al usuario mediante el componente src/components/RoleSelect.tsx. 
 
 ## 4. Ejecución de tests de integración (Vitest)
 
@@ -73,7 +73,6 @@ npx vitest run src/services/supabase.integration.test.ts
 - `signInWithPassword` con credenciales inexistentes devuelve error real de Supabase.
 - `getSession` sin sesión activa devuelve `null`.
 - `signUp` crea un usuario real en el proyecto de Supabase (email aleatorio por ejecución).
-- `onAuthStateChange` devuelve una suscripción real.
 - Si se configuran `VITE_TEST_USER_EMAIL` y `VITE_TEST_USER_PASSWORD` en `.env`, valida signIn, getUser y signOut con un usuario persistente.
 
 **Configuración recomendada para tests completos:**
