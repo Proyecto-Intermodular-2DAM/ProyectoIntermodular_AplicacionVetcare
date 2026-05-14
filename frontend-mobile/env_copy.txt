@@ -1,0 +1,4 @@
+VITE_SUPABASE_URL=https://bixdljpamugqsjzbkiyz.supabase.co
+VITE_SUPABASE_ANON_KEY=sb_publishable_5a9AbtELGYYXSyBuJS6NZA_QpH23kxU
+
+VITE_SITE_URL=com.vetcare.app://

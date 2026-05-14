@@ -1,0 +1,151 @@
+.appointment-card {
+    border-radius: 16px;
+    box-shadow: var(--dropshadow);
+    margin: 16px;
+    background: var(--color-white);
+    padding-bottom: 8px;
+    position: relative;
+    /* For absolute positioning of icon */
+}
+
+.appointment-card-header {
+    display: flex;
+    justify-content: flex-start;
+    /* Changed from space-between since icon is absolute */
+    align-items: flex-start;
+    padding-bottom: 0px;
+    padding-right: 30px;
+    padding-top: 16px;
+    padding-left: 16px;
+    /* Space for the absolute icon */
+}
+
+.header-left-content {
+    flex: 1;
+}
+
+.appointment-title {
+    font-family: var(--heading-h6-font-family, 'Poppins', sans-serif);
+    font-size: var(--heading-h6-font-size);
+    font-weight: var(--heading-h6-font-weight);
+    line-height: var(--heading-h6-line-height);
+    color: var(--color-black-1);
+    margin: 0;
+}
+
+.more-options-icon {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 20px;
+    color: var(--color-grey-1);
+    /* Use theme grey */
+}
+
+.appointment-date-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    color: var(--color-grey-1);
+    font-family: var(--text-small-font-family, 'Poppins', sans-serif);
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+}
+
+.appointment-date-text {
+    margin-right: 4px;
+}
+
+.appointment-body {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    padding-top: 0;
+}
+
+.time-column {
+    width: 90px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Centered vertically as requested */
+    padding-top: 0;
+    /* Remove top padding to let centering work */
+    font-family: var(--text-medium-font-family, 'Poppins', sans-serif);
+    font-size: var(--text-medium-font-size);
+    color: var(--color-black-2);
+}
+
+.divider-column {
+    width: 4px;
+    background-color: var(--color-info);
+    border-radius: 2px;
+    margin-right: 12px;
+    margin-left: 0;
+}
+
+.details-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.detail-item strong {
+    display: block;
+    font-family: var(--text-small-bold-font-family, 'Poppins', sans-serif);
+    font-size: var(--text-small-bold-font-size);
+    color: var(--color-black-1);
+    margin-bottom: 2px;
+}
+
+.custom-chip {
+    margin: 0;
+    padding-left: 4px;
+    height: 32px;
+    background: transparent;
+    color: var(--color-grey-1);
+    font-family: var(--text-small-font-family, 'Poppins', sans-serif);
+    font-size: var(--text-small-font-size);
+}
+
+.custom-chip ion-avatar,
+.custom-chip ion-avatar::part(native) {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    margin-right: 8px;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    flex-shrink: 0;
+}
+
+.custom-chip ion-avatar img,
+.custom-chip ion-avatar::part(native) img {
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px !important;
+    min-height: 24px !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+    display: block !important;
+}
+
+/* Additional specificity for Ionic's internal structure */
+.appointment-card .custom-chip ion-avatar {
+    --border-radius: 50% !important;
+}
+
+.today-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 4px;
+    color: var(--color-info);
+    font-family: var(--text-small-bold-font-family, 'Poppins', sans-serif);
+    font-size: var(--text-small-bold-font-size);
+    font-weight: var(--text-small-bold-font-weight);
+}

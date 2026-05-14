@@ -1,0 +1,77 @@
+/* UserMenu.css */
+.user-menu-container {
+    position: absolute;
+    top: 60px;
+    /* Adjust based on top bar height */
+    right: 20px;
+    width: 250px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid #f0f0f0;
+}
+
+.user-menu-header {
+    padding: 20px;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.menu-user-avatar {
+    width: 48px;
+    height: 48px;
+    background-color: #e3f2fd;
+    /* Light blue */
+    color: #1976d2;
+    /* Blue text */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.menu-user-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+}
+
+.user-menu-list {
+    padding: 8px 0;
+}
+
+.user-menu-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 15px;
+    font-weight: 500;
+    color: #333;
+}
+
+.user-menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.user-menu-item ion-icon {
+    font-size: 24px;
+    /* Larger icon size as per image */
+    color: #424242;
+}
+
+/* Specific styling for Logout to match image if needed */
+.user-menu-item.logout {
+    border-top: 1px solid #f0f0f0;
+    /* Example style to separate logout or just remove empty block if not needed */
+}

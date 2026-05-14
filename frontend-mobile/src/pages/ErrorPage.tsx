@@ -2,10 +2,10 @@ import React from 'react';
 import { IonContent, IonPage, IonButton, IonIcon } from '@ionic/react';
 import { close } from 'ionicons/icons';
 import '../theme/css/ErrorPage.css';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ErrorPage: React.FC = () => {
-    const history = useHistory();
+    const navigate = useNavigate();
 
     return (
         <IonPage>
@@ -29,7 +29,7 @@ const ErrorPage: React.FC = () => {
                     <IonButton
                         className="primary-button"
                         expand="block"
-                        onClick={() => history.push('/home')}
+                        onClick={() => navigate('/home')}
                     >
                         Volver al menú principal
                     </IonButton>

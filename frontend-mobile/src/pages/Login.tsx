@@ -7,44 +7,103 @@ import {
     IonCard,
     IonCardContent,
     IonItem,
-    IonCheckbox, // Nuevo componente
-    IonLabel, // Nuevo componente
-    IonGrid, // Nuevo componente
-    IonRow, // Nuevo componente
-    IonCol, // Nuevo componente
+    IonCheckbox,
+    IonLabel,
+    IonGrid,
+    IonRow,
+    IonCol,
+    IonSpinner,
+    IonToast,
 } from "@ionic/react";
 import { person, lockClosed, paw } from "ionicons/icons";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { authService } from "../services/authService";
 import "../theme/css/Login.css";
 
-// Importa el logo si lo necesitas. Usaremos 'paw' por ahora como icono.
-// import vector from "./vector.svg"; 
-
 const Login: React.FC = () => {
-    const history = useHistory();
-    const [email, setEmail] = useState<string>(""); // Cambiado de 'user' a 'email'
+    const navigate = useNavigate();
+    const [email, setEmail] = useState<string>("");
     const [pass, setPass] = useState<string>("");
-    const [rememberMe, setRememberMe] = useState<boolean>(false); // Nuevo estado
+    const [rememberMe, setRememberMe] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string>("");
+    const [showToast, setShowToast] = useState<boolean>(false);
 
-    const handleLogin = (e: React.FormEvent) => {
-        e.preventDefault(); // Previene el comportamiento por defecto del formulario
-        console.log("Formulario enviado:", { email, pass, rememberMe });
+    const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-        // TODO: conectar con backend (AuthService)
-        if (email && pass) {
-            history.push("/home");
+    // Load saved email on mount
+    useState(() => {
+        const savedEmail = localStorage.getItem('remembered_email');
+        if (savedEmail) {
+            setEmail(savedEmail);
+            setRememberMe(true);
+        }
+    });
+
+    const validateEmail = (email: string) => {
+        return email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+    };
+
+    const markTouched = (field: string) => {
+        setTouched(prev => ({ ...prev, [field]: true }));
+    };
+
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        // Mark all as touched on submit
+        setTouched({ email: true, pass: true });
+
+        if (!validateEmail(email)) {
+            setError("Por favor, introduce un email válido");
+            setShowToast(true);
+            return;
+        }
+
+        if (!pass) {
+            setError("Por favor, introduce tu contraseña");
+            setShowToast(true);
+            return;
+        }
+
+        // Handle "Remember Me"
+        if (rememberMe) {
+            localStorage.setItem('remembered_email', email);
+        } else {
+            localStorage.removeItem('remembered_email');
+        }
+
+        setError("");
+        setLoading(true);
+
+        try {
+            const { error: authError } = await authService.signIn(email, pass);
+
+            if (authError) {
+                setError("Credenciales inválidas. Por favor, revisa tu email y contraseña.");
+                setShowToast(true);
+                setLoading(false);
+                return;
+            }
+
+            navigate("/home");
+        } catch (err) {
+            setError("Error inesperado al iniciar sesión");
+            setShowToast(true);
+        } finally {
+            setLoading(false);
         }
     };
 
     const handleSignUp = () => {
-        history.push("/signup");
+        navigate("/signup");
     };
 
     const handleRecoverPassword = () => {
+
         console.log("Navegar a recuperación de contraseña");
-        history.push("/passwordRecovery");
-        // history.push("/recover-password"); // Ejemplo de navegación
+        navigate("/passwordRecovery");
     };
 
     return (
@@ -68,15 +127,18 @@ const Login: React.FC = () => {
                                         className="login-signup-button"
                                         aria-label="Sign up for a new account"
                                     >
-                                        Sign up
+                                        Registrarse
                                     </button>
                                 </p>
                             </header>
 
                             {/* --- Formulario --- */}
-                            <form onSubmit={handleLogin}>
+                            <form onSubmit={handleLogin} noValidate>
                                 {/* --- Email --- */}
-                                <IonItem className="login-input" lines="none">
+                                {touched.email && !validateEmail(email) && (
+                                    <div className="field-error-message">Email no válido</div>
+                                )}
+                                <IonItem className={`login-input ${touched.email && !validateEmail(email) ? 'ion-invalid ion-touched' : ''}`} lines="none">
                                     <IonIcon slot="start" icon={person} />
                                     <IonInput
                                         label="Email"
@@ -84,13 +146,17 @@ const Login: React.FC = () => {
                                         placeholder="ejemplo@correo.com"
                                         type="email"
                                         value={email}
-                                        onIonChange={(e) => setEmail(e.detail.value!)}
+                                        onIonInput={(e: CustomEvent) => setEmail(e.detail.value ?? '')}
+                                        onIonBlur={() => markTouched('email')}
                                         required
                                     />
                                 </IonItem>
 
                                 {/* --- Contraseña --- */}
-                                <IonItem className="login-input" lines="none">
+                                {touched.pass && !pass && (
+                                    <div className="field-error-message">La contraseña es obligatoria</div>
+                                )}
+                                <IonItem className={`login-input ${touched.pass && !pass ? 'ion-invalid ion-touched' : ''}`} lines="none">
                                     <IonIcon slot="start" icon={lockClosed} />
                                     <IonInput
                                         label="Contraseña"
@@ -98,7 +164,8 @@ const Login: React.FC = () => {
                                         placeholder="Contraseña"
                                         type="password"
                                         value={pass}
-                                        onIonChange={(e) => setPass(e.detail.value!)}
+                                        onIonInput={(e: CustomEvent) => setPass(e.detail.value ?? '')}
+                                        onIonBlur={() => markTouched('pass')}
                                         required
                                     />
                                 </IonItem>
@@ -110,7 +177,7 @@ const Login: React.FC = () => {
                                             <IonItem lines="none" className="ion-no-padding login-remember-me">
                                                 <IonCheckbox
                                                     checked={rememberMe}
-                                                    onIonChange={(e) => setRememberMe(e.detail.checked)}
+                                                    onIonChange={(e: CustomEvent) => setRememberMe(e.detail.checked)}
                                                     labelPlacement="end"
                                                     aria-label="Recordarme"
                                                     color="primary"
@@ -142,10 +209,21 @@ const Login: React.FC = () => {
                                     expand="block"
                                     className="login-button"
                                     aria-label="Sign in"
+                                    disabled={loading}
                                 >
-                                    Sign in
+                                    {loading ? <IonSpinner name="crescent" /> : "Sign in"}
                                 </IonButton>
                             </form>
+
+                            {/* Toast for error messages */}
+                            <IonToast
+                                isOpen={showToast}
+                                onDidDismiss={() => setShowToast(false)}
+                                message={error}
+                                duration={3000}
+                                color="danger"
+                                position="top"
+                            />
                         </IonCardContent>
                     </IonCard>
                 </div>

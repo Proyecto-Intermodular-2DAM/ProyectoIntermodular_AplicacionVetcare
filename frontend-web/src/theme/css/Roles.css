@@ -1,0 +1,104 @@
+/* Roles.css */
+.roles-page-container {
+    padding: 20px 40px;
+    background-color: #ffffff;
+    min-height: 100%;
+}
+
+.roles-page-container h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 40px;
+}
+
+.roles-section {
+    margin-bottom: 40px;
+}
+
+.roles-section h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+}
+
+.roles-form-top {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px 40px;
+    max-width: 1000px;
+    margin-bottom: 40px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #444;
+    margin-bottom: 12px;
+}
+
+.custom-input {
+    background-color: #e8eaed;
+    border-radius: 12px;
+    padding: 16px 24px;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 16px;
+    color: #3c4043;
+}
+
+.custom-input::placeholder {
+    color: #9aa0a6;
+}
+
+.permissions-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.permission-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.permission-item label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.permission-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Specific styling to match the image spacing */
+.access-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+
+    .roles-form-top,
+    .permissions-grid,
+    .access-grid {
+        grid-template-columns: 1fr;
+    }
+}

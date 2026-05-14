@@ -1,0 +1,237 @@
+/* ListAnimals Page Styles */
+
+.treatment-content {
+    --background: var(--color-grey-5);
+}
+
+.treatment-container {
+    padding: 0;
+    min-height: 100%;
+}
+
+/* Header Section */
+.treatment-header {
+    background: var(--color-secondary);
+    padding: 24px 20px 32px 20px;
+    border-radius: 0 0 0 0;
+}
+
+.treatment-title {
+    font-size: var(--heading-h5-font-size);
+    font-weight: var(--heading-h5-font-weight);
+    line-height: var(--heading-h5-line-height);
+    color: var(--color-white);
+    margin: 0 0 8px 0;
+}
+
+.treatment-subtitle {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+    line-height: var(--text-small-line-height);
+    color: var(--color-white);
+    margin: 0 0 20px 0;
+    opacity: 0.9;
+}
+
+/* Stats Card */
+.treatment-stats-card {
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+}
+
+.treatment-stats-content {
+    padding: 20px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.treatment-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.treatment-stat-label {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+    color: var(--color-grey-1);
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.treatment-stat-value {
+    font-size: var(--heading-h4-font-size);
+    font-weight: var(--heading-h4-font-weight);
+    color: var(--color-black-2);
+}
+
+.treatment-stat-divider {
+    width: 1px;
+    height: 40px;
+    background-color: var(--color-grey-3);
+    margin: 0 16px;
+}
+
+/* Animals List */
+.treatment-list {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Animal Card */
+.treatment-card {
+    margin: 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.treatment-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.treatment-card-content {
+    padding: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.treatment-card-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+}
+
+.treatment-avatar {
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--color-secondary);
+}
+
+.treatment-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.treatment-name {
+    font-size: var(--text-medium-bold-font-size);
+    font-weight: var(--text-medium-bold-font-weight);
+    color: var(--color-black-2);
+    margin: 0;
+}
+
+.treatment-breed {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+    color: var(--color-grey-1);
+    margin: 0;
+}
+
+.treatment-card-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.treatment-treatments {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(128, 203, 196, 0.15);
+    padding: 6px 12px;
+    border-radius: 16px;
+}
+
+.treatment-treatment-icon {
+    font-size: 16px;
+    color: var(--color-primary);
+}
+
+.treatment-treatment-text {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-bold-font-weight);
+    color: var(--color-primary);
+    white-space: nowrap;
+}
+
+.treatment-no-treatments {
+    font-size: var(--text-small-font-size);
+    font-weight: var(--text-small-font-weight);
+    color: var(--color-grey-2);
+    white-space: nowrap;
+}
+
+.treatment-arrow-icon {
+    font-size: 20px;
+    color: var(--color-grey-2);
+    flex-shrink: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .treatment-card-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .treatment-card-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .treatment-treatment-text {
+        font-size: 12px;
+    }
+}
+
+/* Dark Mode Overrides - DISABLED */
+/*
+@media (prefers-color-scheme: dark) {
+    .treatment-title {
+        color: var(--color-white);
+    }
+
+    .treatment-subtitle {
+        color: var(--color-grey-4);
+    }
+
+    .treatment-stats-card,
+    .treatment-card {
+        background: var(--color-black-3);
+    }
+
+    .treatment-stat-label {
+        color: var(--color-grey-3);
+    }
+
+    .treatment-stat-value {
+        color: var(--color-white);
+    }
+
+    .treatment-name {
+        color: var(--color-white);
+    }
+
+    .treatment-breed {
+        color: var(--color-grey-3);
+    }
+
+    .treatment-no-treatments {
+        color: var(--color-grey-3);
+    }
+
+    .treatment-arrow-icon {
+        color: var(--color-grey-3);
+    }
+}
+*/
