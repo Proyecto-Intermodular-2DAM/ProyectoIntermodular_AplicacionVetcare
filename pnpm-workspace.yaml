@@ -2,3 +2,8 @@ packages:
   - 'frontend-web'
   - 'frontend-mobile'
   - 'shared'
+allowBuilds:
+  core-js: true
+  cypress: true
+  esbuild: true
+  unrs-resolver: true

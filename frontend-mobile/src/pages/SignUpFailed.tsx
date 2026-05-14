@@ -7,7 +7,7 @@ import {
     IonButton
 } from "@ionic/react";
 import { paw, closeCircle } from "ionicons/icons";
-import "../theme/css/SignUp.css";
+import "../theme/css/Signup.css";
 import { useNavigate } from "react-router-dom";
 
 const SignUpFailed: React.FC = () => {
