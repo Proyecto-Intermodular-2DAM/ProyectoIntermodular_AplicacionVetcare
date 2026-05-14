@@ -12,6 +12,8 @@
     "lint": "eslint",
     "ionic:build": "pnpm run build",
     "ionic:serve": "pnpm run dev -- --open",
+    "tauri": "tauri",
+    "tauri:build": "tauri build",
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
@@ -35,10 +37,12 @@
   },
   "devDependencies": {
     "@capacitor/cli": "latest",
+    "@tauri-apps/cli": "^2.11.1",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.6.1",
+    "@types/node": "^20.11.0",
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-legacy": "^7.2.1",
@@ -53,7 +57,6 @@
     "terser": "^5.44.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.51.0",
-    "@types/node": "^20.11.0",
     "vite": "~7.3.0",
     "vitest": "^4.0.16"
   },
