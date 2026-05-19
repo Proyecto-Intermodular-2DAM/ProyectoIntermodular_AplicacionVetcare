@@ -5,13 +5,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
 
 import com.vetcare.vetapp.domain.User;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.UUID;
 
@@ -38,16 +36,6 @@ public class Appointment {
     @Enumerated(EnumType.STRING)
     @NotNull
     private com.vetcare.vetapp.domain.AppointmentStatus status;
-
-    @Column(name = "is_active", nullable = false)
-    @ColumnDefault("true")
-    private boolean isActive;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private UUID deletedBy;
 
     @ManyToOne
     @JoinColumn(name = "receptionist_id")

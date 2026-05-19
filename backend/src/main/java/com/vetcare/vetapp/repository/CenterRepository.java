@@ -3,21 +3,16 @@ package com.vetcare.vetapp.repository;
 import com.vetcare.vetapp.domain.Center;
 import com.vetcare.vetapp.domain.CenterType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface CenterRepository extends JpaRepository<Center, UUID> {
+    Center getCenterById(UUID id);
 
-    @Query("SELECT c FROM Center c WHERE c.isActive = true")
-    List<Center> findAllActive();
+    List<Center> findByCityContainingIgnoreCase(String city);
 
-    @Query("SELECT c FROM Center c WHERE c.isActive = true AND c.id = :id")
-    Optional<Center> findActiveById(@Param("id") UUID id);
+    List<Center> findByType(CenterType type);
 
-    @Query("SELECT c FROM Center c WHERE c.isActive = true AND c.type = :type")
-    List<Center> findActiveByType(@Param("type") CenterType type);
+    List<Center> findByCityContainingIgnoreCaseAndType(String city, CenterType type);
 }

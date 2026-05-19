@@ -8,7 +8,6 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,15 +49,9 @@ public class User {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
-    @Column(name = "is_active", nullable = false)
-    @ColumnDefault("true")
+    @Column(name = "is_active" , nullable = false)
+    @ColumnDefault( "'true'")
     private boolean isActive;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
-
-    @Column(name = "deleted_by")
-    private UUID deletedBy;
 
     @Column(name = "salary")
     private BigDecimal salary;
