@@ -25,7 +25,6 @@ const SideMenu: React.FC = () => {
     const { profile } = useAuth();
     const isAdmin = profile?.role === 'ADMIN';
 
-    // Helper to determine if route is active
     const isActive = (path: string) => location.pathname === path;
 
     const mainMenuItems = [
@@ -52,16 +51,13 @@ const SideMenu: React.FC = () => {
 
     return (
         <div className="side-menu-container">
-            {/* Logo Section */}
             <div className="side-menu-logo">
                 <IonIcon icon={appsOutline} className="logo-icon" />
                 <h2 className="logo-text">VetCare</h2>
             </div>
 
-            {/* Main Menu Label */}
             <div className="menu-section-label">MAIN MENU</div>
 
-            {/* Main Menu List */}
             <IonList lines="none">
                 {mainMenuItems.map((item) => (
                     <IonItem
@@ -76,10 +72,8 @@ const SideMenu: React.FC = () => {
                 ))}
             </IonList>
 
-            {/* Divider */}
             <div className="menu-divider"></div>
 
-            {/* Secondary Menu List */}
             <IonList lines="none">
                 {secondaryMenuItems.map((item) => (
                     <IonItem

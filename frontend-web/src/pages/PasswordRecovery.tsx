@@ -86,8 +86,6 @@ const PasswordRecovery: React.FC = () => {
                                 )}
                             </header>
 
-
-
                             <IonButton
                                 expand="block"
                                 className="login-button"
@@ -97,7 +95,6 @@ const PasswordRecovery: React.FC = () => {
                                 {success ? "Ir a Sign in" : "Volver a Sign in"}
                             </IonButton>
 
-                            {/* Toast for error messages */}
                             <IonToast
                                 isOpen={showToast}
                                 onDidDismiss={() => setShowToast(false)}

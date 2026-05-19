@@ -33,7 +33,7 @@ const ListClients: React.FC = () => {
         if (!window.confirm("¿Estás seguro de que deseas eliminar este cliente?")) return;
 
         try {
-            await vetService.deleteEmployee(id); // Use deleteEmployee as it targets the /users table
+            await vetService.deleteEmployee(id);
             setClients(clients.filter(c => c.id !== id));
             setToastMessage("Cliente eliminado correctamente");
             setShowToast(true);

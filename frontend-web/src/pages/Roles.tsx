@@ -3,11 +3,9 @@ import MainLayout from '../components/MainLayout';
 import '../theme/css/Roles.css';
 
 const Roles: React.FC = () => {
-    // State for inputs
     const [empleado, setEmpleado] = useState("");
     const [idEmpleado, setIdEmpleado] = useState("");
 
-    // State for permissions checkboxes
     const [permissions, setPermissions] = useState({
         consultar: false,
         insertar: false,
@@ -16,7 +14,6 @@ const Roles: React.FC = () => {
         ejecutar: false
     });
 
-    // State for access checkboxes
     const [access, setAccess] = useState({
         empleados: false,
         citas: false,

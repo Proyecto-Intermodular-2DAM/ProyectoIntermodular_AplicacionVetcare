@@ -9,7 +9,6 @@ import '../theme/css/Animal.css';
 const Animal: React.FC = () => {
     const navigate = useNavigate();
 
-    // State for form fields
     const [dniCliente, setDniCliente] = useState<string>("");
     const [nombre, setNombre] = useState<string>("");
     const [especie, setEspecie] = useState<string>("");

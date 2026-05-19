@@ -14,7 +14,7 @@ const Employee: React.FC = () => {
     const [phone, setPhone] = useState<string>("");
     const [salary, setSalary] = useState<string>("");
     const [email, setEmail] = useState<string>("");
-    const [role, setRole] = useState<string>("ADMIN");
+    const [role, setRole] = useState<string>("");
 
     const [employees, setEmployees] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState<string>("");
@@ -43,7 +43,7 @@ const Employee: React.FC = () => {
         setPhone(emp.phone_number || "");
         setSalary(emp.salary?.toString() || "");
         setEmail(emp.email || "");
-        setRole(emp.role || "Administrador");
+        setRole(emp.role || "");
         setSelectedEmployeeId(emp.id);
         setSearchTerm("");
     };
