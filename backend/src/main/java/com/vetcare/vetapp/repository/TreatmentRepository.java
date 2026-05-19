@@ -1,25 +1,19 @@
 package com.vetcare.vetapp.repository;
 
+import com.vetcare.vetapp.domain.Room;
 import com.vetcare.vetapp.domain.Treatment;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface TreatmentRepository extends JpaRepository<Treatment, UUID> {
+    // Buscar tratamientos dados en una cita específica
+    List<Treatment> findByAppointmentId(UUID appointmentId);
 
-    @Query("SELECT t FROM Treatment t WHERE t.isActive = true")
-    List<Treatment> findAllActive();
+    // Buscar tratamientos recetados por un empleado o veterinario específico
+    List<Treatment> findByEmployeeId(UUID employeeId);
 
-    @Query("SELECT t FROM Treatment t WHERE t.isActive = true AND t.id = :id")
-    Optional<Treatment> findActiveById(@Param("id") UUID id);
-
-    @Query("SELECT t FROM Treatment t WHERE t.isActive = true AND t.appointment.id = :appointmentId")
-    List<Treatment> findActiveByAppointmentId(@Param("appointmentId") UUID appointmentId);
-
-    @Query("SELECT t FROM Treatment t WHERE t.isActive = true AND t.employee.id = :employeeId")
-    List<Treatment> findActiveByEmployeeId(@Param("employeeId") UUID employeeId);
+    // Buscar por cita y empleado
+    List<Treatment> findByAppointmentIdAndEmployeeId(UUID appointmentId, UUID employeeId);
 }
