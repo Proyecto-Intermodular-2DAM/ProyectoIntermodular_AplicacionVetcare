@@ -49,13 +49,11 @@ const Breadcrumbs: React.FC = () => {
     const location = useLocation();
     const rawPathnames = location.pathname.split('/').filter((x) => x);
 
-    // Virtualize hierarchy if it's a flat list/management route
     let pathnames = [...rawPathnames];
     if (pathnames.length === 1 && parentMap[pathnames[0]]) {
         pathnames = [parentMap[pathnames[0]], pathnames[0]];
     }
 
-    // Don't show breadcrumbs on home or login
     if (rawPathnames.length === 0 || rawPathnames[0] === 'home' || rawPathnames[0] === 'login') {
         return null;
     }

@@ -9,7 +9,6 @@ import '../theme/css/Clients.css';
 const Clients: React.FC = () => {
     const navigate = useNavigate();
 
-    // State for form fields as per image
     const [dniCliente, setDniCliente] = useState<string>("");
     const [firstName, setFirstName] = useState<string>("");
     const [lastName, setLastName] = useState<string>("");

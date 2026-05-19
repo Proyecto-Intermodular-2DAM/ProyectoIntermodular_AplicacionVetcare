@@ -9,7 +9,6 @@ import '../theme/css/Rooms.css';
 const Rooms: React.FC = () => {
     const navigate = useNavigate();
 
-    // State for form fields based on the image provided
     const [nombre, setNombre] = useState<string>("");
     const [idCentro, setIdCentro] = useState<string>("");
     const [centers, setCenters] = useState<any[]>([]);
@@ -80,7 +79,6 @@ const Rooms: React.FC = () => {
             return;
         }
 
-        // Check for duplicate name in the same center
         const isDuplicate = rooms.some(r => 
             r.center_id === idCentro && 
             r.name.trim().toLowerCase() === nombre.trim().toLowerCase() &&
@@ -93,7 +91,6 @@ const Rooms: React.FC = () => {
             return;
         }
 
-        // Check if center exists
         const selectedCenter = centers.find(c => c.id === idCentro);
         if (!selectedCenter) {
             setMessage("El centro seleccionado no existe");

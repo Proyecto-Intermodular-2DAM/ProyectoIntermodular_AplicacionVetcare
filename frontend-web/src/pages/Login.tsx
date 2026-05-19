@@ -32,7 +32,6 @@ const Login: React.FC = () => {
 
     const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-    // Load saved email on mount
     useState(() => {
         const savedEmail = localStorage.getItem('remembered_email');
         if (savedEmail) {
@@ -52,7 +51,6 @@ const Login: React.FC = () => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Mark all as touched on submit
         setTouched({ email: true, pass: true });
 
         if (!validateEmail(email)) {
@@ -67,7 +65,6 @@ const Login: React.FC = () => {
             return;
         }
 
-        // Handle "Remember Me"
         if (rememberMe) {
             localStorage.setItem('remembered_email', email);
         } else {

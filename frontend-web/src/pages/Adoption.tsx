@@ -9,7 +9,6 @@ import '../theme/css/Adoption.css';
 const Adoption: React.FC = () => {
     const navigate = useNavigate();
 
-    // State for form fields based on mockup
     const [dniAdopter, setDniAdopter] = useState<string>("");
     const [idAnimal, setIdAnimal] = useState<string>("");
     const [nombreAnimal, setNombreAnimal] = useState<string>("");
@@ -107,9 +106,7 @@ const Adoption: React.FC = () => {
 
         setLoading(true);
         try {
-            // Find Animal
             const animal = animals.find(a => a.id === idAnimal);
-            // Find New Owner (Client)
             const newOwner = clients.find(c => c.dni.toUpperCase() === dniAdopter.toUpperCase());
 
             if (!animal) {

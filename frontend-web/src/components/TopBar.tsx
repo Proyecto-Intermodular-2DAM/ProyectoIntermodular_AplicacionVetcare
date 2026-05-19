@@ -21,7 +21,6 @@ const TopBar: React.FC = () => {
     return (
         <div className="top-bar-container">
             <div className="top-bar-left">
-                {/* Black box icon with A, as seen in image */}
                 <div className="context-icon-box">
                     A
                 </div>
@@ -29,7 +28,6 @@ const TopBar: React.FC = () => {
             </div>
 
             <div className="top-bar-right">
-                {/* Search bar removed as requested */}
 
                 <div className="notification-button">
                     <IonIcon icon={notificationsOutline} className="notification-icon" />

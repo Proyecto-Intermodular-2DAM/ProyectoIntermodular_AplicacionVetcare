@@ -9,7 +9,6 @@ import '../theme/css/Date.css';
 const DatePage: React.FC = () => {
     const navigate = useNavigate();
 
-    // State for form fields
     const [nombreCliente, setNombreCliente] = useState<string>("");
     const [idAnimal, setIdAnimal] = useState<string>("");
     const [dniCliente, setDniCliente] = useState<string>("");
@@ -63,7 +62,6 @@ const DatePage: React.FC = () => {
             if (client) {
                 setNombreCliente(`${client.first_name} ${client.last_name}`);
                 
-                // Auto-select animal if there's only one
                 const clientAnimals = allAnimals.filter(a => a.client_id === client.id);
                 if (clientAnimals.length === 1) {
                     setIdAnimal(clientAnimals[0].id);
@@ -79,7 +77,6 @@ const DatePage: React.FC = () => {
         setFecha(apt.appointment_date || "");
         setHora(apt.appointment_time || "");
         
-        // Find room and its center
         const room = rooms.find(r => r.id === apt.room_id);
         if (room) {
             setIdCentro(room.center_id || "");
@@ -141,7 +138,6 @@ const DatePage: React.FC = () => {
 
         setLoading(true);
         try {
-            // Resolve Client ID from DNI
             const client = allClients.find(c => c.dni?.toUpperCase() === dniCliente.toUpperCase());
             if (!client) {
                 setMessage("No se encontró el cliente con ese DNI");
@@ -150,7 +146,6 @@ const DatePage: React.FC = () => {
                 return;
             }
 
-            // animalId is already the ID since we use a select dropdown now
             const animalId = idAnimal;
             
             if (!animalId) {
@@ -298,7 +293,7 @@ const DatePage: React.FC = () => {
                             value={idCentro}
                             onChange={(e) => {
                                 setIdCentro(e.target.value);
-                                setIdSala(""); // Reset room when center changes
+                                setIdSala("");
                             }}
                         >
                             <option value="">Seleccionar Centro</option>

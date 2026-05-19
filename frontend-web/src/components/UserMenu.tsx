@@ -32,7 +32,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ profile, onClose }) => {
             </div>
 
             <div className="user-menu-list">
-                {/* Editar Perfil removed as requested by user */}
 
                 <div className="user-menu-item" onClick={handleLogout}>
                     <IonIcon icon={logOutOutline} style={{ transform: 'rotate(180deg)' }} />

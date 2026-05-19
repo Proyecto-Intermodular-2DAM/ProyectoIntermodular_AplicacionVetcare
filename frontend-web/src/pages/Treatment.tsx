@@ -57,15 +57,12 @@ const Treatment: React.FC = () => {
         fetchData();
     }, []);
 
-    // Auto-fill and animal filter logic
     React.useEffect(() => {
         if (dniCliente.length >= 8) {
             const client = allClients.find(c => c.dni?.toUpperCase() === dniCliente.toUpperCase());
             if (client) {
-                // Filter animals for this client
                 const clientAnimals = allAnimals.filter(a => a.client_id === client.id);
                 
-                // If current idAnimal is not in this client's animals, reset or auto-select
                 const currentAnimalValid = clientAnimals.some(a => a.id === idAnimal);
                 if (!currentAnimalValid) {
                     if (clientAnimals.length === 1) {
@@ -150,7 +147,6 @@ const Treatment: React.FC = () => {
 
         setLoading(true);
         try {
-            // Find Appointment
             const appointment = appointmentsList.find(a => 
                 a.client?.dni.toUpperCase() === dniCliente.toUpperCase() &&
                 a.animal_id === idAnimal
