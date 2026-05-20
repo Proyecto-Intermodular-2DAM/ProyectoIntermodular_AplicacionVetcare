@@ -17,7 +17,7 @@ Nuestro proyecto consiste en el desarrollo de una aplicación multiplataforma qu
 
     Permitirá consultar y gestionar información personal, ver el historial médico de sus mascotas, consultar y pedir citas, recibir recordatorios, acceder a información sobre tratamientos y explorar animales disponibles para adopción.
 
-## [1 Objetivos principales de la aplicación](project_documentation\objetivosPrincipales.md)
+## [1 Objetivos principales de la aplicación](project_documentation/objetivosPrincipales.md)
 
 ## [2. Funcionalidades principales de la aplicación](project_documentation/funcionalidadesDeLaAplicacion.md)
 
@@ -29,7 +29,7 @@ Nuestro proyecto consiste en el desarrollo de una aplicación multiplataforma qu
 
 ## [6. Arboles de Navegación](project_documentation/Arbolesdenavegación.md)
 
-## [7. Diagrama de casos de Uso](project_documentation\diagramaDeCasosDeUso.md)
+## [7. Diagrama de casos de Uso](project_documentation/diagramaDeCasosDeUso.md)
 
 ## [8.Justificación del modelo de la base de datos](project_documentation/JustificaciónDelModeloDeBaseDeDatos.md)
 
@@ -39,4 +39,4 @@ Nuestro proyecto consiste en el desarrollo de una aplicación multiplataforma qu
 
 ## [11.Mockup & Wireframe](project_documentation/Mockup&Wireframe.md)
 
-## [12.Casos de Prueba](project_documentation\CasosDePrueba.md)
+## [12.Casos de Prueba](project_documentation/CasosDePrueba.md)
