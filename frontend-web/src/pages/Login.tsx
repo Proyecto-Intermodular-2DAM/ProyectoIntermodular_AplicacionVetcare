@@ -117,18 +117,6 @@ const Login: React.FC = () => {
                                 <IonIcon icon={paw} className="login-icon" />
 
                                 <h1 className="login-title">Iniciar Sesión</h1>
-
-                                <p className="login-signup-text">
-                                    No tienes una cuenta?
-                                    <button
-                                        type="button"
-                                        onClick={handleSignUp}
-                                        className="login-signup-button"
-                                        aria-label="Sign up for a new account"
-                                    >
-                                        Registrarse
-                                    </button>
-                                </p>
                             </header>
 
                             {/* --- Formulario --- */}
